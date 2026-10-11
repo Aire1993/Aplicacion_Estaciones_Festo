@@ -35,6 +35,10 @@
     from { opacity: 0; }
     to   { opacity: 1; }
   }
+  @keyframes card-in {
+    from { opacity: 0; translate: 0 14px; }
+    to   { opacity: 1; translate: 0 0; }
+  }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ---------- Barra superior ---------- */
@@ -58,7 +62,9 @@
     color: var(--festo-blue);
     text-decoration: none;
     line-height: 1;
+    transition: opacity 0.25s ease;
   }
+  .brand:hover { opacity: 0.7; }
   .brand-sub {
     color: var(--text-muted);
     font-size: 14px;
@@ -136,15 +142,15 @@
     transition: box-shadow 0.3s ease, transform 0.3s var(--ease-out);
   }
   .cards.enter .card {
-    animation: view-in 0.55s var(--ease-out) backwards;
+    animation: card-in 0.55s var(--ease-out) backwards;
     animation-delay: calc(var(--i, 0) * 90ms);
   }
   .card:hover,
   .card:focus-visible {
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
     transform: translateY(-3px);
-    outline: none;
   }
+  .card:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
   .card-img {
     aspect-ratio: 3 / 4;
     background: var(--bg-soft);
@@ -275,9 +281,11 @@
     width: 40px;
     height: 40px;
     margin: -20px 0 0 -20px;
-    border: 3px solid rgba(0, 145, 220, 0.25);
+    border: 4px solid rgba(0, 145, 220, 0.25);
     border-top-color: var(--festo-blue);
     border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     opacity: 0;
     transition: opacity 0.2s ease;
     pointer-events: none;
@@ -416,8 +424,9 @@
     color: #fff;
   }
   .player.is-settled .player-stage {
-    transition: left 0.35s var(--ease-out), top 0.35s var(--ease-out), width 0.35s var(--ease-out);
+    transition: left 0.2s var(--ease-out), top 0.2s var(--ease-out), width 0.2s var(--ease-out);
   }
+  .player.is-settled .player-video { transition: height 0.2s var(--ease-out); }
   .player-head,
   .player-controls {
     display: flex;
@@ -461,13 +470,20 @@
     display: block;
     object-fit: contain;
   }
-  .player-video .media-spinner { opacity: 0; }
+  .player-video .media-spinner { opacity: 0; z-index: 1; }
   .player.is-buffering .player-video .media-spinner {
     opacity: 1;
     animation: spin 0.8s linear infinite;
   }
   .player-controls { height: 56px; }
   .player.is-fallback .player-controls { visibility: hidden; }
+  .focus-guard {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+  }
 
   .pbtn {
     flex-shrink: 0;
@@ -561,7 +577,8 @@
   }
   @media (max-width: 700px) {
     .cards { grid-template-columns: 1fr; }
-    .card-img { aspect-ratio: 4 / 3; }
+    .card-img { aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; }
+    .card-img img { width: 58%; height: auto; padding: 0; }
     h1 { font-size: 30px; }
     .hero-inner { padding: 28px 16px; }
     main { padding: 28px 16px 48px; }
@@ -582,6 +599,7 @@
       transition-duration: 0.01ms !important;
       transition-delay: 0ms !important;
     }
+    .media.is-counting .media-progress span { transition-duration: var(--preview-ms, 3000ms) !important; }
   }
 </style>
 </head>
@@ -668,6 +686,7 @@
         <svg class="when-fs" viewBox="0 0 20 20"><path d="M8 3v5H3M17 8h-5V3M12 17v-5h5M3 12h5v5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
       </button>
     </div>
+    <span class="focus-guard" id="player-guard" tabindex="0"></span>
   </div>
 </div>
 
@@ -894,6 +913,7 @@
   var fsBtn = $("player-fs");
   var closeBtn = $("player-close");
   var sentinel = $("viewport-sentinel");
+  var root = document.documentElement;
 
   media.style.setProperty("--preview-ms", PREVIEW_MS + "ms");
 
@@ -912,6 +932,8 @@
   var fallback = false;        // el navegador no pot reproduir el fitxer directament
   var hovering = false;
   var cooldown = false;        // no tornar a començar fins que el ratolí surti de la imatge
+  var navHold = false;         // després de canviar de pantalla, esperar un moviment real del ratolí
+  var closing = false;
   var closedAt = -1e9;
   var previewTimer = null;
   var resetTimer = null;
@@ -924,6 +946,8 @@
   var fullscreenSupported = !!(document.fullscreenEnabled && stage.requestFullscreen);
   if (!fullscreenSupported) fsBtn.classList.add("hidden");
 
+  function noop() {}
+
   function videoAspect() {
     return video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 16 / 9;
   }
@@ -931,6 +955,8 @@
   function videoSetStation(s) {
     current = s;
     fallback = false;
+    clearTimeout(loadTimer);
+    loadTimer = null;
     media.classList.remove("is-hint");
     playerTitle.textContent = s.title;
     video.src = driveVideo(s.videoId);
@@ -940,8 +966,11 @@
   function clearTimers() {
     clearTimeout(previewTimer);
     clearTimeout(resetTimer);
-    clearTimeout(loadTimer);
-    previewTimer = resetTimer = loadTimer = null;
+    previewTimer = resetTimer = null;
+  }
+
+  function cancelSlotAnims() {
+    if (slot.getAnimations) slot.getAnimations().forEach(function (a) { a.cancel(); });
   }
 
   function playVideo() {
@@ -957,10 +986,12 @@
     }
   }
 
+  // Un sol termini per estació: si el vídeo no arriba a temps, es fa servir el reproductor de Drive.
   function armLoadTimeout() {
-    clearTimeout(loadTimer);
+    if (loadTimer || fallback) return;
     loadTimer = setTimeout(function () {
-      if (video.readyState < 3 && (state === "loading" || state === "expanded")) enterFallback();
+      loadTimer = null;
+      if (video.readyState < 3) enterFallback();
     }, LOAD_TIMEOUT_MS);
   }
 
@@ -968,6 +999,7 @@
     if (fallback || !current) return;
     fallback = true;
     clearTimeout(loadTimer);
+    loadTimer = null;
     if (state === "loading" || state === "preview") {
       stopPreview();
       if (hovering) media.classList.add("is-hint");
@@ -984,6 +1016,7 @@
   });
   video.addEventListener("playing", function () {
     clearTimeout(loadTimer);
+    loadTimer = null;
     media.classList.remove("is-loading");
     player.classList.remove("is-buffering");
     if (state === "loading") {
@@ -997,9 +1030,13 @@
   video.addEventListener("waiting", function () {
     if (state === "expanded") player.classList.add("is-buffering");
   });
+  ["pause", "canplay", "ended", "seeked"].forEach(function (ev) {
+    video.addEventListener(ev, function () { player.classList.remove("is-buffering"); });
+  });
   video.addEventListener("play", syncPlayState);
   video.addEventListener("pause", syncPlayState);
   video.addEventListener("ended", syncPlayState);
+  video.addEventListener("seeked", syncPlayState);
   video.addEventListener("loadedmetadata", syncTime);
   video.addEventListener("seeked", syncTime);
 
@@ -1033,14 +1070,27 @@
   media.addEventListener("pointerenter", function (e) {
     if (e.pointerType === "touch") return;
     hovering = true;
-    // Just després de tancar el reproductor el ratolí pot quedar sobre la imatge.
-    if (performance.now() - closedAt < 800) cooldown = true;
+    // Just després de tancar el reproductor o de canviar de pantalla el ratolí pot quedar
+    // sobre la imatge sense que l'usuari l'hi hagi posat: esperem que es mogui o en surti.
+    if (navHold || performance.now() - closedAt < 800) {
+      cooldown = true;
+      return;
+    }
     startPreview();
+  });
+  media.addEventListener("pointermove", function (e) {
+    if (e.pointerType === "touch" || !navHold) return;
+    navHold = false;
+    if (cooldown && performance.now() - closedAt >= 800) {
+      cooldown = false;
+      startPreview();
+    }
   });
   media.addEventListener("pointerleave", function (e) {
     if (e.pointerType === "touch") return;
     hovering = false;
     cooldown = false;
+    navHold = false;
     media.classList.remove("is-hint");
     stopPreview();
   });
@@ -1058,6 +1108,7 @@
   media.addEventListener("keydown", function (e) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
+      e.stopPropagation();
       media.click();
     }
   });
@@ -1078,7 +1129,7 @@
       var r = entries[entries.length - 1].intersectionRect;
       var left = Math.max(0, r.left), top = Math.max(0, r.top);
       var right = Math.min(w, r.left + r.width), bottom = Math.min(h, r.top + r.height);
-      if (right - left < 240 || bottom - top < 200) cb(full);
+      if (right - left < 1 || bottom - top < 1) cb(full);
       else cb({ left: left, top: top, width: right - left, height: bottom - top });
     });
     io.observe(sentinel);
@@ -1090,7 +1141,7 @@
   function layoutStage(vis) {
     if (document.fullscreenElement) return;
     lastVisible = vis;
-    var margin = vis.width < 600 ? 12 : 32;
+    var margin = vis.width < 600 ? 8 : 32;
     var head = 52, controls = 56;
     var aspect = fallback ? 16 / 9 : videoAspect();
     var availW = vis.width - margin * 2;
@@ -1098,9 +1149,11 @@
     var w = Math.min(availW, Math.max(availH, 120) * aspect, 1280);
     var h = w / aspect;
     var total = head + h + controls;
+    var top = Math.max(vis.top + 4, vis.top + (vis.height - total) / 2);
+    top = Math.max(4, Math.min(top, window.innerHeight - total - 4));
     stage.style.width = w + "px";
     stage.style.left = vis.left + (vis.width - w) / 2 + "px";
-    stage.style.top = Math.max(vis.top + 4, vis.top + (vis.height - total) / 2) + "px";
+    stage.style.top = top + "px";
     slot.style.height = h + "px";
   }
 
@@ -1109,16 +1162,33 @@
     pollTimer = setInterval(function () {
       measureVisible(function (vis) {
         if (state !== "expanded" || !lastVisible) return;
+        // Si el visitant fa desaparèixer gairebé tot el marc, mantenim la mida que tenia.
+        if (vis.height < 200 && vis.height < window.innerHeight - 2) return;
         if (Math.abs(vis.top - lastVisible.top) > 4 || Math.abs(vis.height - lastVisible.height) > 4 ||
             Math.abs(vis.left - lastVisible.left) > 4 || Math.abs(vis.width - lastVisible.width) > 4) {
           layoutStage(vis);
         }
       });
-    }, 350);
+    }, 100);
   }
   function stopPolling() {
     clearInterval(pollTimer);
     pollTimer = null;
+  }
+
+  // Bloqueja el desplaçament sense que la pàgina salti quan desapareix la barra de desplaçament.
+  function lockScroll() {
+    var sbw = window.innerWidth - root.clientWidth;
+    root.style.paddingRight = sbw > 0 ? sbw + "px" : "";
+    root.classList.add("player-open");
+  }
+  function unlockScroll() {
+    root.classList.remove("player-open");
+    root.style.paddingRight = "";
+  }
+
+  function focusQuietly(el) {
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
   }
 
   // --- Reproductor ampliat ---
@@ -1130,43 +1200,63 @@
     if (video.parentNode === slot) mediaVideo.appendChild(video);
     if (!iframe) {
       iframe = document.createElement("iframe");
-      iframe.setAttribute("allow", "autoplay; fullscreen");
-      iframe.setAttribute("allowfullscreen", "");
+      // Només demanem els permisos que aquesta pàgina té (evita avisos a la consola).
+      var fp = document.permissionsPolicy || document.featurePolicy;
+      var allow = ["autoplay", "fullscreen"].filter(function (f) {
+        return !fp || !fp.allowsFeature || fp.allowsFeature(f);
+      });
+      if (allow.length) iframe.setAttribute("allow", allow.join("; "));
+      if (allow.indexOf("fullscreen") >= 0) iframe.setAttribute("allowfullscreen", "");
       iframe.title = "Vídeo";
     }
     var src = driveVideoPlayer(current.videoId);
     if (iframe.getAttribute("src") !== src) iframe.src = src;
     if (iframe.parentNode !== slot) slot.appendChild(iframe);
+    if (stage.contains(document.activeElement) && document.activeElement !== closeBtn) focusQuietly(closeBtn);
     if (lastVisible) layoutStage(lastVisible);
   }
 
   function expand() {
     if (state === "expanded" || !current) return;
+    cancelSlotAnims();
+    closing = false;
+    navHold = false;
     clearTimeout(previewTimer);
     clearTimeout(resetTimer);
-    var from = containRect(mediaVideo.getBoundingClientRect(), fallback ? 16 / 9 : videoAspect());
+    var aspect = fallback ? 16 / 9 : videoAspect();
+    var from = containRect(mediaVideo.getBoundingClientRect(), aspect);
     state = "expanded";
     media.classList.remove("is-loading", "is-playing", "is-counting", "is-hint");
     var token = ++openToken;
 
+    // El reproductor es prepara invisible i es mostra quan ja té la mida i la posició.
     player.hidden = false;
+    stage.style.visibility = "hidden";
     player.classList.remove("is-open", "is-settled", "is-ended");
-    document.documentElement.classList.add("player-open");
+    lockScroll();
     if (fallback) {
       useIframe();
     } else {
       player.classList.remove("is-fallback");
-      slot.appendChild(video);
       if (video.readyState < 3) player.classList.add("is-buffering");
       if (video.paused) playVideo();
     }
     syncPlayState();
     syncTime();
 
-    measureVisible(function (vis) {
+    measureVisible(function open(vis, retried) {
       if (token !== openToken) return;
+      // Si el marc de Google Sites només es veu en part, el portem a la vista abans d'ampliar.
+      if (!retried && vis.height < Math.min(window.innerHeight - 2, 520)) {
+        try { media.scrollIntoView({ block: "center" }); } catch (e) {}
+        from = containRect(mediaVideo.getBoundingClientRect(), aspect);
+        measureVisible(function (v2) { open(v2, true); });
+        return;
+      }
+      if (!fallback && video.parentNode !== slot) slot.appendChild(video);
       layoutStage(vis);
       var to = slot.getBoundingClientRect();
+      stage.style.visibility = "";
       void player.offsetWidth;
       player.classList.add("is-open");
       if (slot.animate && to.width > 0) {
@@ -1179,19 +1269,22 @@
       setTimeout(function () {
         if (token === openToken) player.classList.add("is-settled");
       }, 600);
-      try { closeBtn.focus({ preventScroll: true }); } catch (e) { closeBtn.focus(); }
+      focusQuietly(fallback ? closeBtn : playBtn);
       startPolling();
       startRaf();
     });
   }
 
   function finishClose() {
+    closing = false;
+    cancelSlotAnims();
     stopPolling();
     stopRaf();
-    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(noop);
     player.hidden = true;
+    stage.style.visibility = "";
     player.classList.remove("is-open", "is-settled", "is-buffering", "is-fallback", "is-fullscreen");
-    document.documentElement.classList.remove("player-open");
+    unlockScroll();
     if (iframe && iframe.parentNode) {
       iframe.parentNode.removeChild(iframe);
       iframe.removeAttribute("src");
@@ -1201,26 +1294,31 @@
   }
 
   function close() {
-    if (state !== "expanded") return;
+    if (state !== "expanded" || closing) return;
+    closing = true;
     var token = ++openToken;
     stopPolling();
     stopRaf();
-    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+    var wasFullscreen = !!document.fullscreenElement;
+    if (wasFullscreen && document.exitFullscreen) document.exitFullscreen().catch(noop);
     var withVideo = video.parentNode === slot;
+    // Si encara s'estava obrint, el tancament continua des d'on era.
+    var cur = getComputedStyle(slot).transform;
+    cancelSlotAnims();
     var last = slot.getBoundingClientRect();
     var to = containRect(mediaVideo.getBoundingClientRect(), fallback ? 16 / 9 : videoAspect());
     player.classList.remove("is-open", "is-settled");
     var done = false;
+    var anim = null;
     function finish() {
       if (done || token !== openToken) return;
       done = true;
-      if (anim) anim.cancel();
       if (withVideo) {
         // El vídeo torna al seu lloc i es fon amb la foto.
         mediaVideo.appendChild(video);
-        media.classList.add("is-playing");
-        void media.offsetWidth;
-        media.classList.remove("is-playing");
+        if (mediaVideo.animate) {
+          mediaVideo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED_MOTION ? 1 : 450, easing: "ease" });
+        }
         resetTimer = setTimeout(function () {
           if (state === "idle") {
             video.pause();
@@ -1230,15 +1328,17 @@
       }
       finishClose();
       cooldown = hovering;
-      try { media.focus({ preventScroll: true }); } catch (e) {}
+      focusQuietly(media);
     }
-    var anim = null;
-    if (slot.animate && last.width > 0) {
+    if (slot.animate && last.width > 0 && !wasFullscreen) {
       var s = to.width / last.width;
       anim = slot.animate([
-        { transform: "none" },
+        { transform: cur && cur !== "none" ? cur : "none" },
         { transform: "translate(" + (to.left - last.left) + "px," + (to.top - last.top) + "px) scale(" + s + ")" }
       ], { duration: REDUCED_MOTION ? 1 : 460, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
+      anim.onfinish = finish;
+    } else if (slot.animate) {
+      anim = slot.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED_MOTION ? 1 : 300, fill: "forwards" });
       anim.onfinish = finish;
     }
     setTimeout(finish, REDUCED_MOTION ? 20 : 520);
@@ -1250,10 +1350,13 @@
     clearTimers();
     media.classList.remove("is-loading", "is-playing", "is-counting", "is-hint");
     if (state === "expanded") finishClose();
+    closing = false;
+    cancelSlotAnims();
     if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
     video.pause();
     state = "idle";
     cooldown = false;
+    navHold = true;
   }
 
   function togglePlay() {
@@ -1294,12 +1397,20 @@
     rafId = 0;
   }
 
+  // Els clics just quan s'obre (o el segon clic d'un doble clic) no compten.
+  function settledClick(e) {
+    return e.detail <= 1 && player.classList.contains("is-settled");
+  }
+
   playBtn.addEventListener("click", togglePlay);
   slot.addEventListener("click", function (e) {
-    if (e.target === video) togglePlay();
+    if (settledClick(e) && e.target === video) togglePlay();
   });
   closeBtn.addEventListener("click", close);
-  $("player-backdrop").addEventListener("click", close);
+  $("player-backdrop").addEventListener("click", function (e) {
+    if (settledClick(e)) close();
+  });
+  $("player-guard").addEventListener("focus", function () { focusQuietly(closeBtn); });
 
   range.addEventListener("pointerdown", function () { scrubbing = true; });
   range.addEventListener("input", function () {
@@ -1315,15 +1426,15 @@
 
   fsBtn.addEventListener("click", function () {
     if (document.fullscreenElement) {
-      document.exitFullscreen().catch(function () {});
+      document.exitFullscreen().catch(noop);
     } else {
-      stage.requestFullscreen().catch(function () {});
+      stage.requestFullscreen().catch(noop);
     }
   });
   document.addEventListener("fullscreenchange", function () {
     var fs = document.fullscreenElement === stage;
     player.classList.toggle("is-fullscreen", fs);
-    if (!fs && state === "expanded") measureVisible(layoutStage);
+    if (!fs && state === "expanded" && !closing) measureVisible(layoutStage);
   });
 
   document.addEventListener("keydown", function (e) {
@@ -1332,17 +1443,19 @@
     if (e.key === "Escape") {
       e.preventDefault();
       close();
-    } else if ((e.key === " " || e.key === "k") && tag !== "BUTTON" && tag !== "INPUT") {
+    } else if (e.key === "k" || (e.key === " " && tag !== "BUTTON")) {
+      if (fallback) return;
       e.preventDefault();
       togglePlay();
-    } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && tag !== "INPUT" && !fallback) {
+    } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !fallback) {
       e.preventDefault();
       var d = e.key === "ArrowLeft" ? -5 : 5;
       try { video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + d)); } catch (err) {}
     } else if (e.key === "Tab") {
       // Mantenir el focus dins del reproductor.
-      var items = Array.prototype.filter.call(stage.querySelectorAll("button, input"), function (el) {
-        return el.offsetParent !== null && !el.classList.contains("hidden");
+      var items = Array.prototype.filter.call(stage.querySelectorAll("button, input, iframe"), function (el) {
+        return el.offsetParent !== null && !el.classList.contains("hidden") &&
+          getComputedStyle(el).visibility !== "hidden";
       });
       if (!items.length) return;
       var first = items[0], last = items[items.length - 1];
@@ -1352,7 +1465,7 @@
   });
 
   window.addEventListener("resize", function () {
-    if (state === "expanded") measureVisible(layoutStage);
+    if (state === "expanded" && !closing) measureVisible(layoutStage);
   });
 
   // ---------------------------------------------------------------------------
