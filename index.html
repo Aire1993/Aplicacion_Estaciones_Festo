@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estacions de Festo</title>
+<style>
+  :root {
+    --blue: #0091dc;
+    --blue-dark: #0073b0;
+    --blue-darker: #005a8c;
+    --text: #333333;
+    --text-muted: #5c6670;
+    --gray-bg: #f2f3f5;
+    --border: #d3d8dd;
+    --white: #ffffff;
+    --font: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body { margin: 0; }
+
+  body {
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img { display: block; max-width: 100%; }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+  }
+
+  .accent { height: 4px; background: var(--blue); }
+
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 56px;
+  }
+
+  h1 {
+    margin: 0 0 32px;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  h1:focus { outline: none; }
+
+  /* ---------- Pantalla inicial: targetes de les estacions ---------- */
+
+  .stations {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    background: var(--white);
+    border: 1px solid var(--border);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card::after {
+    content: "";
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    height: 4px;
+    background: var(--blue);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+
+  .card:hover,
+  .card:focus-visible { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); }
+
+  .card:hover::after,
+  .card:focus-visible::after { transform: scaleX(1); }
+
+  .card__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    padding: 24px;
+    overflow: hidden;
+    background: var(--white);
+  }
+
+  .card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.35s ease;
+  }
+
+  .card:hover .card__media img { transform: scale(1.04); }
+
+  .card__body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 88px;
+    padding: 20px 24px;
+    background: var(--gray-bg);
+  }
+
+  .card__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    transition: color 0.2s ease;
+  }
+
+  .card:hover .card__title,
+  .card:focus-visible .card__title { color: var(--blue); }
+
+  .card__arrow {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    color: var(--blue);
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover .card__arrow { transform: translateX(4px); }
+
+  /* ---------- Pantalla d'estació ---------- */
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .breadcrumb a { color: var(--blue); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .detail {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 40px;
+    align-items: start;
+  }
+
+  .detail__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    padding: 24px;
+    background: var(--white);
+    border: 1px solid var(--border);
+  }
+
+  .detail__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .detail__text p {
+    margin: 0 0 16px;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .detail__text p:last-child { margin-bottom: 0; }
+
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 14px 20px;
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    color: var(--white);
+    text-decoration: none;
+    background: var(--blue);
+    transition: background 0.15s ease;
+  }
+
+  .btn:hover { background: var(--blue-dark); }
+
+  .btn[aria-current="true"] { background: var(--blue-darker); }
+
+  .btn[aria-current="true"]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+    border-bottom: 0;
+    border-top-color: var(--blue-darker);
+  }
+
+  .panel {
+    margin-top: 24px;
+    padding: 32px;
+    background: var(--gray-bg);
+    border-top: 4px solid var(--blue);
+  }
+
+  .panel h2 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .panel__empty { margin: 0; color: var(--text-muted); }
+
+  /* ---------- Adaptació a pantalles petites ---------- */
+
+  @media (max-width: 860px) {
+    .detail { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 24px 16px 40px; }
+    h1 { margin-bottom: 24px; }
+    .stations { grid-template-columns: 1fr; }
+    .actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 32px; }
+    .btn[aria-current="true"]::after { display: none; }
+    .panel { padding: 24px 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="accent"></div>
+<main id="app" class="page"></main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ===================================================================
+  //  CONTINGUT
+  //  - driveId: identificador de la imatge a Google Drive (ha d'estar
+  //    compartida com "Qualsevol persona amb l'enllaç").
+  //  - localImage: còpia de la imatge dins del repositori (reserva).
+  //  - description: paràgrafs del text descriptiu.
+  //  - sections: contingut HTML de cada botó (buit = "en preparació").
+  // ===================================================================
+
+  var STATIONS = [
+    {
+      slug: 'distributing-conveyor-station',
+      title: 'Distributing Conveyor Station',
+      driveId: '1V2z0bdAIv0TssQggLAq7PGRHndPkw1MF',
+      localImage: 'img/distributing-conveyor-station.jpg',
+      description: [
+        "L'estació de distribució/transportadora separa les peces emmagatzemades en el tub del magatzem apilador. Un cilindre de doble efecte empeny les peces cap a fora d'una en una.",
+        "El mòdul transportador porta la peça cap a la dreta o cap a l'esquerra. Si és necessari, la peça pot detenir-se i separar-se en la cinta transportadora."
+      ],
+      sections: { esquemes: '', 'entrades-sortides-plc': '', grafcet: '', components: '' }
+    },
+    {
+      slug: 'pick-and-place-station',
+      title: 'Pick and Place Station',
+      driveId: '1d2sBMzKCqGozHc4iNX-eaXaCGb2Of2Xc',
+      localImage: 'img/pick-and-place-station.jpg',
+      description: [
+        "Les carcasses de les peces de treball col·locades en el transportador es detecten mitjançant sensors difusos o barreres fotoelèctriques. La peça de treball es transporta fins al separador elèctric situat en la cinta transportadora, on és detectada per un segon sensor difús. El mòdul recull una inserció de la peça de treball de la safata lliscant i el col·loca sobre la carcassa de la peça de treball.",
+        "La peça completa (carcassa i inserció) és alliberada pel separador i transportada fins al final de la cinta transportadora. Una barrera fotoelèctrica detecta la peça al final de la cinta transportadora."
+      ],
+      sections: { esquemes: '', 'entrades-sortides-plc': '', grafcet: '', components: '' }
+    },
+    {
+      slug: 'sorting-station',
+      title: 'Sorting Station',
+      driveId: '11-R10iEWEhm_nlZXY9dhZEHOaxzN-mjR',
+      localImage: 'img/sorting-station.jpg',
+      description: [
+        "L'estació distribueix les peces en tres rampes. Les peces col·locades a l'inici de la cinta transportadora són detectades per una barrera fotoelèctrica en forma de forqueta.",
+        "Les peces són detingudes per un topall pneumàtic per a determinar les seves característiques. Els sensors del mòdul de detecció determinen el material i el color de les peces (negre, vermell o metal·litzat).",
+        "Les peces es classifiquen en les rampes corresponents mitjançant deflectors accionats elèctricament. Un sensor retrorreflectante supervisa els nivells d'ompliment de les rampes."
+      ],
+      sections: { esquemes: '', 'entrades-sortides-plc': '', grafcet: '', components: '' }
+    }
+  ];
+
+  var SECTIONS = [
+    { id: 'esquemes', label: 'Esquemes' },
+    { id: 'entrades-sortides-plc', label: 'Entrades/Sortides PLC' },
+    { id: 'grafcet', label: 'Grafcet' },
+    { id: 'components', label: 'Components' }
+  ];
+
+  var HOME_TITLE = 'Estacions de Festo';
+
+  // ===================================================================
+
+  var app = document.getElementById('app');
+
+  var ARROW =
+    '<svg class="card__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M9 5l7 7-7 7"/></svg>';
+
+  function esc(value) {
+    return String(value).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // Primer s'intenta carregar la imatge des de Drive; si falla, es prova
+  // la miniatura de Drive i, finalment, la còpia local del repositori.
+  function imageHtml(station, loading) {
+    var sources = [
+      'https://lh3.googleusercontent.com/d/' + station.driveId,
+      'https://drive.google.com/thumbnail?id=' + station.driveId + '&sz=w1200',
+      station.localImage
+    ];
+    return '<img src="' + esc(sources[0]) + '"' +
+      ' data-fallbacks="' + esc(sources.slice(1).join('|')) + '"' +
+      ' alt="' + esc(station.title) + '" loading="' + loading + '" decoding="async">';
+  }
+
+  document.addEventListener('error', function (event) {
+    var img = event.target;
+    if (!(img instanceof HTMLImageElement) || !img.dataset.fallbacks) return;
+    var rest = img.dataset.fallbacks.split('|');
+    var next = rest.shift();
+    img.dataset.fallbacks = rest.join('|');
+    img.src = next;
+  }, true);
+
+  function renderHome() {
+    document.title = HOME_TITLE;
+    app.innerHTML =
+      '<h1 tabindex="-1">' + esc(HOME_TITLE) + '</h1>' +
+      '<ul class="stations">' +
+        STATIONS.map(function (station) {
+          return '<li>' +
+            '<a class="card" href="#/' + station.slug + '">' +
+              '<div class="card__media">' + imageHtml(station, 'lazy') + '</div>' +
+              '<div class="card__body">' +
+                '<h2 class="card__title">' + esc(station.title) + '</h2>' + ARROW +
+              '</div>' +
+            '</a>' +
+          '</li>';
+        }).join('') +
+      '</ul>';
+  }
+
+  function renderStation(station) {
+    document.title = station.title + ' · ' + HOME_TITLE;
+    app.innerHTML =
+      '<nav class="breadcrumb" aria-label="Ruta de navegació">' +
+        '<a href="#/">' + esc(HOME_TITLE) + '</a>' +
+        '<span aria-hidden="true">›</span>' +
+        '<span aria-current="page">' + esc(station.title) + '</span>' +
+      '</nav>' +
+      '<h1 tabindex="-1">' + esc(station.title) + '</h1>' +
+      '<div class="detail">' +
+        '<div class="detail__media">' + imageHtml(station, 'eager') + '</div>' +
+        '<div class="detail__text">' +
+          station.description.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+        '</div>' +
+      '</div>' +
+      '<nav class="actions" aria-label="Apartats de l\'estació">' +
+        SECTIONS.map(function (s) {
+          return '<a class="btn" href="#/' + station.slug + '/' + s.id + '"' +
+            ' data-section="' + s.id + '">' + esc(s.label) + '</a>';
+        }).join('') +
+      '</nav>' +
+      '<div id="panel-slot"></div>';
+  }
+
+  // En canviar de botó només s'actualitzen els botons i el panell, així la
+  // imatge i el text de l'estació no es tornen a carregar.
+  function renderSection(station, section) {
+    var buttons = app.querySelectorAll('.actions .btn');
+    for (var i = 0; i < buttons.length; i++) {
+      if (section && buttons[i].getAttribute('data-section') === section.id) {
+        buttons[i].setAttribute('aria-current', 'true');
+      } else {
+        buttons[i].removeAttribute('aria-current');
+      }
+    }
+
+    var slot = document.getElementById('panel-slot');
+    if (!section) {
+      slot.innerHTML = '';
+      return;
+    }
+    slot.innerHTML =
+      '<section id="panel" class="panel" aria-label="' + esc(section.label) + '">' +
+        '<h2>' + esc(section.label) + '</h2>' +
+        (station.sections[section.id] || '<p class="panel__empty">Contingut en preparació.</p>') +
+      '</section>';
+  }
+
+  var currentSlug;
+
+  function route() {
+    var parts = location.hash.replace(/^#\/?/, '').split('/');
+    var station = STATIONS.filter(function (s) { return s.slug === parts[0]; })[0];
+    var section = station && SECTIONS.filter(function (s) { return s.id === parts[1]; })[0];
+    var slug = station ? station.slug : '';
+    var pageChanged = slug !== currentSlug;
+
+    if (pageChanged) {
+      if (station) renderStation(station);
+      else renderHome();
+    }
+    if (station) renderSection(station, section);
+
+    if (pageChanged && currentSlug !== undefined) {
+      window.scrollTo(0, 0);
+      app.querySelector('h1').focus({ preventScroll: true });
+    } else if (!pageChanged && section) {
+      document.getElementById('panel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    currentSlug = slug;
+  }
+
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
