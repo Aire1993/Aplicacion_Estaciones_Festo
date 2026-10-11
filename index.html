@@ -13,6 +13,7 @@
     --bg: #ffffff;
     --bg-soft: #f2f3f5;
     --border: #d3d8dd;
+    --ease-out: cubic-bezier(0.22, 0.8, 0.24, 1);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,8 +25,19 @@
     font-size: 16px;
     line-height: 1.6;
   }
+  html.player-open { overflow: hidden; }
 
-  /* ---------- Capçalera ---------- */
+  @keyframes view-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Barra superior ---------- */
   .topbar {
     background: var(--bg);
     border-bottom: 1px solid var(--border);
@@ -33,16 +45,19 @@
   .topbar-inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 14px 24px;
+    padding: 12px 24px;
+    min-height: 72px;
     display: flex;
     align-items: center;
     gap: 12px;
   }
   .brand {
     font-weight: 700;
-    font-size: 22px;
+    font-size: 24px;
     letter-spacing: 0.5px;
     color: var(--festo-blue);
+    text-decoration: none;
+    line-height: 1;
   }
   .brand-sub {
     color: var(--text-muted);
@@ -50,7 +65,25 @@
     border-left: 1px solid var(--border);
     padding-left: 12px;
   }
+  .logo-link {
+    display: inline-flex;
+    align-items: center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .logo-link:hover { opacity: 0.7; }
+  .logo-link:focus-visible,
+  .brand:focus-visible {
+    outline: 2px solid var(--festo-blue);
+    outline-offset: 4px;
+  }
+  .school-link { margin-left: auto; }
+  .school-link img {
+    display: block;
+    height: 44px;
+    width: auto;
+  }
 
+  /* ---------- Banda del títol ---------- */
   .hero {
     background: var(--bg-soft);
     border-bottom: 4px solid var(--festo-blue);
@@ -60,6 +93,7 @@
     margin: 0 auto;
     padding: 40px 24px 36px;
   }
+  .hero-inner.enter { animation: view-in 0.5s var(--ease-out) backwards; }
   .breadcrumb {
     font-size: 14px;
     color: var(--text-muted);
@@ -83,6 +117,7 @@
     margin: 0 auto;
     padding: 40px 24px 64px;
   }
+  .view.enter { animation: view-in 0.5s var(--ease-out) backwards; }
 
   /* ---------- Pantalla inicial: targetes ---------- */
   .cards {
@@ -98,12 +133,16 @@
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s var(--ease-out);
+  }
+  .cards.enter .card {
+    animation: view-in 0.55s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 90ms);
   }
   .card:hover,
   .card:focus-visible {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
     outline: none;
   }
   .card-img {
@@ -114,11 +153,13 @@
   .card-img img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    padding: 28px;
+    object-fit: contain;
     display: block;
-    transition: transform 0.3s ease;
+    mix-blend-mode: multiply; /* el fons blanc de la foto es fon amb el gris del requadre */
+    transition: transform 0.4s var(--ease-out);
   }
-  .card:hover .card-img img { transform: scale(1.03); }
+  .card:hover .card-img img { transform: scale(1.04); }
   .card-body {
     padding: 20px 20px 24px;
     border-top: 4px solid var(--festo-blue);
@@ -142,22 +183,16 @@
     background: var(--festo-blue);
     color: #fff;
     font-size: 18px;
+    transition: transform 0.3s var(--ease-out), background 0.3s ease;
   }
+  .card:hover .arrow { transform: translateX(4px); background: var(--festo-blue-dark); }
 
-  /* ---------- Pantalla de detall ---------- */
+  /* ---------- Fitxa de l'estació ---------- */
   .detail {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: 40px;
     align-items: start;
-  }
-  .detail-img {
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-  }
-  .detail-img img {
-    width: 100%;
-    display: block;
   }
   .detail-text h2 {
     font-size: 24px;
@@ -168,6 +203,115 @@
   }
   .detail-text p { margin-bottom: 16px; }
 
+  /* Imatge amb vídeo */
+  .media {
+    position: relative;
+    min-height: 200px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+  }
+  .media:hover { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12); }
+  .media:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
+  .media > img {
+    width: 100%;
+    display: block;
+  }
+  .media-video {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+  }
+  .media-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .media.is-playing .media-video { opacity: 1; }
+
+  .media-badge {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 8px;
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transition: opacity 0.3s ease, transform 0.3s var(--ease-out);
+    pointer-events: none;
+  }
+  .media-badge .icon {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--festo-blue);
+    color: #fff;
+    border-radius: 50%;
+  }
+  .media-badge .icon svg { width: 10px; height: 10px; margin-left: 2px; }
+  .media-badge .hint { display: none; }
+  .media.is-hint .media-badge .label { display: none; }
+  .media.is-hint .media-badge .hint { display: inline; }
+  .media.is-playing .media-badge,
+  .media.is-loading .media-badge { opacity: 0; transform: translateY(6px); }
+
+  .media-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 3px solid rgba(0, 145, 220, 0.25);
+    border-top-color: var(--festo-blue);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+  .media.is-loading .media-spinner {
+    opacity: 1;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .media-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: rgba(0, 145, 220, 0.18);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .media-progress span {
+    display: block;
+    height: 100%;
+    background: var(--festo-blue);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .media.is-playing .media-progress { opacity: 1; }
+  .media.is-counting .media-progress span {
+    transform: scaleX(1);
+    transition: transform var(--preview-ms, 3000ms) linear;
+  }
+
+  /* Botons */
   .buttons {
     margin-top: 48px;
     display: grid;
@@ -184,14 +328,25 @@
     border: 2px solid var(--festo-blue);
     cursor: pointer;
     text-align: center;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s var(--ease-out);
   }
-  .btn:hover { background: var(--festo-blue-dark); border-color: var(--festo-blue-dark); }
+  .btn:hover { background: var(--festo-blue-dark); border-color: var(--festo-blue-dark); transform: translateY(-2px); }
+  .btn:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
   .btn.active {
     background: var(--bg);
     color: var(--festo-blue);
+    border-color: var(--festo-blue);
   }
 
+  /* Panell de contingut (s'obre sota els botons) */
+  .panel-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.4s var(--ease-out), opacity 0.35s ease;
+  }
+  .panel-wrap.open { grid-template-rows: 1fr; opacity: 1; }
+  .panel-inner { overflow: hidden; min-height: 0; }
   .panel {
     margin-top: 24px;
     padding: 24px;
@@ -204,6 +359,7 @@
     margin-bottom: 8px;
   }
   .panel p { color: var(--text-muted); }
+  .panel.swap { animation: fade-in 0.35s ease; }
 
   .back {
     display: inline-block;
@@ -212,21 +368,191 @@
     text-decoration: none;
     font-weight: 600;
     cursor: pointer;
+    transition: transform 0.25s var(--ease-out);
   }
-  .back:hover { text-decoration: underline; }
+  .back:hover { text-decoration: underline; transform: translateX(-4px); }
 
-  footer {
+  /* ---------- Peu de pàgina (contingut pendent) ---------- */
+  .site-footer {
     border-top: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 13px;
   }
-  footer div {
+  .footer-inner {
     max-width: 1200px;
+    min-height: 64px;
     margin: 0 auto;
     padding: 20px 24px;
   }
 
   .hidden { display: none !important; }
+
+  /* ---------- Reproductor ampliat ---------- */
+  .viewport-sentinel {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .player[hidden] { display: none; }
+  .player {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+  }
+  .player-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 22, 34, 0.9);
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  .player.is-open .player-backdrop { opacity: 1; }
+  .player-stage {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+  }
+  .player.is-settled .player-stage {
+    transition: left 0.35s var(--ease-out), top 0.35s var(--ease-out), width 0.35s var(--ease-out);
+  }
+  .player-head,
+  .player-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s var(--ease-out);
+  }
+  .player.is-open .player-head,
+  .player.is-open .player-controls {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.2s;
+  }
+  .player-head {
+    height: 52px;
+    justify-content: space-between;
+  }
+  .player-title {
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .player-video {
+    position: relative;
+    background: #fff;
+    transform-origin: 0 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+  }
+  .player-video video,
+  .player-video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    object-fit: contain;
+  }
+  .player-video .media-spinner { opacity: 0; }
+  .player.is-buffering .player-video .media-spinner {
+    opacity: 1;
+    animation: spin 0.8s linear infinite;
+  }
+  .player-controls { height: 56px; }
+  .player.is-fallback .player-controls { visibility: hidden; }
+
+  .pbtn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #fff;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s var(--ease-out);
+  }
+  .pbtn:hover { background: rgba(255, 255, 255, 0.14); }
+  .pbtn:active { transform: scale(0.92); }
+  .pbtn:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+  .pbtn svg { width: 20px; height: 20px; }
+  .pbtn.play-btn {
+    background: var(--festo-blue);
+  }
+  .pbtn.play-btn:hover { background: var(--festo-blue-dark); }
+  .pbtn .when-playing,
+  .pbtn .when-ended,
+  .pbtn .when-fs { display: none; }
+  .player.is-playing .play-btn .when-paused { display: none; }
+  .player.is-playing .play-btn .when-playing { display: block; }
+  .player.is-ended .play-btn .when-paused { display: none; }
+  .player.is-ended .play-btn .when-ended { display: block; }
+  .player.is-fullscreen .fs-btn .when-fs { display: block; }
+  .player.is-fullscreen .fs-btn .when-normal { display: none; }
+
+  .player-time {
+    flex-shrink: 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.85);
+    min-width: 36px;
+    text-align: center;
+  }
+  .player-range {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 0;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, var(--festo-blue) 0 var(--p, 0%), rgba(255, 255, 255, 0.28) var(--p, 0%) 100%);
+    cursor: pointer;
+    outline: none;
+  }
+  .player-range:focus-visible { box-shadow: 0 0 0 3px rgba(0, 145, 220, 0.5); }
+  .player-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--festo-blue);
+    transition: transform 0.15s ease;
+  }
+  .player-range:hover::-webkit-slider-thumb { transform: scale(1.2); }
+  .player-range::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--festo-blue);
+  }
+  .player-range::-moz-range-track { background: transparent; }
+
+  .player-stage:fullscreen {
+    position: fixed;
+    inset: 0;
+    width: 100% !important;
+    height: 100%;
+    padding: 0 24px;
+    background: #0a1622;
+  }
+  .player-stage:fullscreen .player-video {
+    flex: 1;
+    height: auto !important;
+  }
 
   /* ---------- Responsive ---------- */
   @media (max-width: 900px) {
@@ -239,10 +565,23 @@
     h1 { font-size: 30px; }
     .hero-inner { padding: 28px 16px; }
     main { padding: 28px 16px 48px; }
-    .topbar-inner, footer div { padding-left: 16px; padding-right: 16px; }
+    .topbar-inner, .footer-inner { padding-left: 16px; padding-right: 16px; }
+  }
+  @media (max-width: 520px) {
+    .brand-sub { display: none; }
+    .school-link img { height: 36px; }
+    .player-time.total { display: none; }
   }
   @media (max-width: 420px) {
     .buttons { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
   }
 </style>
 </head>
@@ -250,13 +589,16 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-    <span class="brand">FESTO</span>
+    <a class="brand" href="https://www.festo.com/es/es" target="_blank" rel="noopener noreferrer" title="Festo">FESTO</a>
     <span class="brand-sub">Estacions didàctiques</span>
+    <a class="logo-link school-link" href="https://escoladeltreball.org/ca/" target="_blank" rel="noopener noreferrer" title="Institut Escola del Treball de Barcelona">
+      <img alt="Institut Escola del Treball de Barcelona" src="data:image/png;base64,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">
+    </a>
   </div>
 </header>
 
 <section class="hero">
-  <div class="hero-inner">
+  <div class="hero-inner" id="hero">
     <div class="breadcrumb" id="breadcrumb"></div>
     <h1 id="page-title">Estacions de Festo</h1>
   </div>
@@ -264,12 +606,22 @@
 
 <main>
   <!-- Pantalla inicial -->
-  <section id="home" class="cards"></section>
+  <section id="home" class="view cards"></section>
 
-  <!-- Pantalla de detall -->
-  <section id="station" class="hidden">
+  <!-- Pantalla de l'estació -->
+  <section id="station" class="view hidden">
     <div class="detail">
-      <div class="detail-img"><img id="station-img" alt=""></div>
+      <div class="media" id="media" tabindex="0" role="button" aria-label="Reproduir el vídeo de l'estació">
+        <img id="station-img" alt="">
+        <div class="media-video" id="media-video"></div>
+        <div class="media-spinner" aria-hidden="true"></div>
+        <div class="media-badge" aria-hidden="true">
+          <span class="icon"><svg viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z" fill="currentColor"/></svg></span>
+          <span class="label">Vídeo</span>
+          <span class="hint">Clica per veure el vídeo</span>
+        </div>
+        <div class="media-progress" aria-hidden="true"><span></span></div>
+      </div>
       <div class="detail-text">
         <h2>Descripció</h2>
         <div id="station-desc"></div>
@@ -277,21 +629,68 @@
     </div>
 
     <div class="buttons" id="buttons"></div>
-    <div class="panel hidden" id="panel"></div>
+    <div class="panel-wrap" id="panel-wrap">
+      <div class="panel-inner"><div class="panel" id="panel"></div></div>
+    </div>
 
     <a class="back" href="#">&larr; Tornar a les estacions</a>
   </section>
 </main>
 
-<footer><div>Estacions de Festo</div></footer>
+<!-- Peu de pàgina: contingut pendent -->
+<footer class="site-footer"><div class="footer-inner" id="footer"></div></footer>
+
+<!-- Reproductor de vídeo ampliat -->
+<div class="viewport-sentinel" id="viewport-sentinel" aria-hidden="true"></div>
+<div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="player-title" hidden>
+  <div class="player-backdrop" id="player-backdrop"></div>
+  <div class="player-stage" id="player-stage">
+    <div class="player-head">
+      <span class="player-title" id="player-title"></span>
+      <button class="pbtn close-btn" id="player-close" type="button" aria-label="Tancar el vídeo">
+        <svg viewBox="0 0 20 20"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="player-video" id="player-video">
+      <div class="media-spinner" aria-hidden="true"></div>
+    </div>
+    <div class="player-controls">
+      <button class="pbtn play-btn" id="player-play" type="button" aria-label="Reproduir / Pausar">
+        <svg class="when-paused" viewBox="0 0 20 20"><path d="M6 3.5l11 6.5-11 6.5z" fill="currentColor"/></svg>
+        <svg class="when-playing" viewBox="0 0 20 20"><path d="M5 3h3.5v14H5zM11.5 3H15v14h-3.5z" fill="currentColor"/></svg>
+        <svg class="when-ended" viewBox="0 0 20 20"><path d="M10 4a6 6 0 1 1-5.66 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 3.5v5h5z" fill="currentColor"/></svg>
+      </button>
+      <span class="player-time" id="player-current">0:00</span>
+      <input class="player-range" id="player-range" type="range" min="0" max="0" step="any" value="0" aria-label="Línia de temps">
+      <span class="player-time total" id="player-total">0:00</span>
+      <button class="pbtn fs-btn" id="player-fs" type="button" aria-label="Pantalla completa">
+        <svg class="when-normal" viewBox="0 0 20 20"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <svg class="when-fs" viewBox="0 0 20 20"><path d="M8 3v5H3M17 8h-5V3M12 17v-5h5M3 12h5v5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
-  // Les imatges es carreguen des de Google Drive (els fitxers han de ser públics).
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------------------
+  // Dades
+  // ---------------------------------------------------------------------------
+
+  // Imatges i vídeos es carreguen des de Google Drive (els fitxers han de ser públics).
   function driveImg(id) {
     return "https://drive.google.com/thumbnail?id=" + id + "&sz=w1200";
   }
   function driveImgFallback(id) {
     return "https://lh3.googleusercontent.com/d/" + id + "=w1200";
+  }
+  function driveVideo(id) {
+    return "https://drive.google.com/uc?export=download&id=" + id;
+  }
+  function driveVideoPlayer(id) {
+    return "https://drive.google.com/file/d/" + id + "/preview";
   }
 
   var STATIONS = [
@@ -299,6 +698,7 @@
       slug: "distributing-conveyor",
       title: "Distributing Conveyor Station",
       imageId: "1V2z0bdAIv0TssQggLAq7PGRHndPkw1MF",
+      videoId: "17QP8BIyBUt18p9VaqKIh5JbhtJsJ-tNw",
       description: [
         "L'estació de distribució/transportadora separa les peces emmagatzemades en el tub del magatzem apilador. Un cilindre de doble efecte empeny les peces cap a fora d'una en una.",
         "El mòdul transportador porta la peça cap a la dreta o cap a l'esquerra. Si és necessari, la peça pot detenir-se i separar-se en la cinta transportadora."
@@ -308,6 +708,7 @@
       slug: "pick-and-place",
       title: "Pick and Place Station",
       imageId: "1d2sBMzKCqGozHc4iNX-eaXaCGb2Of2Xc",
+      videoId: "1dqghcQuXWaoBHcUy1dHYOPJmsc0D5PqC",
       description: [
         "Les carcasses de les peces de treball col·locades en el transportador es detecten mitjançant sensors difusos o barreres fotoelèctriques. La peça de treball es transporta fins al separador elèctric situat en la cinta transportadora, on és detectada per un segon sensor difús. El mòdul recull una inserció de la peça de treball de la safata lliscant i el col·loca sobre la carcassa de la peça de treball.",
         "La peça completa (carcassa i inserció) és alliberada pel separador i transportada fins al final de la cinta transportadora. Una barrera fotoelèctrica detecta la peça al final de la cinta transportadora."
@@ -317,6 +718,7 @@
       slug: "sorting",
       title: "Sorting Station",
       imageId: "11-R10iEWEhm_nlZXY9dhZEHOaxzN-mjR",
+      videoId: "1miOvlUw2UlK6ogMasl6DututKDaS3LBJ",
       description: [
         "L'estació distribueix les peces en tres rampes. Les peces col·locades a l'inici de la cinta transportadora són detectades per una barrera fotoelèctrica en forma de forqueta.",
         "Les peces són detingudes per un topall pneumàtic per a determinar les seves característiques. Els sensors del mòdul de detecció determinen el material i el color de les peces (negre, vermell o metal·litzat).",
@@ -334,14 +736,24 @@
     { key: "components", label: "Components" }
   ];
 
-  var home = document.getElementById("home");
-  var station = document.getElementById("station");
-  var pageTitle = document.getElementById("page-title");
-  var breadcrumb = document.getElementById("breadcrumb");
-  var stationImg = document.getElementById("station-img");
-  var stationDesc = document.getElementById("station-desc");
-  var buttonsEl = document.getElementById("buttons");
-  var panel = document.getElementById("panel");
+  // Segons de vídeo petit abans que s'amplii automàticament.
+  var PREVIEW_MS = 3000;
+  // Si el vídeo no comença en aquest temps, es fa servir el reproductor de Google Drive.
+  var LOAD_TIMEOUT_MS = 10000;
+
+  var REDUCED_MOTION = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  // ---------------------------------------------------------------------------
+  // Utilitats
+  // ---------------------------------------------------------------------------
+
+  function $(id) { return document.getElementById(id); }
+
+  function escapeHtml(s) {
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
 
   function setImage(img, id, alt) {
     img.alt = alt;
@@ -352,17 +764,46 @@
     img.src = driveImg(id);
   }
 
-  function escapeHtml(s) {
-    var d = document.createElement("div");
-    d.textContent = s;
-    return d.innerHTML;
+  function restartAnimation(el) {
+    el.classList.remove("enter");
+    void el.offsetWidth;
+    el.classList.add("enter");
   }
 
-  // Targetes de la pantalla inicial
-  STATIONS.forEach(function (s) {
+  function formatTime(t) {
+    if (!isFinite(t) || t < 0) t = 0;
+    var m = Math.floor(t / 60);
+    var s = Math.floor(t % 60);
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  // Rectangle on es veu el contingut d'un vídeo amb object-fit: contain.
+  function containRect(box, aspect) {
+    var w = box.width, h = w / aspect;
+    if (h > box.height) { h = box.height; w = h * aspect; }
+    return { left: box.left + (box.width - w) / 2, top: box.top + (box.height - h) / 2, width: w, height: h };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Pantalles
+  // ---------------------------------------------------------------------------
+
+  var home = $("home");
+  var station = $("station");
+  var hero = $("hero");
+  var pageTitle = $("page-title");
+  var breadcrumb = $("breadcrumb");
+  var stationImg = $("station-img");
+  var stationDesc = $("station-desc");
+  var buttonsEl = $("buttons");
+  var panelWrap = $("panel-wrap");
+  var panel = $("panel");
+
+  STATIONS.forEach(function (s, i) {
     var a = document.createElement("a");
     a.className = "card";
     a.href = "#" + s.slug;
+    a.style.setProperty("--i", i);
     a.innerHTML =
       '<div class="card-img"><img loading="lazy"></div>' +
       '<div class="card-body"><span class="card-title">' + escapeHtml(s.title) + '</span>' +
@@ -373,55 +814,552 @@
 
   function showHome() {
     pageTitle.textContent = "Estacions de Festo";
-    breadcrumb.innerHTML = "Inici";
-    home.classList.remove("hidden");
+    breadcrumb.textContent = "Inici";
     station.classList.add("hidden");
+    home.classList.remove("hidden");
+    restartAnimation(home);
   }
 
   function showStation(s) {
     pageTitle.textContent = s.title;
-    breadcrumb.innerHTML = '<a href="#">Estacions de Festo</a> &rsaquo; ' + escapeHtml(s.title);
+    breadcrumb.innerHTML = '<a href="#">Inici</a> &rsaquo; ' + escapeHtml(s.title);
     setImage(stationImg, s.imageId, s.title);
     stationDesc.innerHTML = s.description.map(function (p) {
       return "<p>" + escapeHtml(p) + "</p>";
     }).join("");
 
     buttonsEl.innerHTML = "";
-    panel.classList.add("hidden");
+    panelWrap.classList.remove("open");
     BUTTONS.forEach(function (b) {
       var btn = document.createElement("button");
       btn.className = "btn";
       btn.type = "button";
       btn.textContent = b.label;
+      btn.setAttribute("aria-expanded", "false");
       btn.addEventListener("click", function () {
-        var active = btn.classList.contains("active");
-        Array.prototype.forEach.call(buttonsEl.children, function (c) { c.classList.remove("active"); });
-        if (active) {
-          panel.classList.add("hidden");
+        var wasActive = btn.classList.contains("active");
+        Array.prototype.forEach.call(buttonsEl.children, function (c) {
+          c.classList.remove("active");
+          c.setAttribute("aria-expanded", "false");
+        });
+        if (wasActive) {
+          panelWrap.classList.remove("open");
           return;
         }
         btn.classList.add("active");
+        btn.setAttribute("aria-expanded", "true");
         var content = s.sections && s.sections[b.key];
         panel.innerHTML = "<h3>" + escapeHtml(b.label) + "</h3>" +
           (content || "<p>Contingut en preparació.</p>");
-        panel.classList.remove("hidden");
+        if (panelWrap.classList.contains("open")) {
+          panel.classList.remove("swap");
+          void panel.offsetWidth;
+          panel.classList.add("swap");
+        }
+        panelWrap.classList.add("open");
       });
       buttonsEl.appendChild(btn);
     });
 
+    videoSetStation(s);
+
     home.classList.add("hidden");
     station.classList.remove("hidden");
+    restartAnimation(station);
   }
 
   function route() {
     var slug = location.hash.replace("#", "");
     var s = STATIONS.filter(function (x) { return x.slug === slug; })[0];
+    videoReset();
     if (s) showStation(s); else showHome();
+    restartAnimation(hero);
     window.scrollTo(0, 0);
   }
 
+  // ---------------------------------------------------------------------------
+  // Vídeo: es reprodueix en passar per sobre de la imatge i s'amplia sol
+  // ---------------------------------------------------------------------------
+
+  var media = $("media");
+  var mediaVideo = $("media-video");
+  var player = $("player");
+  var stage = $("player-stage");
+  var slot = $("player-video");
+  var playerTitle = $("player-title");
+  var playBtn = $("player-play");
+  var range = $("player-range");
+  var curEl = $("player-current");
+  var totEl = $("player-total");
+  var fsBtn = $("player-fs");
+  var closeBtn = $("player-close");
+  var sentinel = $("viewport-sentinel");
+
+  media.style.setProperty("--preview-ms", PREVIEW_MS + "ms");
+
+  var video = document.createElement("video");
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  video.preload = "auto";
+  mediaVideo.appendChild(video);
+
+  var iframe = null;           // reproductor de Google Drive (alternativa)
+  var current = null;          // estació actual
+  var state = "idle";          // idle | loading | preview | expanded
+  var fallback = false;        // el navegador no pot reproduir el fitxer directament
+  var hovering = false;
+  var cooldown = false;        // no tornar a començar fins que el ratolí surti de la imatge
+  var closedAt = -1e9;
+  var previewTimer = null;
+  var resetTimer = null;
+  var loadTimer = null;
+  var pollTimer = null;
+  var rafId = 0;
+  var openToken = 0;
+  var scrubbing = false;
+  var lastVisible = null;
+  var fullscreenSupported = !!(document.fullscreenEnabled && stage.requestFullscreen);
+  if (!fullscreenSupported) fsBtn.classList.add("hidden");
+
+  function videoAspect() {
+    return video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 16 / 9;
+  }
+
+  function videoSetStation(s) {
+    current = s;
+    fallback = false;
+    media.classList.remove("is-hint");
+    playerTitle.textContent = s.title;
+    video.src = driveVideo(s.videoId);
+    video.load();
+  }
+
+  function clearTimers() {
+    clearTimeout(previewTimer);
+    clearTimeout(resetTimer);
+    clearTimeout(loadTimer);
+    previewTimer = resetTimer = loadTimer = null;
+  }
+
+  function playVideo() {
+    var p = video.play();
+    if (p && p.catch) {
+      p.catch(function (err) {
+        // El navegador no deixa començar el vídeo sol: cal un clic.
+        if (err && err.name === "NotAllowedError" && state !== "expanded") {
+          stopPreview();
+          if (hovering) media.classList.add("is-hint");
+        }
+      });
+    }
+  }
+
+  function armLoadTimeout() {
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(function () {
+      if (video.readyState < 3 && (state === "loading" || state === "expanded")) enterFallback();
+    }, LOAD_TIMEOUT_MS);
+  }
+
+  function enterFallback() {
+    if (fallback || !current) return;
+    fallback = true;
+    clearTimeout(loadTimer);
+    if (state === "loading" || state === "preview") {
+      stopPreview();
+      if (hovering) media.classList.add("is-hint");
+    } else if (state === "expanded") {
+      useIframe();
+    }
+  }
+
+  video.addEventListener("error", function () {
+    if (video.getAttribute("src")) enterFallback();
+  });
+  video.addEventListener("loadedmetadata", function () {
+    if (!video.videoWidth) enterFallback();
+  });
+  video.addEventListener("playing", function () {
+    clearTimeout(loadTimer);
+    media.classList.remove("is-loading");
+    player.classList.remove("is-buffering");
+    if (state === "loading") {
+      state = "preview";
+      media.classList.add("is-playing");
+      void media.offsetWidth;
+      media.classList.add("is-counting");
+      previewTimer = setTimeout(expand, PREVIEW_MS);
+    }
+  });
+  video.addEventListener("waiting", function () {
+    if (state === "expanded") player.classList.add("is-buffering");
+  });
+  video.addEventListener("play", syncPlayState);
+  video.addEventListener("pause", syncPlayState);
+  video.addEventListener("ended", syncPlayState);
+  video.addEventListener("loadedmetadata", syncTime);
+  video.addEventListener("seeked", syncTime);
+
+  // --- Vista prèvia sobre la imatge ---
+
+  function startPreview() {
+    if (state !== "idle" || cooldown) return;
+    if (fallback) { media.classList.add("is-hint"); return; }
+    clearTimers();
+    state = "loading";
+    media.classList.add("is-loading");
+    if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
+    try { video.currentTime = 0; } catch (e) {}
+    playVideo();
+    armLoadTimeout();
+  }
+
+  function stopPreview() {
+    if (state !== "loading" && state !== "preview") return;
+    clearTimers();
+    state = "idle";
+    media.classList.remove("is-loading", "is-playing", "is-counting");
+    resetTimer = setTimeout(function () {
+      if (state === "idle") {
+        video.pause();
+        try { video.currentTime = 0; } catch (e) {}
+      }
+    }, 450);
+  }
+
+  media.addEventListener("pointerenter", function (e) {
+    if (e.pointerType === "touch") return;
+    hovering = true;
+    // Just després de tancar el reproductor el ratolí pot quedar sobre la imatge.
+    if (performance.now() - closedAt < 800) cooldown = true;
+    startPreview();
+  });
+  media.addEventListener("pointerleave", function (e) {
+    if (e.pointerType === "touch") return;
+    hovering = false;
+    cooldown = false;
+    media.classList.remove("is-hint");
+    stopPreview();
+  });
+  media.addEventListener("click", function () {
+    if (state === "expanded") return;
+    if (!fallback && state === "idle") {
+      clearTimers();
+      if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
+      try { video.currentTime = 0; } catch (e) {}
+      playVideo();
+      armLoadTimeout();
+    }
+    expand();
+  });
+  media.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      media.click();
+    }
+  });
+
+  // --- Part visible de la pàgina ---
+  // Dins de Google Sites la web va dins d'un marc (iframe) que pot ser més alt que la
+  // pantalla. IntersectionObserver ens diu quina part del marc es veu realment.
+
+  function measureVisible(cb) {
+    var w = window.innerWidth, h = window.innerHeight;
+    var full = { left: 0, top: 0, width: w, height: h };
+    if (!("IntersectionObserver" in window)) { cb(full); return; }
+    var done = false;
+    var io = new IntersectionObserver(function (entries) {
+      if (done) return;
+      done = true;
+      io.disconnect();
+      var r = entries[entries.length - 1].intersectionRect;
+      var left = Math.max(0, r.left), top = Math.max(0, r.top);
+      var right = Math.min(w, r.left + r.width), bottom = Math.min(h, r.top + r.height);
+      if (right - left < 240 || bottom - top < 200) cb(full);
+      else cb({ left: left, top: top, width: right - left, height: bottom - top });
+    });
+    io.observe(sentinel);
+    setTimeout(function () {
+      if (!done) { done = true; io.disconnect(); cb(full); }
+    }, 300);
+  }
+
+  function layoutStage(vis) {
+    if (document.fullscreenElement) return;
+    lastVisible = vis;
+    var margin = vis.width < 600 ? 12 : 32;
+    var head = 52, controls = 56;
+    var aspect = fallback ? 16 / 9 : videoAspect();
+    var availW = vis.width - margin * 2;
+    var availH = vis.height - margin * 2 - head - controls;
+    var w = Math.min(availW, Math.max(availH, 120) * aspect, 1280);
+    var h = w / aspect;
+    var total = head + h + controls;
+    stage.style.width = w + "px";
+    stage.style.left = vis.left + (vis.width - w) / 2 + "px";
+    stage.style.top = Math.max(vis.top + 4, vis.top + (vis.height - total) / 2) + "px";
+    slot.style.height = h + "px";
+  }
+
+  function startPolling() {
+    stopPolling();
+    pollTimer = setInterval(function () {
+      measureVisible(function (vis) {
+        if (state !== "expanded" || !lastVisible) return;
+        if (Math.abs(vis.top - lastVisible.top) > 4 || Math.abs(vis.height - lastVisible.height) > 4 ||
+            Math.abs(vis.left - lastVisible.left) > 4 || Math.abs(vis.width - lastVisible.width) > 4) {
+          layoutStage(vis);
+        }
+      });
+    }, 350);
+  }
+  function stopPolling() {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+
+  // --- Reproductor ampliat ---
+
+  function useIframe() {
+    player.classList.add("is-fallback");
+    player.classList.remove("is-buffering");
+    video.pause();
+    if (video.parentNode === slot) mediaVideo.appendChild(video);
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.setAttribute("allow", "autoplay; fullscreen");
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.title = "Vídeo";
+    }
+    var src = driveVideoPlayer(current.videoId);
+    if (iframe.getAttribute("src") !== src) iframe.src = src;
+    if (iframe.parentNode !== slot) slot.appendChild(iframe);
+    if (lastVisible) layoutStage(lastVisible);
+  }
+
+  function expand() {
+    if (state === "expanded" || !current) return;
+    clearTimeout(previewTimer);
+    clearTimeout(resetTimer);
+    var from = containRect(mediaVideo.getBoundingClientRect(), fallback ? 16 / 9 : videoAspect());
+    state = "expanded";
+    media.classList.remove("is-loading", "is-playing", "is-counting", "is-hint");
+    var token = ++openToken;
+
+    player.hidden = false;
+    player.classList.remove("is-open", "is-settled", "is-ended");
+    document.documentElement.classList.add("player-open");
+    if (fallback) {
+      useIframe();
+    } else {
+      player.classList.remove("is-fallback");
+      slot.appendChild(video);
+      if (video.readyState < 3) player.classList.add("is-buffering");
+      if (video.paused) playVideo();
+    }
+    syncPlayState();
+    syncTime();
+
+    measureVisible(function (vis) {
+      if (token !== openToken) return;
+      layoutStage(vis);
+      var to = slot.getBoundingClientRect();
+      void player.offsetWidth;
+      player.classList.add("is-open");
+      if (slot.animate && to.width > 0) {
+        var s = from.width / to.width;
+        slot.animate([
+          { transform: "translate(" + (from.left - to.left) + "px," + (from.top - to.top) + "px) scale(" + s + ")" },
+          { transform: "none" }
+        ], { duration: REDUCED_MOTION ? 1 : 560, easing: "cubic-bezier(0.22, 0.8, 0.24, 1)" });
+      }
+      setTimeout(function () {
+        if (token === openToken) player.classList.add("is-settled");
+      }, 600);
+      try { closeBtn.focus({ preventScroll: true }); } catch (e) { closeBtn.focus(); }
+      startPolling();
+      startRaf();
+    });
+  }
+
+  function finishClose() {
+    stopPolling();
+    stopRaf();
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+    player.hidden = true;
+    player.classList.remove("is-open", "is-settled", "is-buffering", "is-fallback", "is-fullscreen");
+    document.documentElement.classList.remove("player-open");
+    if (iframe && iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe);
+      iframe.removeAttribute("src");
+    }
+    state = "idle";
+    closedAt = performance.now();
+  }
+
+  function close() {
+    if (state !== "expanded") return;
+    var token = ++openToken;
+    stopPolling();
+    stopRaf();
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+    var withVideo = video.parentNode === slot;
+    var last = slot.getBoundingClientRect();
+    var to = containRect(mediaVideo.getBoundingClientRect(), fallback ? 16 / 9 : videoAspect());
+    player.classList.remove("is-open", "is-settled");
+    var done = false;
+    function finish() {
+      if (done || token !== openToken) return;
+      done = true;
+      if (anim) anim.cancel();
+      if (withVideo) {
+        // El vídeo torna al seu lloc i es fon amb la foto.
+        mediaVideo.appendChild(video);
+        media.classList.add("is-playing");
+        void media.offsetWidth;
+        media.classList.remove("is-playing");
+        resetTimer = setTimeout(function () {
+          if (state === "idle") {
+            video.pause();
+            try { video.currentTime = 0; } catch (e) {}
+          }
+        }, 500);
+      }
+      finishClose();
+      cooldown = hovering;
+      try { media.focus({ preventScroll: true }); } catch (e) {}
+    }
+    var anim = null;
+    if (slot.animate && last.width > 0) {
+      var s = to.width / last.width;
+      anim = slot.animate([
+        { transform: "none" },
+        { transform: "translate(" + (to.left - last.left) + "px," + (to.top - last.top) + "px) scale(" + s + ")" }
+      ], { duration: REDUCED_MOTION ? 1 : 460, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
+      anim.onfinish = finish;
+    }
+    setTimeout(finish, REDUCED_MOTION ? 20 : 520);
+  }
+
+  // Atura-ho tot de cop (canvi de pantalla).
+  function videoReset() {
+    ++openToken;
+    clearTimers();
+    media.classList.remove("is-loading", "is-playing", "is-counting", "is-hint");
+    if (state === "expanded") finishClose();
+    if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
+    video.pause();
+    state = "idle";
+    cooldown = false;
+  }
+
+  function togglePlay() {
+    if (fallback) return;
+    if (video.ended) {
+      try { video.currentTime = 0; } catch (e) {}
+    }
+    if (video.paused || video.ended) playVideo(); else video.pause();
+  }
+
+  function syncPlayState() {
+    var playing = !video.paused && !video.ended;
+    player.classList.toggle("is-playing", playing);
+    player.classList.toggle("is-ended", video.ended);
+    playBtn.setAttribute("aria-label", playing ? "Pausar" : (video.ended ? "Tornar a veure" : "Reproduir"));
+  }
+
+  function syncTime() {
+    var d = isFinite(video.duration) ? video.duration : 0;
+    var t = video.currentTime || 0;
+    if (+range.max !== d) range.max = d;
+    if (!scrubbing) range.value = t;
+    var p = d ? Math.min(100, (t / d) * 100) : 0;
+    range.style.setProperty("--p", p + "%");
+    curEl.textContent = formatTime(t);
+    totEl.textContent = formatTime(d);
+  }
+
+  function startRaf() {
+    stopRaf();
+    (function tick() {
+      syncTime();
+      rafId = requestAnimationFrame(tick);
+    })();
+  }
+  function stopRaf() {
+    cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+
+  playBtn.addEventListener("click", togglePlay);
+  slot.addEventListener("click", function (e) {
+    if (e.target === video) togglePlay();
+  });
+  closeBtn.addEventListener("click", close);
+  $("player-backdrop").addEventListener("click", close);
+
+  range.addEventListener("pointerdown", function () { scrubbing = true; });
+  range.addEventListener("input", function () {
+    var t = +range.value;
+    if (isFinite(t)) {
+      try { video.currentTime = t; } catch (e) {}
+      if (video.ended || t < (video.duration || 0)) player.classList.remove("is-ended");
+    }
+    syncTime();
+  });
+  range.addEventListener("change", function () { scrubbing = false; });
+  window.addEventListener("pointerup", function () { scrubbing = false; });
+
+  fsBtn.addEventListener("click", function () {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(function () {});
+    } else {
+      stage.requestFullscreen().catch(function () {});
+    }
+  });
+  document.addEventListener("fullscreenchange", function () {
+    var fs = document.fullscreenElement === stage;
+    player.classList.toggle("is-fullscreen", fs);
+    if (!fs && state === "expanded") measureVisible(layoutStage);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (state !== "expanded") return;
+    var tag = e.target && e.target.tagName;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+    } else if ((e.key === " " || e.key === "k") && tag !== "BUTTON" && tag !== "INPUT") {
+      e.preventDefault();
+      togglePlay();
+    } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && tag !== "INPUT" && !fallback) {
+      e.preventDefault();
+      var d = e.key === "ArrowLeft" ? -5 : 5;
+      try { video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + d)); } catch (err) {}
+    } else if (e.key === "Tab") {
+      // Mantenir el focus dins del reproductor.
+      var items = Array.prototype.filter.call(stage.querySelectorAll("button, input"), function (el) {
+        return el.offsetParent !== null && !el.classList.contains("hidden");
+      });
+      if (!items.length) return;
+      var first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  window.addEventListener("resize", function () {
+    if (state === "expanded") measureVisible(layoutStage);
+  });
+
+  // ---------------------------------------------------------------------------
+
   window.addEventListener("hashchange", route);
   route();
+})();
 </script>
 </body>
 </html>
