@@ -578,7 +578,7 @@
   @media (max-width: 700px) {
     .cards { grid-template-columns: 1fr; }
     .card-img { aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; }
-    .card-img img { width: 58%; height: auto; padding: 0; }
+    .card-img img { width: 62%; height: auto; padding: 0; }
     h1 { font-size: 30px; }
     .hero-inner { padding: 28px 16px; }
     main { padding: 28px 16px 48px; }
@@ -934,6 +934,7 @@
   var cooldown = false;        // no tornar a començar fins que el ratolí surti de la imatge
   var navHold = false;         // després de canviar de pantalla, esperar un moviment real del ratolí
   var closing = false;
+  var loadTimedOut = false;    // el vídeo no ha arribat a temps (encara pot arribar més tard)
   var closedAt = -1e9;
   var previewTimer = null;
   var resetTimer = null;
@@ -955,6 +956,7 @@
   function videoSetStation(s) {
     current = s;
     fallback = false;
+    loadTimedOut = false;
     clearTimeout(loadTimer);
     loadTimer = null;
     media.classList.remove("is-hint");
@@ -979,6 +981,8 @@
       p.catch(function (err) {
         // El navegador no deixa començar el vídeo sol: cal un clic.
         if (err && err.name === "NotAllowedError" && state !== "expanded") {
+          clearTimeout(loadTimer);
+          loadTimer = null;
           stopPreview();
           if (hovering) media.classList.add("is-hint");
         }
@@ -988,11 +992,16 @@
 
   // Un sol termini per estació: si el vídeo no arriba a temps, es fa servir el reproductor de Drive.
   function armLoadTimeout() {
-    if (loadTimer || fallback) return;
+    if (loadTimer || fallback || loadTimedOut) return;
     loadTimer = setTimeout(function () {
       loadTimer = null;
-      if (video.readyState < 3) enterFallback();
+      if (video.readyState >= 3) return;
+      loadTimedOut = true;
+      if (state === "loading" || state === "expanded") enterFallback();
     }, LOAD_TIMEOUT_MS);
+  }
+  function checkLoadTimedOut() {
+    if (loadTimedOut && !fallback && video.readyState < 3) enterFallback();
   }
 
   function enterFallback() {
@@ -1033,6 +1042,13 @@
   ["pause", "canplay", "ended", "seeked"].forEach(function (ev) {
     video.addEventListener(ev, function () { player.classList.remove("is-buffering"); });
   });
+  video.addEventListener("canplay", function () {
+    loadTimedOut = false;
+    if (fallback && state !== "expanded" && video.videoWidth && !video.error) {
+      fallback = false;
+      media.classList.remove("is-hint");
+    }
+  });
   video.addEventListener("play", syncPlayState);
   video.addEventListener("pause", syncPlayState);
   video.addEventListener("ended", syncPlayState);
@@ -1044,6 +1060,7 @@
 
   function startPreview() {
     if (state !== "idle" || cooldown) return;
+    checkLoadTimedOut();
     if (fallback) { media.classList.add("is-hint"); return; }
     clearTimers();
     state = "loading";
@@ -1081,7 +1098,7 @@
   media.addEventListener("pointermove", function (e) {
     if (e.pointerType === "touch" || !navHold) return;
     navHold = false;
-    if (cooldown && performance.now() - closedAt >= 800) {
+    if (performance.now() - closedAt >= 800) {
       cooldown = false;
       startPreview();
     }
@@ -1096,6 +1113,7 @@
   });
   media.addEventListener("click", function () {
     if (state === "expanded") return;
+    checkLoadTimedOut();
     if (!fallback && state === "idle") {
       clearTimers();
       if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
@@ -1138,18 +1156,33 @@
     }, 300);
   }
 
+  // Després de desplaçar la pàgina de Google Sites, esperem que la posició s'estabilitzi.
+  function measureStable(cb) {
+    var t0 = performance.now(), prev = null;
+    (function step() {
+      measureVisible(function (v) {
+        var stable = prev && Math.abs(v.top - prev.top) < 2 && Math.abs(v.height - prev.height) < 2;
+        if (stable || performance.now() - t0 > 600) cb(v);
+        else { prev = v; step(); }
+      });
+    })();
+  }
+
   function layoutStage(vis) {
     if (document.fullscreenElement) return;
     lastVisible = vis;
     var margin = vis.width < 600 ? 8 : 32;
+    // Si el marc queda tallat per dalt, la barra fixa de Google Sites pot tapar-ne una part.
+    var topInset = vis.top > 0 ? 64 : 0;
     var head = 52, controls = 56;
     var aspect = fallback ? 16 / 9 : videoAspect();
     var availW = vis.width - margin * 2;
-    var availH = vis.height - margin * 2 - head - controls;
+    var availH = vis.height - topInset - margin * 2 - head - controls;
     var w = Math.min(availW, Math.max(availH, 120) * aspect, 1280);
     var h = w / aspect;
     var total = head + h + controls;
-    var top = Math.max(vis.top + 4, vis.top + (vis.height - total) / 2);
+    var areaTop = vis.top + topInset, areaH = vis.height - topInset;
+    var top = Math.max(areaTop + 4, areaTop + (areaH - total) / 2);
     top = Math.max(4, Math.min(top, window.innerHeight - total - 4));
     stage.style.width = w + "px";
     stage.style.left = vis.left + (vis.width - w) / 2 + "px";
@@ -1231,7 +1264,7 @@
 
     // El reproductor es prepara invisible i es mostra quan ja té la mida i la posició.
     player.hidden = false;
-    stage.style.visibility = "hidden";
+    stage.style.opacity = "0";
     player.classList.remove("is-open", "is-settled", "is-ended");
     lockScroll();
     if (fallback) {
@@ -1246,17 +1279,19 @@
 
     measureVisible(function open(vis, retried) {
       if (token !== openToken) return;
-      // Si el marc de Google Sites només es veu en part, el portem a la vista abans d'ampliar.
-      if (!retried && vis.height < Math.min(window.innerHeight - 2, 520)) {
+      // Si del marc de Google Sites només se'n veu una franja massa petita, el portem a la vista.
+      if (!retried && vis.height < Math.min(window.innerHeight - 2, 360)) {
         try { media.scrollIntoView({ block: "center" }); } catch (e) {}
-        from = containRect(mediaVideo.getBoundingClientRect(), aspect);
-        measureVisible(function (v2) { open(v2, true); });
+        measureStable(function (v2) {
+          from = containRect(mediaVideo.getBoundingClientRect(), aspect);
+          open(v2, true);
+        });
         return;
       }
       if (!fallback && video.parentNode !== slot) slot.appendChild(video);
       layoutStage(vis);
       var to = slot.getBoundingClientRect();
-      stage.style.visibility = "";
+      stage.style.opacity = "";
       void player.offsetWidth;
       player.classList.add("is-open");
       if (slot.animate && to.width > 0) {
@@ -1282,7 +1317,7 @@
     stopRaf();
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(noop);
     player.hidden = true;
-    stage.style.visibility = "";
+    stage.style.opacity = "";
     player.classList.remove("is-open", "is-settled", "is-buffering", "is-fallback", "is-fullscreen");
     unlockScroll();
     if (iframe && iframe.parentNode) {
@@ -1313,6 +1348,11 @@
     function finish() {
       if (done || token !== openToken) return;
       done = true;
+      if (!withVideo && !fallback) {
+        // Tancat abans que el vídeo arribés al reproductor.
+        video.pause();
+        try { video.currentTime = 0; } catch (e) {}
+      }
       if (withVideo) {
         // El vídeo torna al seu lloc i es fon amb la foto.
         mediaVideo.appendChild(video);
@@ -1332,10 +1372,12 @@
     }
     if (slot.animate && last.width > 0 && !wasFullscreen) {
       var s = to.width / last.width;
-      anim = slot.animate([
-        { transform: cur && cur !== "none" ? cur : "none" },
-        { transform: "translate(" + (to.left - last.left) + "px," + (to.top - last.top) + "px) scale(" + s + ")" }
-      ], { duration: REDUCED_MOTION ? 1 : 460, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
+      var target = "translate(" + (to.left - last.left) + "px," + (to.top - last.top) + "px) scale(" + s + ")";
+      // Amb el reproductor de Drive no hi ha vídeo per fondre amb la foto: el requadre s'esvaeix en arribar.
+      var frames = withVideo
+        ? [{ transform: cur && cur !== "none" ? cur : "none" }, { transform: target }]
+        : [{ transform: cur && cur !== "none" ? cur : "none", opacity: 1 }, { opacity: 1, offset: 0.6 }, { transform: target, opacity: 0 }];
+      anim = slot.animate(frames, { duration: REDUCED_MOTION ? 1 : 460, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
       anim.onfinish = finish;
     } else if (slot.animate) {
       anim = slot.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED_MOTION ? 1 : 300, fill: "forwards" });
@@ -1397,18 +1439,18 @@
     rafId = 0;
   }
 
-  // Els clics just quan s'obre (o el segon clic d'un doble clic) no compten.
-  function settledClick(e) {
-    return e.detail <= 1 && player.classList.contains("is-settled");
+  // Els clics mentre el reproductor s'obre (p. ex. el segon clic d'un doble clic) no compten.
+  function settled() {
+    return player.classList.contains("is-settled");
   }
 
   playBtn.addEventListener("click", togglePlay);
   slot.addEventListener("click", function (e) {
-    if (settledClick(e) && e.target === video) togglePlay();
+    if (settled() && e.target === video) togglePlay();
   });
   closeBtn.addEventListener("click", close);
   $("player-backdrop").addEventListener("click", function (e) {
-    if (settledClick(e)) close();
+    if (settled() && e.detail <= 1) close();
   });
   $("player-guard").addEventListener("focus", function () { focusQuietly(closeBtn); });
 
@@ -1438,7 +1480,7 @@
   });
 
   document.addEventListener("keydown", function (e) {
-    if (state !== "expanded") return;
+    if (state !== "expanded" || e.ctrlKey || e.metaKey || e.altKey) return;
     var tag = e.target && e.target.tagName;
     if (e.key === "Escape") {
       e.preventDefault();
