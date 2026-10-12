@@ -652,6 +652,7 @@
   .sheet-content {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-auto-rows: max-content;  /* si no hi cap, es desplaça en lloc d'encongir-se */
     min-height: 0;
     flex: 1;
     overflow: auto;
@@ -1099,6 +1100,853 @@
     return "https://drive.google.com/file/d/" + id + "/preview";
   }
 
+  // Components de la Pick and Place Station (MA2B4). Dades: Festo Didactic InfoPortal i fitxes tècniques.
+  var CATALOG_PICK_PLACE = {
+    "base": "https://ip.festo-didactic.com/InfoPortal/MPS/",
+    "source": {
+      "label": "Festo Didactic InfoPortal · Pick and Place Station",
+      "url": "https://ip.festo-didactic.com/InfoPortal/MPS/PickandPlaceStation/EN/Elements.html"
+    },
+    "intro": "Elements que formen l'estació segons la documentació de Festo Didactic. Clica un component per veure'n la fitxa amb les dades tècniques.",
+    "modules": [
+      {
+        "key": "conveyor",
+        "name": "Mòdul transportador",
+        "nameEn": "Conveyor Module",
+        "refs": "8032692, 8033135",
+        "img": "ConveyorModule/img/thumb.jpg",
+        "image": "ConveyorModule/img/image.jpg",
+        "page": "ConveyorModule/EN/index.html",
+        "text": [
+          "Transporta les peces i les pot retenir en espera. Uns detectors òptics amb cable de fibra òptica comproven si hi ha peça abans del separador i al final de la cinta.",
+          "La cinta l'acciona un motoreductor de corrent continu. Un electroimant amb separador pot aturar i separar les peces, i les posicions finals es controlen amb detectors inductius."
+        ],
+        "more": [
+          "Es pot muntar sobre una placa perfilada, un peu de perfil o un bastidor ranurat, i el motor de CC es pot col·locar on convingui. És apte per a peces de 40 mm de diàmetre (per exemple, els jocs de peces «Body» o «Cylinder for assembly»).",
+          "Es subministra completament muntat, amb el controlador del motor integrat, que permet el gir en tots dos sentits.",
+          "Si es treu el pont entre els borns 6 i 8 del controlador del motor, el born 6 es pot connectar al born 11/12 del terminal d'E/S per regular la velocitat de la cinta amb un senyal analògic de 0…10 V."
+        ],
+        "items": [
+          "Sensor196959",
+          "Sensor196960",
+          "Aktor532952",
+          "Aktor532941",
+          "Part8064284",
+          "Part8025739"
+        ]
+      },
+      {
+        "key": "pickplace",
+        "name": "Mòdul Pick&Place",
+        "nameEn": "Pick and Place Module (Suction Gripper)",
+        "refs": "8031659",
+        "img": "PickandPlaceModule/img/thumb.jpg",
+        "image": "PickandPlaceModule/img/image.jpg",
+        "page": "PickandPlaceModule/EN/index.html",
+        "text": [
+          "Manipulador pneumàtic que munta les peces amb una ventosa. Es basa en unitats de lliscament de precisió, i les posicions finals dels carros es detecten elèctricament amb detectors de proximitat.",
+          "La posició dels detectors, la posició de muntatge i l'alçada de muntatge es poden ajustar."
+        ],
+        "more": [
+          "Una ventosa de manxa agafa les peces. Directament a la ventosa hi ha muntat un filtre de buit que evita que la brutícia arribi al generador de buit, i un pressòstat indica que la peça està ben agafada.",
+          "Amb un regulador de pressió es pot ajustar la força de la unitat de lliscament vertical (eix Z).",
+          "Es subministra complet: unitats de lliscament, generador de buit, filtre de buit, ventosa de manxa, pressòstat, terminal de vàlvules, regulador de pressió i interfície elèctrica."
+        ],
+        "items": [
+          "Sensor173210",
+          "Sensor527458",
+          "Aktor543930",
+          "Aktor525675",
+          "Part175041",
+          "Part153495",
+          "Part193552",
+          "Part189199",
+          "Part191203",
+          "Part189401",
+          "Part153329",
+          "Part153328",
+          "Part153252",
+          "Part8025739"
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "key": "station",
+        "name": "Altres elements",
+        "items": [
+          "Aktor532952",
+          "Part8025738",
+          "Part8033583",
+          "Part540691",
+          "Part8034300"
+        ]
+      }
+    ],
+    "items": {
+      "Sensor196959": {
+        "name": "Sensor de reflexió difusa de fibra òptica",
+        "nameEn": "Diffuse sensor",
+        "code": "SOEG-L-Q30-P-A-S-2L + SOEZ-LLK-RT-2,0-M6",
+        "refs": "165327, 165358",
+        "text": "Sensor òptic format per un equip de fibra òptica amb cable i escaire de muntatge per a perfil o placa perfilada, i un cable de fibra òptica. Emet llum vermella i detecta per reflexió els objectes situats davant la fibra, fins i tot si són molt petits o en llocs de difícil accés.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Llum vermella, per reflexió"
+          ],
+          [
+            "Abast màxim de detecció",
+            "120 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP"
+          ],
+          [
+            "Tensió de funcionament",
+            "24 V DC (10 ... 30 V)"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 4 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "1000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor196959/img/thumb.jpg",
+        "pdf": "Components/Sensor196959/Documentation/DataSheet.pdf"
+      },
+      "Sensor196960": {
+        "name": "Barrera de llum de fibra òptica",
+        "nameEn": "Light barrier",
+        "code": "SOEG-L-Q30-P-A-S-2L + SOEZ-LLK-SE-2,0-M4",
+        "refs": "165327, 165360",
+        "text": "Barrera de llum formada per un equip de fibra òptica amb cable i escaire de muntatge per a perfil o placa perfilada, i un cable de fibra òptica. Detecta un objecte quan aquest interromp el feix de llum vermella guiat per la fibra, fins i tot en llocs de difícil accés.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Llum vermella, per interrupció del feix"
+          ],
+          [
+            "Abast màxim (cable de fibra òptica)",
+            "400 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP"
+          ],
+          [
+            "Tensió de funcionament",
+            "24 V DC (10 ... 30 V)"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 4 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "1000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor196960/img/thumb.jpg",
+        "pdf": "Components/Sensor196960/Documentation/DataSheet.pdf"
+      },
+      "Sensor173210": {
+        "name": "Sensor de proximitat magnètic SME (contacte reed)",
+        "nameEn": "Proximity Sensor SME",
+        "code": "SME-10-KL-LED-24",
+        "refs": "173210",
+        "text": "Sensor de proximitat elèctric amb contacte reed i cable, per a actuadors amb ranura en C. Al mòdul Pick and Place es munta a la ranura d'un actuador, commuta per efecte magnètic i indica el seu estat amb un LED groc.",
+        "specs": [
+          [
+            "Principi de mesura",
+            "Magnètic, contacte reed"
+          ],
+          [
+            "Funció de l'element de commutació",
+            "Contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "12 ... 27 V AC/DC"
+          ],
+          [
+            "Corrent màxim de sortida",
+            "100 mA"
+          ],
+          [
+            "Connexió elèctrica",
+            "Cable de 3 fils, 2,5 m"
+          ],
+          [
+            "Indicador d'estat",
+            "LED groc"
+          ]
+        ],
+        "img": "Components/Sensor173210/img/thumb.jpg",
+        "pdf": "Components/Sensor173210/Documentation/DataSheet.pdf"
+      },
+      "Sensor527458": {
+        "name": "Sensor de pressió de buit SDE5",
+        "nameEn": "Pressure sensor SDE5",
+        "code": "SDE5-V1-O-Q6-P-M8",
+        "refs": "527458",
+        "text": "Sensor de pressió per a buit amb connector M8, que mesura la pressió relativa entre 0 i -1 bar amb un element piezoresistiu. Al mòdul Pick and Place, que treballa amb una ventosa, activa una sortida PNP quan el buit arriba al llindar ajustat.",
+        "specs": [
+          [
+            "Rang de mesura (pressió relativa)",
+            "0 ... -1 bar"
+          ],
+          [
+            "Principi de mesura",
+            "Sensor de pressió piezoresistiu"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "15 ... 30 V DC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 3 pins"
+          ],
+          [
+            "Connexió pneumàtica",
+            "QS-6"
+          ]
+        ],
+        "img": "Components/Sensor527458/img/thumb.jpg",
+        "pdf": "Components/Sensor527458/Documentation/DataSheet.pdf"
+      },
+      "Aktor532952": {
+        "name": "Mòdul desviador/separador elèctric",
+        "nameEn": "Sorting gate/separator module, el.",
+        "code": "",
+        "refs": "532952",
+        "text": "Mòdul que permet desviar (classificar) o separar les peces que circulen per una cinta transportadora. S'acciona elèctricament amb un electroimant rotatiu de corrent continu de 24 V.",
+        "specs": [
+          [
+            "Tipus d'actuador",
+            "Electroimant rotatiu de CC (Magnet-Schultz, sèrie G DA)"
+          ],
+          [
+            "Tensió nominal",
+            "24 VDC"
+          ],
+          [
+            "Angle de gir",
+            "35°, 65° o 95° (+3°), segons el model"
+          ],
+          [
+            "Retorn",
+            "Molla de retorn opcional, amb força de retorn ajustable"
+          ],
+          [
+            "Grau de protecció",
+            "IP 20 (VDE 0470/EN 60529)"
+          ],
+          [
+            "Connexió elèctrica",
+            "Cables flexibles lliures"
+          ]
+        ],
+        "img": "Components/Aktor532952/img/thumb.jpg",
+        "pdf": "Components/Aktor532952/Documentation/DataSheet_en.pdf"
+      },
+      "Aktor532941": {
+        "name": "Motor de corrent continu (motoreductor)",
+        "nameEn": "DC motor",
+        "code": "",
+        "refs": "532941 (motoreductor 374134)",
+        "text": "Motoreductor de corrent continu de 24 V, amb el motor fixat a un reductor reversible de cargol sens fi (eixos en angle recte), que acciona la cinta transportadora. Es subministra complet amb acoblament i accessoris de muntatge per al mòdul transportador 700 o 350.",
+        "specs": [
+          [
+            "Tensió nominal",
+            "24 V"
+          ],
+          [
+            "Corrent nominal",
+            "1,5 A"
+          ],
+          [
+            "Velocitat nominal de l'eix de sortida",
+            "65 r.p.m."
+          ],
+          [
+            "Parell nominal / d'arrencada",
+            "1 Nm / 7 Nm"
+          ],
+          [
+            "Gir reversible",
+            "Sí"
+          ],
+          [
+            "Connexió elèctrica",
+            "2 terminals plans"
+          ]
+        ],
+        "img": "Components/Aktor532941/img/thumb.jpg",
+        "pdf": "Components/Aktor532941/Documentation/DataSheet.pdf"
+      },
+      "Part8064284": {
+        "name": "Controlador de motor de CC",
+        "nameEn": "DC Motor Controller",
+        "code": "",
+        "refs": "8064284",
+        "text": "S'utilitza per canviar el sentit de gir i regular la velocitat de motors de CC amb escombretes de 24 V / 4 A, amb consigna de velocitat interna (potenciòmetre) o externa (entrada analògica). Inclou desconnexió per sobrecorrent, detecció de curtcircuit, aturada ràpida i detecció de finals de cursa, i es munta en un carril DIN de 35 mm.",
+        "specs": [
+          [
+            "Tensió nominal",
+            "24 V DC ±10%, molt baixa tensió de seguretat (SELV, PELV)"
+          ],
+          [
+            "Corrent permanent del motor",
+            "4 A DC"
+          ],
+          [
+            "Entrades de control",
+            "1 lògic: 10 ... 24 V DC; 0 lògic: 0 ... 4 V DC"
+          ],
+          [
+            "Entrada analògica (consigna de velocitat)",
+            "0 … 10 V DC, tolerant a 24 V, resistència d'entrada aprox. 100 kΩ"
+          ],
+          [
+            "Sortida digital «a punt per funcionar»",
+            "Activa a nivell alt, 24 V / 0,7 A, protegida contra curtcircuits"
+          ],
+          [
+            "Temperatura ambient",
+            "5 … 40 °C"
+          ]
+        ],
+        "img": "Components/Part8064284/img/thumb.jpg",
+        "pdf": "Components/Part8064284/Documentation/DataSheet.pdf"
+      },
+      "Part8034300": {
+        "name": "Suport per a cables amb velcro",
+        "nameEn": "Cable holder with hook-and-loop",
+        "code": "",
+        "refs": "8034300",
+        "text": "Element de fixació fiable i estable, amb tancament de velcro, per guiar i subjectar els cables i els tubs de les instal·lacions elèctriques i pneumàtiques de la planta.",
+        "specs": [],
+        "img": "Components/Part8034300/img/thumb.jpg",
+        "pdf": ""
+      },
+      "Aktor543930": {
+        "name": "Minicarro pneumàtic",
+        "nameEn": "Mini slide DGSL",
+        "code": "DGSL-8-50-PA",
+        "refs": "543930",
+        "text": "Actuador lineal pneumàtic de doble efecte amb guia de gàbia de boles molt precisa i resistent, preparat per a la detecció de posició amb sensors de proximitat. Té amortiment elàstic a tots dos extrems, sense topall metàl·lic a les posicions finals.",
+        "specs": [
+          [
+            "Cursa",
+            "50 mm"
+          ],
+          [
+            "Diàmetre del pistó",
+            "10 mm"
+          ],
+          [
+            "Pressió de treball",
+            "1,5 ... 8 bar"
+          ],
+          [
+            "Força teòrica a 6 bar (avanç / retorn)",
+            "47 N / 40 N"
+          ],
+          [
+            "Repetibilitat",
+            "0,3 mm"
+          ],
+          [
+            "Connexió pneumàtica",
+            "M3"
+          ]
+        ],
+        "img": "Components/Aktor543930/img/thumb.jpg",
+        "pdf": "Components/Aktor543930/Documentation/DataSheet.pdf"
+      },
+      "Aktor525675": {
+        "name": "Terminal de vàlvules",
+        "nameEn": "Valve manifold CPV-SC",
+        "code": "CPV-SC-MP-VI",
+        "refs": "525675",
+        "text": "Terminal de vàlvules d'accionament elèctric amb connexió multipol, que distribueix l'aire comprimit cap als actuadors pneumàtics del mòdul. Segons la configuració, pot dur vàlvules 2/2, 3/2 i 5/2, i és apte per a buit.",
+        "specs": [
+          [
+            "Funcions de vàlvula possibles",
+            "2/2 tancada monoestable; 3/2 tancada o oberta monoestable; 5/2 monoestable o biestable"
+          ],
+          [
+            "Pressió de treball",
+            "-0,9 ... 7 bar"
+          ],
+          [
+            "Tensió nominal de funcionament",
+            "24 V DC (+/- 10 %)"
+          ],
+          [
+            "Cabal nominal màxim",
+            "170 l/min (vàlvules de 10 mm)"
+          ],
+          [
+            "Nombre màxim de posicions de vàlvula",
+            "16"
+          ],
+          [
+            "Grau de protecció",
+            "IP40"
+          ]
+        ],
+        "img": "Components/Aktor525675/img/thumb.jpg",
+        "pdf": "Components/Aktor525675/Documentation/DataSheet.pdf"
+      },
+      "Part175041": {
+        "name": "Vàlvula reguladora de cabal unidireccional",
+        "nameEn": "One-way flow control valve GRLA",
+        "code": "GRLA-M3-QS-3",
+        "refs": "175041",
+        "text": "Vàlvula d'estrangulació amb antiretorn que es cargola en una connexió M3 i regula el cabal de l'aire d'escapament i, així, la velocitat del moviment. Té una connexió ràpida QS-3 per al tub i s'ajusta amb un cargol de cap ranurat.",
+        "specs": [
+          [
+            "Connexions pneumàtiques",
+            "QS-3 (port 1) / M3 (port 2)"
+          ],
+          [
+            "Pressió de treball",
+            "0,2 ... 10 bar"
+          ],
+          [
+            "Cabal nominal en sentit d'estrangulació",
+            "41 l/min"
+          ],
+          [
+            "Cabal nominal en sentit antiretorn",
+            "27 ... 50 l/min"
+          ],
+          [
+            "Element d'ajust",
+            "Cargol de cap ranurat"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Part175041/img/thumb.jpg",
+        "pdf": "Components/Part175041/Documentation/DataSheet.pdf"
+      },
+      "Part153495": {
+        "name": "Regulador de pressió amb manòmetre",
+        "nameEn": "Pressure regulator LRMA",
+        "code": "LRMA-QS-4",
+        "refs": "153495",
+        "text": "Regulador de pressió amb manòmetre que manté constant la pressió de sortida (amb escapament secundari). Té connexions ràpides QS-4 a l'entrada i a la sortida i un cargol moletejat amb contrafemella per bloquejar l'ajust.",
+        "specs": [
+          [
+            "Rang de regulació de pressió",
+            "1 ... 8 bar"
+          ],
+          [
+            "Pressió d'entrada",
+            "0 ... 9 bar"
+          ],
+          [
+            "Cabal nominal",
+            "50 l/min"
+          ],
+          [
+            "Connexions pneumàtiques",
+            "QS-4 (port 1) / QS-4 (port 2)"
+          ],
+          [
+            "Indicació de pressió",
+            "Amb manòmetre"
+          ],
+          [
+            "Temperatura ambient",
+            "0 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Part153495/img/thumb.jpg",
+        "pdf": "Components/Part153495/Documentation/DataSheet.pdf"
+      },
+      "Part193552": {
+        "name": "Generador de buit",
+        "nameEn": "Vacuum generator VN",
+        "code": "VN-05-M-I3-PQ2-VQ2",
+        "refs": "193552",
+        "text": "Ejector de buit en línia, d'alt buit i de 10 mm d'amplada, que genera buit a partir de l'aire comprimit mitjançant una tovera Laval. Al mòdul subministra el buit a la ventosa i té connexions ràpides QS-6.",
+        "specs": [
+          [
+            "Pressió de treball",
+            "1 ... 8 bar"
+          ],
+          [
+            "Pressió nominal de treball",
+            "6 bar"
+          ],
+          [
+            "Buit màxim",
+            "86 % (a 6 bar)"
+          ],
+          [
+            "Cabal d'aspiració màxim (respecte a l'atmosfera)",
+            "6,1 l/min"
+          ],
+          [
+            "Diàmetre nominal de la tovera Laval",
+            "0,45 mm"
+          ],
+          [
+            "Connexions (aire comprimit / buit)",
+            "QS-6 / QS-6"
+          ]
+        ],
+        "img": "Components/Part193552/img/thumb.jpg",
+        "pdf": "Components/Part193552/Documentation/DataSheet.pdf"
+      },
+      "Part189199": {
+        "name": "Suport de ventosa",
+        "nameEn": "Suction cup holder ESH",
+        "code": "ESH-HA-4-QS",
+        "refs": "189199",
+        "text": "Suport que subjecta la ventosa (fixació M6) i li fa arribar el buit a través de la connexió QS-6 de la part superior. No té compensació d'alçada i es fixa amb dues femelles hexagonals.",
+        "specs": [
+          [
+            "Connexió de buit",
+            "QS-6"
+          ],
+          [
+            "Fixació de la ventosa",
+            "M6"
+          ],
+          [
+            "Mida de suport de ventosa",
+            "Mida 4"
+          ],
+          [
+            "Tipus de fixació",
+            "Amb contrafemella"
+          ],
+          [
+            "Temperatura ambient",
+            "0 ... 60 °C"
+          ],
+          [
+            "Pes del producte",
+            "30 g"
+          ]
+        ],
+        "img": "Components/Part189199/img/thumb.jpg",
+        "pdf": "Components/Part189199/Documentation/DataSheet.pdf"
+      },
+      "Part191203": {
+        "name": "Filtre de buit",
+        "nameEn": "Vacuum filter ESF",
+        "code": "ESF-4A",
+        "refs": "191203",
+        "text": "Filtre per a circuits de buit que reté les partícules de l'aire aspirat, amb una finor de filtració de 10 µm. Es fixa a través de la connexió de buit, amb rosca exterior, i tant la connexió pneumàtica com la de buit són M6.",
+        "specs": [
+          [
+            "Finor de filtració",
+            "10 µm"
+          ],
+          [
+            "Pressió de treball",
+            "-0,95 ... 4 bar"
+          ],
+          [
+            "Cabal amb un buit de -0,75 bar",
+            "260 l/min"
+          ],
+          [
+            "Connexió pneumàtica i de buit",
+            "M6"
+          ],
+          [
+            "Temperatura ambient",
+            "0 ... 60 °C"
+          ],
+          [
+            "Pes del producte",
+            "19 g"
+          ]
+        ],
+        "img": "Components/Part191203/img/thumb.jpg",
+        "pdf": "Components/Part191203/Documentation/DataSheet.pdf"
+      },
+      "Part189401": {
+        "name": "Ventosa",
+        "nameEn": "Suction cup complete ESS",
+        "code": "ESS-20-CS",
+        "refs": "189401",
+        "text": "Ventosa rodona de silicona (VMQ) de 20 mm de diàmetre, amb manxa de 3,5 plecs, que subjecta les peces per buit. Es cargola amb la rosca M6 de la connexió de buit i es pot canviar fàcilment.",
+        "specs": [
+          [
+            "Diàmetre de la ventosa",
+            "20 mm"
+          ],
+          [
+            "Forma de la ventosa",
+            "Rodona, manxa de 3,5 plecs"
+          ],
+          [
+            "Pressió de treball nominal",
+            "-0,7 bar"
+          ],
+          [
+            "Força de retenció a la pressió nominal",
+            "8,2 N"
+          ],
+          [
+            "Connexió de buit",
+            "M6"
+          ],
+          [
+            "Material de la ventosa",
+            "VMQ (silicona)"
+          ]
+        ],
+        "img": "Components/Part189401/img/thumb.jpg",
+        "pdf": "Components/Part189401/Documentation/DataSheet.pdf"
+      },
+      "Part153329": {
+        "name": "Racor instantani reductor de 6 a 4 mm",
+        "nameEn": "Push-in connector QSM-6H",
+        "code": "QSM-6H-4",
+        "refs": "153329",
+        "text": "Racor instantani reductor de mida mini: per un costat té un maniguet d'endollar QS-6 (s'endolla a un racor de 6 mm) i per l'altre accepta tub de 4 mm de diàmetre exterior. Permet passar de 6 mm a 4 mm.",
+        "specs": [
+          [
+            "Connexió 1",
+            "Maniguet d'endollar QS-6"
+          ],
+          [
+            "Connexió 2",
+            "Per a tub de diàmetre exterior 4 mm"
+          ],
+          [
+            "Diàmetre nominal",
+            "2,6 mm"
+          ],
+          [
+            "Pressió de treball (tot el rang de temperatura)",
+            "-0,95 ... 6 bar"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 80 °C"
+          ],
+          [
+            "Pes del producte",
+            "2,4 g"
+          ]
+        ],
+        "img": "Components/Part153329/img/thumb.jpg",
+        "pdf": "Components/Part153329/Documentation/DataSheet.pdf"
+      },
+      "Part153328": {
+        "name": "Racor instantani reductor de 4 a 3 mm",
+        "nameEn": "Push-in connector QSM-4H",
+        "code": "QSM-4H-3",
+        "refs": "153328",
+        "text": "Racor instantani reductor de mida mini: per un costat té un maniguet d'endollar QS-4 (s'endolla a un racor de 4 mm) i per l'altre accepta tub de 3 mm de diàmetre exterior. Permet passar de 4 mm a 3 mm.",
+        "specs": [
+          [
+            "Connexió 1",
+            "Maniguet d'endollar QS-4"
+          ],
+          [
+            "Connexió 2",
+            "Per a tub de diàmetre exterior 3 mm"
+          ],
+          [
+            "Diàmetre nominal",
+            "1,7 mm"
+          ],
+          [
+            "Pressió de treball (tot el rang de temperatura)",
+            "-0,95 ... 6 bar"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 80 °C"
+          ],
+          [
+            "Pes del producte",
+            "0,8 g"
+          ]
+        ],
+        "img": "Components/Part153328/img/thumb.jpg",
+        "pdf": "Components/Part153328/Documentation/DataSheet.pdf"
+      },
+      "Part153252": {
+        "name": "Maniguet d'unió d'endollar de 6 mm",
+        "nameEn": "Push-in sleeve QSH",
+        "code": "QSH-6",
+        "refs": "153252",
+        "text": "Maniguet d'endollar amb connexió QS-6 als dos extrems (de 6 mm a 6 mm). Serveix per unir dos racors instantanis de 6 mm.",
+        "specs": [
+          [
+            "Connexió 1",
+            "Maniguet d'endollar QS-6"
+          ],
+          [
+            "Connexió 2",
+            "Maniguet d'endollar QS-6"
+          ],
+          [
+            "Diàmetre nominal",
+            "4 mm"
+          ],
+          [
+            "Pressió de treball (tot el rang de temperatura)",
+            "-0,95 ... 6 bar"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 80 °C"
+          ],
+          [
+            "Pes del producte",
+            "0,5 g"
+          ]
+        ],
+        "img": "Components/Part153252/img/thumb.jpg",
+        "pdf": "Components/Part153252/Documentation/DataSheet.pdf"
+      },
+      "Part8025739": {
+        "name": "Terminal mini d'E/S",
+        "nameEn": "Mini I/O Terminal",
+        "code": "",
+        "refs": "8025739",
+        "text": "És la interfície elèctrica central dels mòduls MPS: s'hi connecten amb borns de molla 4 entrades i 4 sortides digitals, 2 entrades analògiques i 1 sortida analògica, que es porten a una presa D-Sub HD de 15 pins per connectar el mòdul fàcilment (plug&play) amb un cable D-Sub HD. Els LED de les entrades i sortides mostren l'estat de commutació i faciliten la cerca sistemàtica d'avaries.",
+        "specs": [
+          [
+            "Tensió de funcionament",
+            "24 V DC"
+          ],
+          [
+            "E/S digitals (4 DI / 4 DO)",
+            "Màx. 24 V DC; màx. 2 A per sortida; màx. 4 A en total"
+          ],
+          [
+            "E/S analògiques (2 AI / 1 AO)",
+            "0 … 10 V DC o ±10 V DC"
+          ],
+          [
+            "Connexió elèctrica",
+            "D-Sub HD de 15 pins (3 files); born de molla 0,14 … 0,5 mm²"
+          ],
+          [
+            "Indicadors",
+            "LED d'estat: blau (alimentació), verd (senyals d'entrada), taronja (senyals de sortida)"
+          ],
+          [
+            "Dimensions",
+            "45 mm x 77 mm x 42 mm"
+          ]
+        ],
+        "img": "Components/Part8025739/img/thumb.jpg",
+        "pdf": "Components/Part8025739/Documentation/DataSheet.pdf"
+      },
+      "Part8025738": {
+        "name": "Interfície C",
+        "nameEn": "C interface",
+        "code": "",
+        "refs": "8025738",
+        "text": "És la interfície entre els mòduls MPS i el PLC (connexió «Plug and Learn»): s'hi poden connectar un o dos mòduls a les preses D-Sub HD; les entrades i sortides digitals arriben al PLC per la presa SysLink de 24 pins (IEEE-488), i les analògiques es poden connectar a través de la presa D-Sub de 15 pins. Els LED d'estat mostren l'estat de les entrades i sortides i faciliten la cerca d'avaries.",
+        "specs": [
+          [
+            "Tensió de funcionament",
+            "24 V DC"
+          ],
+          [
+            "E/S digitals (8 DI / 8 DO)",
+            "Màx. 24 V DC; màx. 2 A per sortida; màx. 4 A en total"
+          ],
+          [
+            "E/S analògiques (4 AI / 2 AO)",
+            "0 – 10 V DC o ±10 V DC"
+          ],
+          [
+            "Connexió elèctrica",
+            "2x D-Sub HD de 15 pins (3 files); 1x presa IEEE-488 de 24 pins (SysLink); 1x D-Sub de 15 pins (2 files)"
+          ],
+          [
+            "Indicadors",
+            "LED d'estat: blau (alimentació), verd (senyals d'entrada), taronja (senyals de sortida)"
+          ],
+          [
+            "Dimensions",
+            "68 mm x 77 mm x 42 mm"
+          ]
+        ],
+        "img": "Components/Part8025738/img/thumb.jpg",
+        "pdf": "Components/Part8025738/Documentation/DataSheet.pdf"
+      },
+      "Part8033583": {
+        "name": "Cable D-Sub HD de 15 pins",
+        "nameEn": "15-pin D-Sub-HD cables",
+        "code": "",
+        "refs": "8033582, 8033583, 8042954, 8033584",
+        "text": "Cable de connexió amb un endoll D-Sub HD de 15 pins a cada extrem que uneix els mòduls MPS amb la interfície C a través del terminal mini d'E/S. Està disponible en longituds de 0,5 m, 1,0 m, 1,25 m i 2,0 m.",
+        "specs": [
+          [
+            "Connectors",
+            "2 endolls D-Sub HD de 15 pins (3 files)"
+          ]
+        ],
+        "img": "Components/Part8033583/img/thumb.jpg",
+        "pdf": "Components/Part8033583/Documentation/DataSheet.pdf"
+      },
+      "Part540691": {
+        "name": "Vàlvula d'engegada amb filtre regulador",
+        "nameEn": "Start-up valve with filter control valve",
+        "code": "",
+        "refs": "540691",
+        "text": "Conjunt format per un filtre regulador amb manòmetre i una vàlvula d'engegada 3/2, muntat sobre un suport d'angle ajustable. El filtre amb separador d'aigua neteja l'aire comprimit de brutícia, escates de les canonades, rovell i condensat; el regulador l'ajusta a la pressió de treball fixada i en compensa les fluctuacions, i la vàlvula d'engegada dona pas a l'aire o descarrega tot el circuit de comandament.",
+        "specs": [
+          [
+            "Fluid",
+            "Aire comprimit"
+          ],
+          [
+            "Pressió d'entrada",
+            "100 a 1000 kPa (1 a 10 bar)"
+          ],
+          [
+            "Pressió de funcionament",
+            "50 a 700 kPa (0,5 a 7 bar)"
+          ],
+          [
+            "Cabal nominal estàndard",
+            "110 l/min (pressió d'entrada 1000 kPa, pressió de funcionament 600 kPa, pressió diferencial 100 kPa)"
+          ],
+          [
+            "Posició de muntatge",
+            "Vertical ±5°"
+          ],
+          [
+            "Connexió",
+            "Endoll d'acoblament per a presa d'acoblament G1/8; racor QS per a tub de plàstic PUN 6 x 1"
+          ]
+        ],
+        "img": "Components/Part540691/img/thumb.jpg",
+        "pdf": "Components/Part540691/Documentation/DataSheet_en.pdf"
+      }
+    }
+  };
+
   var STATIONS = [
     {
       slug: "distributing-conveyor",
@@ -1119,7 +1967,8 @@
       imageId: "1d2sBMzKCqGozHc4iNX-eaXaCGb2Of2Xc",
       videoId: "1dqghcQuXWaoBHcUy1dHYOPJmsc0D5PqC",
       sections: {
-        esquemes: { pdf: "104ACTv_B9T1ZvIctjMwS3SsvQrxuXcDy" }
+        esquemes: { pdf: "104ACTv_B9T1ZvIctjMwS3SsvQrxuXcDy" },
+        components: { catalog: CATALOG_PICK_PLACE }
       },
       description: [
         "Les carcasses de les peces de treball col·locades en el transportador es detecten mitjançant sensors difusos o barreres fotoelèctriques. La peça de treball es transporta fins al separador elèctric situat en la cinta transportadora, on és detectada per un segon sensor difús. El mòdul recull una inserció de la peça de treball de la safata lliscant i el col·loca sobre la carcassa de la peça de treball.",
