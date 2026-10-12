@@ -55,3 +55,14 @@ de cada botó (`esquemes`, `io-plc`, `grafcet`, `components`):
 - Un text HTML per a contingut escrit.
 
 Els PDF han d'estar compartits com a "Qualsevol persona amb l'enllaç".
+
+## Components (MA1B4, MA2B4, MA3B4)
+
+Catàleg de components de cada estació amb dades del Festo Didactic InfoPortal i de les fitxes
+tècniques del fabricant. Els mòduls i components es defineixen una sola vegada a
+`FESTO_COMPONENTS` i cada estació indica quins en té (`festoCatalog(...)`), de manera que les
+peces repetides comparteixen les mateixes dades.
+
+- `FESTO_DRIVE_IMAGES`: fotos pujades a Google Drive (ruta de la foto a Festo → ID de Drive).
+  Les que no hi són, o que fallen, es carreguen des de la web de Festo.
+- `FESTO_DRIVE_PDFS`: fitxes tècniques pujades a Google Drive. Les que no hi són s'obren des de Festo.

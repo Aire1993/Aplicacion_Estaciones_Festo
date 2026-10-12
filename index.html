@@ -1201,6 +1201,29 @@
           "Part175056",
           "Part8025739"
         ]
+      },
+      "detection": {
+        "name": "Mòdul de detecció",
+        "nameEn": "Detection Module",
+        "refs": "8044527",
+        "text": [
+          "Comprova la presència de peces vermelles, negres i metàl·liques i en determina el material o el color amb 3 sensors de proximitat de sortida digital.",
+          "El sensor inductiu detecta les peces metàl·liques, el sensor òptic de reflexió difusa detecta les vermelles i les metàl·liques, i la barrera de llum de forquilla les detecta totes. Combinant els senyals de sortida s'identifica cada peça."
+        ],
+        "more": [
+          "Té un sensor de proximitat inductiu i dos sensors de proximitat òptics.",
+          "Es pot muntar directament al carril guia d'un mòdul transportador o d'un mòdul de rampa."
+        ],
+        "key": "detection",
+        "img": "DetectionModule/img/thumb.jpg",
+        "image": "DetectionModule/img/image.jpg",
+        "page": "DetectionModule/EN/index.html",
+        "items": [
+          "Sensor196959",
+          "Sensor150395",
+          "Sensor553563",
+          "Part8025739"
+        ]
       }
     },
     "items": {
@@ -2103,6 +2126,156 @@
         ],
         "img": "Components/Part175056/img/thumb.jpg",
         "pdf": "Components/Part175056/Documentation/DataSheet.pdf"
+      },
+      "Sensor150395": {
+        "name": "Sensor de proximitat inductiu",
+        "nameEn": "Inductive Proximity Sensor",
+        "code": "SIEN-M8NB-PS-S-L",
+        "refs": "150395",
+        "text": "Sensor de proximitat inductiu de mida M8x1 i amb distància de commutació normalitzada, que s'utilitza per detectar peces que contenen metall. Al mòdul de detecció reconeix les peces metàl·liques, i el seu senyal es combina amb el dels altres sensors per identificar cada peça.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Inductiu"
+          ],
+          [
+            "Distància de commutació nominal",
+            "2,5 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "10 ... 30 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 3 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "3000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor150395/img/thumb.jpg",
+        "pdf": "Components/Sensor150395/Documentation/DataSheet.pdf"
+      },
+      "Sensor553563": {
+        "name": "Barrera de llum de forquilla",
+        "nameEn": "Fork Light Barrier",
+        "code": "SOOF-P-FL-ST-C50-P",
+        "refs": "553563",
+        "text": "Barrera de llum optoelectrònica en forma de forquilla, de polímer i amb una obertura de 50 mm, que detecta els objectes que passen entre els dos braços i s'ajusta per Teach-In. Al mòdul de detecció detecta totes les peces, sigui quin sigui el material o el color, i el seu senyal es combina amb el dels altres sensors per identificar cada peça.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Optoelectrònic, llum vermella"
+          ],
+          [
+            "Obertura de la forquilla",
+            "50 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert o tancat (commutable)"
+          ],
+          [
+            "Tensió de funcionament",
+            "10 ... 30 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 3 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "2000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor553563/img/thumb.jpg",
+        "pdf": "Components/Sensor553563/Documentation/DataSheet.pdf"
+      },
+      "Sensor8063218": {
+        "name": "Sensor retroreflector per a carril guia",
+        "nameEn": "Retro-reflective sensor for guide rail",
+        "code": "SOEG-RSG-Q20-PP-S-2L-TI + SOEZ-RFL-10",
+        "refs": "8063218 (sensor 537753, reflector 537787)",
+        "text": "Conjunt format per un emissor-receptor de llum vermella polaritzada i un reflector (mirall), que es pot muntar directament al carril guia d'una cinta transportadora o d'una rampa. A l'estació vigila el nivell d'ompliment de les rampes on es classifiquen les peces.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Llum vermella polaritzada, amb reflector (apte per a objectes transparents)"
+          ],
+          [
+            "Abast de treball",
+            "5 ... 500 mm (material de referència: reflector làser de 51 x 51 mm)"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert o tancat (commutable)"
+          ],
+          [
+            "Tensió de funcionament",
+            "10 ... 30 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 4 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "1000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor8063218/img/thumb.jpg",
+        "pdf": "Components/Sensor8063218/Documentation/DataSheet.pdf"
+      },
+      "Aktor8046324": {
+        "name": "Topall pneumàtic simple amb vàlvula",
+        "nameEn": "Stopper, simple, with valve",
+        "code": "AEVC-12-10-I-P + MHA1-M1H-3/2O-0,6-HC",
+        "refs": "8046324 (cilindre 188083, electrovàlvula 197020)",
+        "text": "Mòdul topall complet, format per un cilindre pneumàtic de cursa curta d'efecte simple i una electrovàlvula 3/2. A l'estació atura les peces sobre la cinta transportadora perquè els sensors del mòdul de detecció en puguin determinar el material i el color.",
+        "specs": [
+          [
+            "Cursa",
+            "10 mm"
+          ],
+          [
+            "Diàmetre del pistó",
+            "12 mm"
+          ],
+          [
+            "Força teòrica a 6 bar (avanç)",
+            "59 N"
+          ],
+          [
+            "Pressió de treball",
+            "Cilindre: 1,5 ... 10 bar; vàlvula: 0 ... 6 bar"
+          ],
+          [
+            "Funció de vàlvula",
+            "3/2 oberta monoestable"
+          ],
+          [
+            "Dades de la bobina",
+            "24 V CC (±10 %), 1 W"
+          ]
+        ],
+        "img": "Components/Aktor8046324/img/thumb.jpg",
+        "pdf": "Components/Aktor8046324/Documentation/DataSheet.pdf"
+      },
+      "Part8046639": {
+        "name": "Rampa 250",
+        "nameEn": "Slide 250",
+        "code": "",
+        "refs": "8046639",
+        "text": "Rampa que serveix per alimentar peces o per classificar-les. En aquesta estació, els desviadors elèctrics hi envien les peces segons el material i el color, i un sensor retroreflector en vigila el nivell d'ompliment.",
+        "specs": [],
+        "img": "Components/Part8046639/img/thumb.jpg",
+        "pdf": ""
       }
     }
   };
@@ -2128,6 +2301,7 @@
 
   var CATALOG_DISTRIBUTING = festoCatalog("Distributing Conveyor Station", "DistributionConveyorStation", ["conveyor", "stack"], ["Aktor532952", "Part8025738", "Part8033583", "Part540691", "Part8034300"]);
   var CATALOG_PICK_PLACE = festoCatalog("Pick and Place Station", "PickandPlaceStation", ["conveyor", "pickplace"], ["Aktor532952", "Part8025738", "Part8033583", "Part540691", "Part8034300"]);
+  var CATALOG_SORTING = festoCatalog("Sorting Station", "SortingStation", ["conveyor", "detection"], ["Sensor8063218", "Aktor8046324", "Aktor532952", "Part8046639", "Part8025738", "Part8033583", "Part540691"]);
 
   var STATIONS = [
     {
@@ -2164,7 +2338,8 @@
       imageId: "11-R10iEWEhm_nlZXY9dhZEHOaxzN-mjR",
       videoId: "1miOvlUw2UlK6ogMasl6DututKDaS3LBJ",
       sections: {
-        esquemes: { pdf: "11fx7idZUYUNGkPIn4b3Kom96FsnmWbbk" }
+        esquemes: { pdf: "11fx7idZUYUNGkPIn4b3Kom96FsnmWbbk" },
+        components: { catalog: CATALOG_SORTING }
       },
       description: [
         "L'estació distribueix les peces en tres rampes. Les peces col·locades a l'inici de la cinta transportadora són detectades per una barrera fotoelèctrica en forma de forqueta.",
