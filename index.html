@@ -1958,6 +1958,10 @@
     }
   };
 
+  // Fotos pujades a Google Drive: ruta de la foto a Festo -> ID del fitxer a Drive.
+  // Les que no hi són es carreguen des de la web de Festo Didactic.
+  var FESTO_DRIVE_IMAGES = {};
+
   var STATIONS = [
     {
       slug: "distributing-conveyor",
@@ -1982,7 +1986,7 @@
         components: { catalog: CATALOG_PICK_PLACE }
       },
       description: [
-        "Les carcasses de les peces de treball col·locades en el transportador es detecten mitjançant sensors difusos o barreres fotoelèctriques. La peça de treball es transporta fins al separador elèctric situat en la cinta transportadora, on és detectada per un segon sensor difús. El mòdul recull una inserció de la peça de treball de la safata lliscant i el col·loca sobre la carcassa de la peça de treball.",
+        "Les carcasses de les peces de treball col·locades en el transportador es detecten mitjançant sensors difusos o barreres fotoelèctriques. La peça de treball es transporta fins al separador elèctric situat en la cinta transportadora, on és detectada per un segon sensor difús. El mòdul recull una inserció de la peça de treball de la safata lliscant i la col·loca sobre la carcassa de la peça de treball.",
         "La peça completa (carcassa i inserció) és alliberada pel separador i transportada fins al final de la cinta transportadora. Una barrera fotoelèctrica detecta la peça al final de la cinta transportadora."
       ]
     },
@@ -1997,7 +2001,7 @@
       description: [
         "L'estació distribueix les peces en tres rampes. Les peces col·locades a l'inici de la cinta transportadora són detectades per una barrera fotoelèctrica en forma de forqueta.",
         "Les peces són detingudes per un topall pneumàtic per a determinar les seves característiques. Els sensors del mòdul de detecció determinen el material i el color de les peces (negre, vermell o metal·litzat).",
-        "Les peces es classifiquen en les rampes corresponents mitjançant deflectors accionats elèctricament. Un sensor retrorreflectante supervisa els nivells d'ompliment de les rampes."
+        "Les peces es classifiquen en les rampes corresponents mitjançant deflectors accionats elèctricament. Un sensor retroreflector supervisa els nivells d'ompliment de les rampes."
       ]
     }
   ];
@@ -2149,6 +2153,25 @@
   var catalogKey = "all";    // filtre actual
 
   function catUrl(path) { return catalog.base + path; }
+
+  // Fotos dels components: des de Google Drive si la foto hi és (FESTO_DRIVE_IMAGES), si no des de Festo.
+  // Si la de Drive falla, es torna a provar amb la de Festo.
+  function catImg(path, alt, attrs) {
+    var id = FESTO_DRIVE_IMAGES[path];
+    var festo = catUrl(path);
+    var src = id ? "https://drive.google.com/thumbnail?id=" + id + "&sz=w800" : festo;
+    return '<img ' + (attrs || "") + 'alt="' + escapeHtml(alt || "") + '" src="' + src + '"' +
+      (id ? ' data-alt="' + festo + '"' : "") + ">";
+  }
+  function imgFailed(img) {
+    var alt = img.getAttribute("data-alt");
+    if (alt) {
+      img.removeAttribute("data-alt");
+      img.src = alt;
+    } else if (img.parentNode) {
+      img.parentNode.classList.add("no-img");
+    }
+  }
   function refText(refs) { return refs ? "Ref. " + refs : ""; }
   function paragraphs(list) {
     return (list || []).map(function (t) { return "<p>" + escapeHtml(t) + "</p>"; }).join("");
@@ -2175,7 +2198,7 @@
     cat.modules.forEach(function (m, i) {
       html += '<article class="comp-module" style="--i:' + i + '">' +
         '<button type="button" class="comp-module-img" data-module="' + m.key + '" aria-label="' +
-        escapeHtml("Veure la fitxa: " + m.name) + '"><img loading="lazy" alt="" src="' + catUrl(m.img) + '"></button>' +
+        escapeHtml("Veure la fitxa: " + m.name) + '">' + catImg(m.img, "", 'loading="lazy" ') + "</button>" +
         '<div class="comp-module-body"><span class="comp-kicker">Mòdul</span>' +
         "<h4>" + escapeHtml(m.name) + "</h4>" +
         '<p class="comp-ref">' + escapeHtml(m.nameEn + " · " + refText(m.refs)) + "</p>" +
@@ -2208,7 +2231,7 @@
     panel.querySelector(".comp-grid").innerHTML = f.items.map(function (id, i) {
       var it = catalog.items[id];
       return '<button type="button" class="comp-card" data-id="' + id + '" style="--i:' + i + '">' +
-        '<span class="comp-card-img"><img loading="lazy" alt="" src="' + catUrl(it.img) + '"></span>' +
+        '<span class="comp-card-img">' + catImg(it.img, "", 'loading="lazy" ') + "</span>" +
         '<span class="comp-card-body"><span class="comp-card-name">' + escapeHtml(it.name).replace(/\//g, "/<wbr>") + "</span>" +
         (it.refs ? '<span class="comp-card-ref">' + escapeHtml(refText(it.refs)) + "</span>" : "") +
         '<span class="comp-card-text">' + escapeHtml(it.text) + "</span></span></button>";
@@ -2233,7 +2256,7 @@
   });
   // Si una foto no es pot carregar, es mostra una icona en lloc d'un requadre buit.
   panel.addEventListener("error", function (e) {
-    if (e.target.tagName === "IMG" && e.target.parentNode) e.target.parentNode.classList.add("no-img");
+    if (e.target.tagName === "IMG") imgFailed(e.target);
   }, true);
 
   // --- Fitxa d'un component ---
@@ -2279,7 +2302,7 @@
         (it.pdf ? '<a class="sheet-link" href="' + catUrl(it.pdf) + '" target="_blank" rel="noopener noreferrer">' +
           'Fitxa tècnica del fabricant (PDF) <span aria-hidden="true">&#8599;</span></a>' : "");
     }
-    return '<div class="sheet-img"><img alt="' + escapeHtml(title) + '" src="' + catUrl(img) + '"></div>' +
+    return '<div class="sheet-img">' + catImg(img, title) + "</div>" +
       '<div class="sheet-body"><span class="comp-kicker">' + escapeHtml(kicker) + "</span>" +
       '<h3 id="sheet-title">' + escapeHtml(title) + "</h3>" +
       '<p class="sheet-sub">' + escapeHtml(sub) + "</p>" + body + "</div>";
@@ -2289,7 +2312,7 @@
     sheetContent.innerHTML = sheetHtml(sheetList[sheetIndex]);
     sheetContent.scrollTop = 0;
     var img = sheetContent.querySelector(".sheet-img img");
-    img.addEventListener("error", function () { img.parentNode.classList.add("no-img"); });
+    img.addEventListener("error", function () { imgFailed(img); });
     img.addEventListener("load", function () {
       if (sheet.classList.contains("is-open") && sheetVis) layoutSheet(sheetVis, true);
     });
