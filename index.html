@@ -1,0 +1,3564 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estacions de Festo</title>
+<style>
+  :root {
+    --festo-blue: #0091dc;
+    --festo-blue-dark: #0070b0;
+    --text: #333333;
+    --text-muted: #666666;
+    --bg: #ffffff;
+    --bg-soft: #f2f3f5;
+    --border: #d3d8dd;
+    --ease-out: cubic-bezier(0.22, 0.8, 0.24, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  html.player-open { overflow: hidden; }
+
+  @keyframes view-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes card-in {
+    from { opacity: 0; translate: 0 14px; }
+    to   { opacity: 1; translate: 0 0; }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Barra superior ---------- */
+  .topbar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 0.5px;
+    color: var(--festo-blue);
+    text-decoration: none;
+    line-height: 1;
+    transition: opacity 0.25s ease;
+  }
+  .brand:hover { opacity: 0.7; }
+  .brand-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    border-left: 1px solid var(--border);
+    padding-left: 12px;
+  }
+  .logo-link {
+    display: inline-flex;
+    align-items: center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .logo-link:hover { opacity: 0.7; }
+  .logo-link:focus-visible,
+  .brand:focus-visible {
+    outline: 2px solid var(--festo-blue);
+    outline-offset: 4px;
+  }
+  .school-link { margin-left: auto; }
+  .school-link img {
+    display: block;
+    height: 44px;
+    width: auto;
+  }
+
+  /* ---------- Banda del títol ---------- */
+  .hero {
+    background: var(--bg-soft);
+    border-bottom: 4px solid var(--festo-blue);
+  }
+  .hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 36px;
+  }
+  .hero-inner.enter { animation: view-in 0.5s var(--ease-out) backwards; }
+  .breadcrumb {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .breadcrumb a {
+    color: var(--festo-blue);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .breadcrumb a:hover { text-decoration: underline; }
+  h1 {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 64px;
+  }
+  .view.enter { animation: view-in 0.5s var(--ease-out) backwards; }
+
+  /* ---------- Pantalla inicial: targetes ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, transform 0.3s var(--ease-out);
+  }
+  .cards.enter .card {
+    animation: card-in 0.55s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+  .card:hover,
+  .card:focus-visible {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+  }
+  .card:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
+  .card-img {
+    aspect-ratio: 3 / 4;
+    background: var(--bg-soft);
+    overflow: hidden;
+  }
+  .card-img img {
+    width: 100%;
+    height: 100%;
+    padding: 28px;
+    object-fit: contain;
+    display: block;
+    mix-blend-mode: multiply; /* el fons blanc de la foto es fon amb el gris del requadre */
+    transition: transform 0.4s var(--ease-out);
+  }
+  .card:hover .card-img img { transform: scale(1.04); }
+  .card-body {
+    padding: 20px 20px 24px;
+    border-top: 4px solid var(--festo-blue);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-title {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .arrow {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--festo-blue);
+    color: #fff;
+    font-size: 18px;
+    transition: transform 0.3s var(--ease-out), background 0.3s ease;
+  }
+  .card:hover .arrow { transform: translateX(4px); background: var(--festo-blue-dark); }
+
+  /* ---------- Fitxa de l'estació ---------- */
+  .detail {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 40px;
+    align-items: start;
+  }
+  .detail-text h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-text p { margin-bottom: 16px; }
+
+  /* Imatge amb vídeo */
+  .media {
+    position: relative;
+    min-height: 200px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+  }
+  .media:hover { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12); }
+  .media:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
+  .media > img {
+    width: 100%;
+    display: block;
+  }
+  .media-video {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+  }
+  .media-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .media.is-playing .media-video { opacity: 1; }
+
+  .media-badge {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 8px;
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transition: opacity 0.3s ease, transform 0.3s var(--ease-out);
+    pointer-events: none;
+  }
+  .media-badge .icon {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--festo-blue);
+    color: #fff;
+    border-radius: 50%;
+  }
+  .media-badge .icon svg { width: 10px; height: 10px; margin-left: 2px; }
+  .media-badge .hint { display: none; }
+  .media.is-hint .media-badge .label { display: none; }
+  .media.is-hint .media-badge .hint { display: inline; }
+  .media.is-playing .media-badge,
+  .media.is-loading .media-badge { opacity: 0; transform: translateY(6px); }
+
+  .media-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 4px solid rgba(0, 145, 220, 0.25);
+    border-top-color: var(--festo-blue);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+  .media.is-loading .media-spinner {
+    opacity: 1;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .media-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: rgba(0, 145, 220, 0.18);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .media-progress span {
+    display: block;
+    height: 100%;
+    background: var(--festo-blue);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .media.is-playing .media-progress { opacity: 1; }
+  .media.is-counting .media-progress span {
+    transform: scaleX(1);
+    transition: transform var(--preview-ms, 3000ms) linear;
+  }
+
+  /* Botons */
+  .buttons {
+    scroll-margin-top: 16px;
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 16px 20px;
+    background: var(--festo-blue);
+    color: #fff;
+    border: 2px solid var(--festo-blue);
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s var(--ease-out);
+  }
+  .btn:hover { background: var(--festo-blue-dark); border-color: var(--festo-blue-dark); transform: translateY(-2px); }
+  .btn:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
+  .btn.active {
+    background: var(--bg);
+    color: var(--festo-blue);
+    border-color: var(--festo-blue);
+  }
+
+  /* Panell de contingut (s'obre sota els botons) */
+  .panel-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition: grid-template-rows 0.4s var(--ease-out), opacity 0.35s ease, visibility 0s linear 0.4s;
+  }
+  .panel-wrap.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .panel-inner { overflow: hidden; min-height: 0; }
+  .panel {
+    margin-top: 24px;
+    padding: 24px;
+    background: var(--bg-soft);
+    border-left: 4px solid var(--festo-blue);
+  }
+  .panel h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .panel p { color: var(--text-muted); }
+
+  /* Document PDF dins del panell (visor de Google Drive) */
+  .doc {
+    position: relative;
+    height: min(78vh, 980px);
+    min-height: 420px;
+    margin-top: 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+  }
+  .doc iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .doc.is-loaded iframe { opacity: 1; }
+  .doc-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .doc-spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid rgba(0, 145, 220, 0.25);
+    border-top-color: var(--festo-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .panel.swap { animation: fade-in 0.35s ease; }
+
+  .back {
+    display: inline-block;
+    margin-top: 40px;
+    color: var(--festo-blue);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease-out);
+  }
+  .back:hover { text-decoration: underline; transform: translateX(-4px); }
+
+  /* ---------- Components (catàleg dins del panell) ---------- */
+  .comp-intro { margin-bottom: 20px; }
+  .comp-kicker {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--festo-blue);
+  }
+  .comp-modules {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .comp-module {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--festo-blue);
+    animation: card-in 0.5s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+  .comp-module-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: var(--bg-soft);
+    border: 0;
+    cursor: zoom-in;
+    overflow: hidden;
+  }
+  .comp-module-img img {
+    max-width: 100%;
+    max-height: 260px;
+    mix-blend-mode: multiply;
+    transition: transform 0.4s var(--ease-out);
+  }
+  .comp-module-img:hover img { transform: scale(1.04); }
+  .comp-module-img:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: -2px; }
+  .comp-module-body { padding: 18px 20px 20px; }
+  .comp-module-body h4 { font-size: 20px; font-weight: 600; line-height: 1.3; margin: 2px 0 2px; }
+  .comp-module-body p { font-size: 14px; margin-bottom: 10px; }
+  .panel .comp-ref { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+  .comp-module details { font-size: 14px; margin-bottom: 12px; }
+  .comp-module summary {
+    cursor: pointer;
+    color: var(--festo-blue);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .comp-more {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 14px;
+    background: var(--festo-blue);
+    color: #fff;
+    border: 0;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s var(--ease-out);
+  }
+  .comp-more:hover { background: var(--festo-blue-dark); transform: translateX(3px); }
+  .comp-more:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
+
+  .comp-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+    scroll-margin-top: 16px;
+  }
+  .comp-chip {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 7px 14px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .comp-chip .n {
+    display: inline-block;
+    min-width: 22px;
+    margin-left: 4px;
+    padding: 0 6px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 999px;
+    background: var(--bg-soft);
+    color: var(--text-muted);
+  }
+  .comp-chip:hover { border-color: var(--festo-blue); color: var(--festo-blue); }
+  .comp-chip[aria-pressed="true"] { background: var(--festo-blue); border-color: var(--festo-blue); color: #fff; }
+  .comp-chip[aria-pressed="true"] .n { background: rgba(255, 255, 255, 0.25); color: #fff; }
+  .comp-chip:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 16px;
+  }
+  .comp-card {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, transform 0.3s var(--ease-out);
+    animation: card-in 0.45s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 35ms);
+  }
+  .comp-card:hover,
+  .comp-card:focus-visible {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+  }
+  .comp-card:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 3px; }
+  .comp-card-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    padding: 18px;
+    background: var(--bg-soft);
+    overflow: hidden;
+  }
+  .comp-card-img img {
+    max-width: 100%;
+    max-height: 100%;
+    mix-blend-mode: multiply;
+    transition: transform 0.4s var(--ease-out);
+  }
+  .comp-card:hover .comp-card-img img { transform: scale(1.05); }
+  .comp-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 14px 14px;
+    border-top: 3px solid var(--festo-blue);
+    flex: 1;
+  }
+  .comp-card-name { font-size: 15px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+  .comp-card-ref { font-size: 12px; color: var(--text-muted); }
+  .comp-card-text {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .no-img img { display: none; }
+  .no-img::after {
+    content: "";
+    width: 40%;
+    aspect-ratio: 1;
+    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b0b7bf' stroke-width='1.5'%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Ccircle cx='9' cy='10' r='2'/%3E%3Cpath d='M21 17l-5-5-9 8'/%3E%3C/svg%3E");
+  }
+  .panel .comp-source { margin-top: 18px; font-size: 12px; }
+  .comp-source a { color: var(--festo-blue); }
+
+  /* Fitxa d'un component (finestra emergent) */
+  .sheet[hidden] { display: none; }
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+  }
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 22, 34, 0.72);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .sheet.is-open .sheet-backdrop { opacity: 1; }
+  .sheet-panel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border-top: 4px solid var(--festo-blue);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    transition: opacity 0.3s ease, transform 0.4s var(--ease-out);
+  }
+  .sheet.is-open .sheet-panel { opacity: 1; transform: none; }
+  .sheet-panel:focus { outline: none; }
+  .sheet-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--text);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .sheet-close:hover { background: var(--bg-soft); }
+  .sheet-close:focus-visible { outline: 2px solid var(--festo-blue); }
+  .sheet-close svg { width: 18px; height: 18px; }
+  .sheet-content {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-auto-rows: max-content;  /* si no hi cap, es desplaça en lloc d'encongir-se */
+    overscroll-behavior: contain; /* no arrossega la pàgina de Google Sites en arribar al final */
+    min-height: 0;
+    flex: 1;
+    overflow: auto;
+  }
+  .sheet-content.swap { animation: fade-in 0.3s ease; }
+  .sheet-content:focus { outline: none; }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .sheet-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    background: var(--bg-soft);
+    min-height: 240px;
+  }
+  .sheet-img img {
+    max-width: 100%;
+    max-height: 420px;
+    mix-blend-mode: multiply;
+  }
+  .sheet-body { padding: 24px 28px 24px; }
+  .sheet-body h3 {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.25;
+    margin: 4px 48px 4px 0;
+  }
+  .sheet-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+  .sheet-text p { margin-bottom: 12px; }
+  .sheet-specs {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 18px;
+    font-size: 14px;
+  }
+  .sheet-specs caption {
+    text-align: left;
+    font-weight: 600;
+    padding-bottom: 6px;
+  }
+  .sheet-specs th,
+  .sheet-specs td {
+    text-align: left;
+    vertical-align: top;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-specs th { font-weight: 400; color: var(--text-muted); width: 52%; }
+  .sheet-specs td { font-weight: 600; }
+  .sheet-specs tr:nth-child(odd) { background: var(--bg-soft); }
+  .sheet-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--festo-blue);
+    text-decoration: none;
+  }
+  .sheet-link:hover { text-decoration: underline; }
+  .sheet-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .sheet-nav button {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--festo-blue);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .sheet-nav button:hover { border-color: var(--festo-blue); background: var(--bg-soft); }
+  .sheet-nav button:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+  .sheet-nav button[disabled] { visibility: hidden; }
+
+  /* ---------- Peu de pàgina (contingut pendent) ---------- */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .footer-inner {
+    max-width: 1200px;
+    min-height: 64px;
+    margin: 0 auto;
+    padding: 20px 24px;
+  }
+
+  .hidden { display: none !important; }
+
+  /* ---------- Reproductor ampliat ---------- */
+  .viewport-sentinel {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .player[hidden] { display: none; }
+  .player {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+  }
+  .player-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 22, 34, 0.9);
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  .player.is-open .player-backdrop { opacity: 1; }
+  .player-stage {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+  }
+  .player.is-settled .player-stage {
+    transition: left 0.2s var(--ease-out), top 0.2s var(--ease-out), width 0.2s var(--ease-out);
+  }
+  .player.is-settled .player-video { transition: height 0.2s var(--ease-out); }
+  .player-head,
+  .player-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s var(--ease-out);
+  }
+  .player.is-open .player-head,
+  .player.is-open .player-controls {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.2s;
+  }
+  .player-head {
+    height: 52px;
+    justify-content: space-between;
+  }
+  .player-title {
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .player-video {
+    position: relative;
+    background: #fff;
+    transform-origin: 0 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+  }
+  .player-video video,
+  .player-video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    object-fit: contain;
+  }
+  .player-video .media-spinner { opacity: 0; z-index: 1; }
+  .player.is-buffering .player-video .media-spinner {
+    opacity: 1;
+    animation: spin 0.8s linear infinite;
+  }
+  .player-controls { height: 56px; }
+  .player.is-fallback .player-controls { visibility: hidden; }
+  .focus-guard {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+  }
+
+  .pbtn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #fff;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s var(--ease-out);
+  }
+  .pbtn:hover { background: rgba(255, 255, 255, 0.14); }
+  .pbtn:active { transform: scale(0.92); }
+  .pbtn:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+  .pbtn svg { width: 20px; height: 20px; }
+  .pbtn.play-btn {
+    background: var(--festo-blue);
+  }
+  .pbtn.play-btn:hover { background: var(--festo-blue-dark); }
+  .pbtn .when-playing,
+  .pbtn .when-ended,
+  .pbtn .when-fs { display: none; }
+  .player.is-playing .play-btn .when-paused { display: none; }
+  .player.is-playing .play-btn .when-playing { display: block; }
+  .player.is-ended .play-btn .when-paused { display: none; }
+  .player.is-ended .play-btn .when-ended { display: block; }
+  .player.is-fullscreen .fs-btn .when-fs { display: block; }
+  .player.is-fullscreen .fs-btn .when-normal { display: none; }
+
+  .player-time {
+    flex-shrink: 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.85);
+    min-width: 36px;
+    text-align: center;
+  }
+  .player-range {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 0;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, var(--festo-blue) 0 var(--p, 0%), rgba(255, 255, 255, 0.28) var(--p, 0%) 100%);
+    cursor: pointer;
+    outline: none;
+  }
+  .player-range:focus-visible { box-shadow: 0 0 0 3px rgba(0, 145, 220, 0.5); }
+  .player-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--festo-blue);
+    transition: transform 0.15s ease;
+  }
+  .player-range:hover::-webkit-slider-thumb { transform: scale(1.2); }
+  .player-range::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--festo-blue);
+  }
+  .player-range::-moz-range-track { background: transparent; }
+
+  .player-stage:fullscreen {
+    position: fixed;
+    inset: 0;
+    width: 100% !important;
+    height: 100%;
+    padding: 0 24px;
+    background: #0a1622;
+  }
+  .player-stage:fullscreen .player-video {
+    flex: 1;
+    height: auto !important;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1000px) {
+    .comp-modules { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 900px) {
+    .detail { grid-template-columns: 1fr; gap: 24px; }
+    .buttons { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 700px) {
+    .cards { grid-template-columns: 1fr; }
+    .card-img { aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; }
+    .card-img img { width: 62%; height: auto; padding: 0; }
+    h1 { font-size: 30px; }
+    .hero-inner { padding: 28px 16px; }
+    main { padding: 28px 16px 48px; }
+    .topbar-inner, .footer-inner { padding-left: 16px; padding-right: 16px; }
+    .panel { padding: 16px; }
+    .doc { height: 70vh; min-height: 360px; }
+    .comp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .comp-card-img { padding: 12px; }
+    .sheet-content { grid-template-columns: 1fr; }
+    .sheet-img { min-height: 0; padding: 20px; }
+    .sheet-img img { max-height: 220px; }
+    .sheet-body { padding: 18px 18px 20px; }
+    .sheet-body h3 { font-size: 20px; }
+  }
+  @media (max-width: 520px) {
+    .brand-sub { display: none; }
+    .school-link img { height: 36px; }
+    .player-time.total { display: none; }
+  }
+  @media (max-width: 480px) {
+    .comp-module { grid-template-columns: 1fr; }
+    .comp-module-img img { max-height: 200px; }
+  }
+  @media (max-width: 420px) {
+    .buttons { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
+    .media.is-counting .media-progress span { transition-duration: var(--preview-ms, 3000ms) !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="https://www.festo.com/es/es" target="_blank" rel="noopener noreferrer" title="Festo">FESTO</a>
+    <span class="brand-sub">Estacions didàctiques</span>
+    <a class="logo-link school-link" href="https://escoladeltreball.org/ca/" target="_blank" rel="noopener noreferrer" title="Institut Escola del Treball de Barcelona">
+      <img alt="Institut Escola del Treball de Barcelona" src="data:image/png;base64,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">
+    </a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner" id="hero">
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <h1 id="page-title">Estacions de Festo</h1>
+  </div>
+</section>
+
+<main>
+  <!-- Pantalla inicial -->
+  <section id="home" class="view cards"></section>
+
+  <!-- Pantalla de l'estació -->
+  <section id="station" class="view hidden">
+    <div class="detail">
+      <div class="media" id="media" tabindex="0" role="button" aria-label="Reproduir el vídeo de l'estació">
+        <img id="station-img" alt="">
+        <div class="media-video" id="media-video"></div>
+        <div class="media-spinner" aria-hidden="true"></div>
+        <div class="media-badge" aria-hidden="true">
+          <span class="icon"><svg viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z" fill="currentColor"/></svg></span>
+          <span class="label">Vídeo</span>
+          <span class="hint">Clica per veure el vídeo</span>
+        </div>
+        <div class="media-progress" aria-hidden="true"><span></span></div>
+      </div>
+      <div class="detail-text">
+        <h2>Descripció</h2>
+        <div id="station-desc"></div>
+      </div>
+    </div>
+
+    <div class="buttons" id="buttons"></div>
+    <div class="panel-wrap" id="panel-wrap">
+      <div class="panel-inner"><div class="panel" id="panel"></div></div>
+    </div>
+
+    <a class="back" href="#">&larr; Tornar a les estacions</a>
+  </section>
+</main>
+
+<!-- Peu de pàgina: contingut pendent -->
+<footer class="site-footer"><div class="footer-inner" id="footer"></div></footer>
+
+<!-- Fitxa d'un component -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-backdrop" id="sheet-backdrop"></div>
+  <div class="sheet-panel" id="sheet-panel" tabindex="-1">
+    <button class="sheet-close" id="sheet-close" type="button" aria-label="Tancar la fitxa">
+      <svg viewBox="0 0 20 20"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="sheet-content" id="sheet-content" tabindex="-1"></div>
+    <div class="sheet-nav">
+      <button type="button" id="sheet-prev">&lsaquo; Anterior</button>
+      <span id="sheet-count"></span>
+      <span class="sr-only" id="sheet-status" aria-live="polite"></span>
+      <button type="button" id="sheet-next">Següent &rsaquo;</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reproductor de vídeo ampliat -->
+<div class="viewport-sentinel" id="viewport-sentinel" aria-hidden="true"></div>
+<div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="player-title" hidden>
+  <div class="player-backdrop" id="player-backdrop"></div>
+  <div class="player-stage" id="player-stage">
+    <div class="player-head">
+      <span class="player-title" id="player-title"></span>
+      <button class="pbtn close-btn" id="player-close" type="button" aria-label="Tancar el vídeo">
+        <svg viewBox="0 0 20 20"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="player-video" id="player-video">
+      <div class="media-spinner" aria-hidden="true"></div>
+    </div>
+    <div class="player-controls">
+      <button class="pbtn play-btn" id="player-play" type="button" aria-label="Reproduir / Pausar">
+        <svg class="when-paused" viewBox="0 0 20 20"><path d="M6 3.5l11 6.5-11 6.5z" fill="currentColor"/></svg>
+        <svg class="when-playing" viewBox="0 0 20 20"><path d="M5 3h3.5v14H5zM11.5 3H15v14h-3.5z" fill="currentColor"/></svg>
+        <svg class="when-ended" viewBox="0 0 20 20"><path d="M10 4a6 6 0 1 1-5.66 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 3.5v5h5z" fill="currentColor"/></svg>
+      </button>
+      <span class="player-time" id="player-current">0:00</span>
+      <input class="player-range" id="player-range" type="range" min="0" max="0" step="any" value="0" aria-label="Línia de temps">
+      <span class="player-time total" id="player-total">0:00</span>
+      <button class="pbtn fs-btn" id="player-fs" type="button" aria-label="Pantalla completa">
+        <svg class="when-normal" viewBox="0 0 20 20"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <svg class="when-fs" viewBox="0 0 20 20"><path d="M8 3v5H3M17 8h-5V3M12 17v-5h5M3 12h5v5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+    </div>
+    <span class="focus-guard" id="player-guard" tabindex="0"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------------------
+  // Dades
+  // ---------------------------------------------------------------------------
+
+  // Imatges i vídeos es carreguen des de Google Drive (els fitxers han de ser públics).
+  function driveImg(id) {
+    return "https://drive.google.com/thumbnail?id=" + id + "&sz=w1200";
+  }
+  function driveImgFallback(id) {
+    return "https://lh3.googleusercontent.com/d/" + id + "=w1200";
+  }
+  function driveVideo(id) {
+    return "https://drive.google.com/uc?export=download&id=" + id;
+  }
+  // Visor de Google Drive incrustat (vídeos que el navegador no pot reproduir i documents PDF).
+  function drivePreview(id) {
+    return "https://drive.google.com/file/d/" + id + "/preview";
+  }
+
+  // Components de les estacions (botó Components). Dades: Festo Didactic InfoPortal i fitxes tècniques.
+  // Els mòduls i components són compartits: cada estació només diu quins en té.
+  var FESTO_COMPONENTS = {
+    "base": "https://ip.festo-didactic.com/InfoPortal/MPS/",
+    "modules": {
+      "conveyor": {
+        "name": "Mòdul transportador",
+        "nameEn": "Conveyor Module",
+        "refs": "8032692, 8033135",
+        "text": [
+          "Transporta les peces i les pot retenir en espera. Uns sensors òptics amb cable de fibra òptica comproven si hi ha peça abans del separador i al final de la cinta.",
+          "La cinta l'acciona un motoreductor de corrent continu. Un electroimant amb separador pot aturar i separar les peces, i les posicions finals es controlen amb sensors inductius."
+        ],
+        "more": [
+          "Es pot muntar sobre una placa perfilada, un peu de perfil o un bastidor ranurat, i el motor de CC es pot col·locar on convingui. És apte per a peces de 40 mm de diàmetre (per exemple, els jocs de peces «Body» o «Cylinder for assembly»).",
+          "Es subministra completament muntat, amb el controlador del motor integrat, que permet el gir en tots dos sentits.",
+          "Si es treu el pont entre els borns 6 i 8 del controlador del motor, el born 6 es pot connectar al born 11/12 del terminal mini d'E/S per regular la velocitat de la cinta amb un senyal analògic de 0 ... 10 V."
+        ],
+        "key": "conveyor",
+        "img": "ConveyorModule/img/thumb.jpg",
+        "image": "ConveyorModule/img/image.jpg",
+        "page": "ConveyorModule/EN/index.html",
+        "items": [
+          "Sensor196959",
+          "Sensor196960",
+          "Aktor532952",
+          "Aktor532941",
+          "Part8064284",
+          "Part8025739"
+        ]
+      },
+      "pickplace": {
+        "name": "Mòdul Pick&Place",
+        "nameEn": "Pick and Place Module (Suction Gripper)",
+        "refs": "8031659",
+        "text": [
+          "Manipulador pneumàtic que munta les peces amb una ventosa. Es basa en unitats de lliscament (minicarros) de precisió, i les posicions finals dels carros es detecten elèctricament amb sensors de proximitat.",
+          "La posició dels sensors, la posició de muntatge i l'alçada de muntatge es poden ajustar."
+        ],
+        "more": [
+          "Una ventosa de manxa agafa les peces. Directament a la ventosa hi ha muntat un filtre de buit que evita que la brutícia arribi al generador de buit, i un sensor de pressió de buit (pressòstat) indica que la peça està ben agafada.",
+          "Amb un regulador de pressió es pot ajustar la força de la unitat de lliscament vertical (eix Z).",
+          "Es subministra complet: unitats de lliscament, generador de buit, filtre de buit, ventosa de manxa, pressòstat, terminal de vàlvules, regulador de pressió i interfície elèctrica."
+        ],
+        "key": "pickplace",
+        "img": "PickandPlaceModule/img/thumb.jpg",
+        "image": "PickandPlaceModule/img/image.jpg",
+        "page": "PickandPlaceModule/EN/index.html",
+        "items": [
+          "Sensor173210",
+          "Sensor527458",
+          "Aktor543930",
+          "Aktor525675",
+          "Part175041",
+          "Part153495",
+          "Part193552",
+          "Part189199",
+          "Part191203",
+          "Part189401",
+          "Part153329",
+          "Part153328",
+          "Part153252",
+          "Part8025739"
+        ]
+      },
+      "stack": {
+        "name": "Mòdul magatzem apilador",
+        "nameEn": "Stack Magazine Module",
+        "refs": "8032171, 8032172",
+        "text": [
+          "Separa les peces d'un magatzem. Al tub s'hi poden apilar fins a 7 peces en qualsevol ordre, i girant el tub es poden separar fins a 17 tapes de peça.",
+          "Un cilindre de doble efecte empeny la peça de més avall fora del magatzem per gravetat, contra un topall extern, i la deixa al suport: aquest és el punt de transferència al mòdul següent."
+        ],
+        "more": [
+          "Una barrera de llum sota el tub comprova si el magatzem és buit. Opcionalment, a la base s'hi pot cargolar un sensor optoelectrònic que detecta les tapes i les peces; també se'n pot instal·lar un al suport.",
+          "La posició del cilindre expulsor es detecta elèctricament amb sensors de proximitat, i la velocitat d'avanç i de retorn es regula de manera contínua amb vàlvules reguladores de cabal unidireccionals.",
+          "Si s'hi afegeix la base, se'n pot ajustar l'alçada per acoblar-lo directament, per exemple, a un mòdul transportador."
+        ],
+        "key": "stack",
+        "img": "StackMagazineModule/img/thumb.jpg",
+        "image": "StackMagazineModule/img/image.jpg",
+        "page": "StackMagazineModule/EN/index.html",
+        "items": [
+          "Sensor150855",
+          "Sensor196960",
+          "Aktor19182",
+          "Aktor564212_M52",
+          "Part175056",
+          "Part8025739"
+        ]
+      },
+      "detection": {
+        "name": "Mòdul de detecció",
+        "nameEn": "Detection Module",
+        "refs": "8044527",
+        "text": [
+          "Comprova la presència de peces vermelles, negres i metàl·liques i en determina el material o el color amb 3 sensors de proximitat de sortida digital.",
+          "El sensor inductiu detecta les peces metàl·liques, el sensor òptic de reflexió difusa detecta les vermelles i les metàl·liques, i la barrera de llum de forquilla les detecta totes. Combinant els senyals de sortida s'identifica cada peça."
+        ],
+        "more": [
+          "Té un sensor de proximitat inductiu i dos sensors de proximitat òptics.",
+          "Es pot muntar directament al carril guia d'un mòdul transportador o d'un mòdul de rampa."
+        ],
+        "key": "detection",
+        "img": "DetectionModule/img/thumb.jpg",
+        "image": "DetectionModule/img/image.jpg",
+        "page": "DetectionModule/EN/index.html",
+        "items": [
+          "Sensor196959",
+          "Sensor150395",
+          "Sensor553563",
+          "Part8025739"
+        ]
+      }
+    },
+    "items": {
+      "Sensor196959": {
+        "name": "Sensor de reflexió difusa de fibra òptica",
+        "nameEn": "Diffuse sensor",
+        "code": "SOEG-L-Q30-P-A-S-2L + SOEZ-LLK-RT-2,0-M6",
+        "refs": "165327, 165358",
+        "text": "Sensor òptic format per un equip de fibra òptica amb cable i escaire de muntatge per a perfil o placa perfilada, i un cable de fibra òptica. Emet llum vermella i detecta per reflexió els objectes situats davant la fibra, fins i tot si són molt petits o en llocs de difícil accés.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Llum vermella, per reflexió"
+          ],
+          [
+            "Abast màxim de detecció",
+            "120 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP"
+          ],
+          [
+            "Tensió de funcionament",
+            "24 V CC (10 ... 30 V)"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 4 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "1000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor196959/img/thumb.jpg",
+        "pdf": "Components/Sensor196959/Documentation/DataSheet.pdf"
+      },
+      "Sensor196960": {
+        "name": "Barrera de llum de fibra òptica",
+        "nameEn": "Light barrier",
+        "code": "SOEG-L-Q30-P-A-S-2L + SOEZ-LLK-SE-2,0-M4",
+        "refs": "165327, 165360",
+        "text": "Barrera de llum formada per un equip de fibra òptica amb cable i escaire de muntatge per a perfil o placa perfilada, i un cable de fibra òptica. Detecta un objecte quan aquest interromp el feix de llum vermella guiat per la fibra, fins i tot en llocs de difícil accés.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Llum vermella, per interrupció del feix"
+          ],
+          [
+            "Abast màxim (cable de fibra òptica)",
+            "400 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP"
+          ],
+          [
+            "Tensió de funcionament",
+            "24 V CC (10 ... 30 V)"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 4 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "1000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor196960/img/thumb.jpg",
+        "pdf": "Components/Sensor196960/Documentation/DataSheet.pdf"
+      },
+      "Sensor173210": {
+        "name": "Sensor de proximitat magnètic SME (contacte reed)",
+        "nameEn": "Proximity Sensor SME",
+        "code": "SME-10-KL-LED-24",
+        "refs": "173210",
+        "text": "Sensor de proximitat elèctric amb contacte reed i cable, per a actuadors amb ranura en C. Al mòdul Pick&Place es munta a la ranura d'un actuador, commuta per efecte magnètic i indica el seu estat amb un LED groc.",
+        "specs": [
+          [
+            "Principi de mesura",
+            "Magnètic, contacte reed"
+          ],
+          [
+            "Funció de l'element de commutació",
+            "Contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "12 ... 27 V CA/CC"
+          ],
+          [
+            "Corrent màxim de sortida",
+            "100 mA"
+          ],
+          [
+            "Connexió elèctrica",
+            "Cable de 3 fils, 2,5 m"
+          ],
+          [
+            "Indicador d'estat",
+            "LED groc"
+          ]
+        ],
+        "img": "Components/Sensor173210/img/thumb.jpg",
+        "pdf": "Components/Sensor173210/Documentation/DataSheet.pdf"
+      },
+      "Sensor527458": {
+        "name": "Sensor de pressió de buit SDE5",
+        "nameEn": "Pressure sensor SDE5",
+        "code": "SDE5-V1-O-Q6-P-M8",
+        "refs": "527458",
+        "text": "Sensor de pressió per a buit amb connector M8, que mesura la pressió relativa entre 0 i -1 bar amb un element piezoresistiu. Al mòdul Pick&Place, que treballa amb una ventosa, activa una sortida PNP quan el buit arriba al llindar ajustat.",
+        "specs": [
+          [
+            "Rang de mesura (pressió relativa)",
+            "0 ... -1 bar"
+          ],
+          [
+            "Principi de mesura",
+            "Sensor de pressió piezoresistiu"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "15 ... 30 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 3 pins"
+          ],
+          [
+            "Connexió pneumàtica",
+            "QS-6"
+          ]
+        ],
+        "img": "Components/Sensor527458/img/thumb.jpg",
+        "pdf": "Components/Sensor527458/Documentation/DataSheet.pdf"
+      },
+      "Aktor532952": {
+        "name": "Mòdul desviador/separador elèctric",
+        "nameEn": "Sorting gate/separator module, el.",
+        "code": "",
+        "refs": "532952",
+        "text": "Mòdul que permet desviar (classificar) o separar les peces que circulen per una cinta transportadora. S'acciona elèctricament amb un electroimant rotatiu de corrent continu de 24 V.",
+        "specs": [
+          [
+            "Tipus d'actuador",
+            "Electroimant rotatiu de CC (Magnet-Schultz, sèrie G DA)"
+          ],
+          [
+            "Tensió nominal",
+            "24 V CC"
+          ],
+          [
+            "Angle de gir",
+            "35°, 65° o 95° (+3°), segons el model"
+          ],
+          [
+            "Retorn",
+            "Molla de retorn opcional, amb força de retorn ajustable"
+          ],
+          [
+            "Grau de protecció",
+            "IP 20 (VDE 0470/EN 60529)"
+          ],
+          [
+            "Connexió elèctrica",
+            "Cables flexibles lliures"
+          ]
+        ],
+        "img": "Components/Aktor532952/img/thumb.jpg",
+        "pdf": "Components/Aktor532952/Documentation/DataSheet_en.pdf"
+      },
+      "Aktor532941": {
+        "name": "Motor de corrent continu (motoreductor)",
+        "nameEn": "DC motor",
+        "code": "",
+        "refs": "532941 (motoreductor 374134)",
+        "text": "Motoreductor de corrent continu de 24 V, amb el motor fixat a un reductor reversible de cargol sens fi (eixos en angle recte), que acciona la cinta transportadora. Es subministra complet amb acoblament i accessoris de muntatge per al mòdul transportador 700 o 350.",
+        "specs": [
+          [
+            "Tensió nominal",
+            "24 V"
+          ],
+          [
+            "Corrent nominal",
+            "1,5 A"
+          ],
+          [
+            "Velocitat nominal de l'eix de sortida",
+            "65 r.p.m."
+          ],
+          [
+            "Parell nominal / d'arrencada",
+            "1 Nm / 7 Nm"
+          ],
+          [
+            "Gir reversible",
+            "Sí"
+          ],
+          [
+            "Connexió elèctrica",
+            "2 terminals plans"
+          ]
+        ],
+        "img": "Components/Aktor532941/img/thumb.jpg",
+        "pdf": "Components/Aktor532941/Documentation/DataSheet.pdf"
+      },
+      "Part8064284": {
+        "name": "Controlador de motor de CC",
+        "nameEn": "DC Motor Controller",
+        "code": "",
+        "refs": "8064284",
+        "text": "S'utilitza per canviar el sentit de gir i regular la velocitat de motors de CC amb escombretes de 24 V / 4 A, amb consigna de velocitat interna (potenciòmetre) o externa (entrada analògica). Inclou desconnexió per sobrecorrent, detecció de curtcircuit, aturada ràpida i detecció de finals de cursa, i es munta en un carril DIN de 35 mm.",
+        "specs": [
+          [
+            "Tensió nominal",
+            "24 V CC ±10 %, molt baixa tensió de seguretat (SELV, PELV)"
+          ],
+          [
+            "Corrent permanent del motor",
+            "4 A CC"
+          ],
+          [
+            "Entrades de control",
+            "1 lògic: 10 ... 24 V CC; 0 lògic: 0 ... 4 V CC"
+          ],
+          [
+            "Entrada analògica (consigna de velocitat)",
+            "0 ... 10 V CC, tolerant a 24 V, resistència d'entrada aprox. 100 kΩ"
+          ],
+          [
+            "Sortida digital «a punt per funcionar»",
+            "Activa a nivell alt, 24 V / 0,7 A, protegida contra curtcircuits"
+          ],
+          [
+            "Temperatura ambient",
+            "5 ... 40 °C"
+          ]
+        ],
+        "img": "Components/Part8064284/img/thumb.jpg",
+        "pdf": "Components/Part8064284/Documentation/DataSheet.pdf"
+      },
+      "Part8034300": {
+        "name": "Suport per a cables amb velcro",
+        "nameEn": "Cable holder with hook-and-loop",
+        "code": "",
+        "refs": "8034300",
+        "text": "Element de fixació fiable i estable, amb tancament de velcro, per guiar i subjectar els cables i els tubs de les instal·lacions elèctriques i pneumàtiques de la planta.",
+        "specs": [],
+        "img": "Components/Part8034300/img/thumb.jpg",
+        "pdf": ""
+      },
+      "Aktor543930": {
+        "name": "Minicarro pneumàtic (unitat de lliscament)",
+        "nameEn": "Mini slide DGSL",
+        "code": "DGSL-8-50-PA",
+        "refs": "543930",
+        "text": "Actuador lineal pneumàtic de doble efecte amb guia de gàbia de boles molt precisa i resistent, preparat per a la detecció de posició amb sensors de proximitat. Té amortiment elàstic a tots dos extrems, sense topall metàl·lic a les posicions finals.",
+        "specs": [
+          [
+            "Cursa",
+            "50 mm"
+          ],
+          [
+            "Diàmetre del pistó",
+            "10 mm"
+          ],
+          [
+            "Pressió de treball",
+            "1,5 ... 8 bar"
+          ],
+          [
+            "Força teòrica a 6 bar (avanç / retorn)",
+            "47 N / 40 N"
+          ],
+          [
+            "Repetibilitat",
+            "0,3 mm"
+          ],
+          [
+            "Connexió pneumàtica",
+            "M3"
+          ]
+        ],
+        "img": "Components/Aktor543930/img/thumb.jpg",
+        "pdf": "Components/Aktor543930/Documentation/DataSheet.pdf"
+      },
+      "Aktor525675": {
+        "name": "Terminal de vàlvules",
+        "nameEn": "Valve manifold CPV-SC",
+        "code": "CPV-SC-MP-VI",
+        "refs": "525675",
+        "text": "Terminal de vàlvules d'accionament elèctric amb connexió multipol, que distribueix l'aire comprimit cap als actuadors pneumàtics del mòdul. Segons la configuració, pot dur vàlvules 2/2, 3/2 i 5/2, i és apte per a buit.",
+        "specs": [
+          [
+            "Funcions de vàlvula possibles",
+            "2/2 tancada monoestable; 3/2 tancada o oberta monoestable; 5/2 monoestable o biestable"
+          ],
+          [
+            "Pressió de treball",
+            "-0,9 ... 7 bar"
+          ],
+          [
+            "Tensió nominal de funcionament",
+            "24 V CC (±10 %)"
+          ],
+          [
+            "Cabal nominal màxim",
+            "170 l/min (vàlvules de 10 mm)"
+          ],
+          [
+            "Nombre màxim de posicions de vàlvula",
+            "16"
+          ],
+          [
+            "Grau de protecció",
+            "IP40"
+          ]
+        ],
+        "img": "Components/Aktor525675/img/thumb.jpg",
+        "pdf": "Components/Aktor525675/Documentation/DataSheet.pdf"
+      },
+      "Part175041": {
+        "name": "Vàlvula reguladora de cabal unidireccional",
+        "nameEn": "One-way flow control valve GRLA",
+        "code": "GRLA-M3-QS-3",
+        "refs": "175041",
+        "text": "Vàlvula d'estrangulació amb antiretorn que es cargola en una connexió M3 i regula el cabal de l'aire d'escapament i, així, la velocitat del moviment. Té una connexió ràpida QS-3 per al tub i s'ajusta amb un cargol de cap ranurat.",
+        "specs": [
+          [
+            "Connexions pneumàtiques",
+            "QS-3 (connexió 1) / M3 (connexió 2)"
+          ],
+          [
+            "Pressió de treball",
+            "0,2 ... 10 bar"
+          ],
+          [
+            "Cabal nominal en sentit d'estrangulació",
+            "41 l/min"
+          ],
+          [
+            "Cabal nominal en sentit antiretorn",
+            "27 ... 50 l/min"
+          ],
+          [
+            "Element d'ajust",
+            "Cargol de cap ranurat"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Part175041/img/thumb.jpg",
+        "pdf": "Components/Part175041/Documentation/DataSheet.pdf"
+      },
+      "Part153495": {
+        "name": "Regulador de pressió amb manòmetre",
+        "nameEn": "Pressure regulator LRMA",
+        "code": "LRMA-QS-4",
+        "refs": "153495",
+        "text": "Regulador de pressió amb manòmetre que manté constant la pressió de sortida (amb escapament secundari). Té connexions ràpides QS-4 a l'entrada i a la sortida i un cargol moletejat amb contrafemella per bloquejar l'ajust.",
+        "specs": [
+          [
+            "Rang de regulació de pressió",
+            "1 ... 8 bar"
+          ],
+          [
+            "Pressió d'entrada",
+            "0 ... 9 bar"
+          ],
+          [
+            "Cabal nominal",
+            "50 l/min"
+          ],
+          [
+            "Connexions pneumàtiques",
+            "QS-4 (connexió 1) / QS-4 (connexió 2)"
+          ],
+          [
+            "Indicació de pressió",
+            "Amb manòmetre"
+          ],
+          [
+            "Temperatura ambient",
+            "0 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Part153495/img/thumb.jpg",
+        "pdf": "Components/Part153495/Documentation/DataSheet.pdf"
+      },
+      "Part193552": {
+        "name": "Generador de buit",
+        "nameEn": "Vacuum generator VN",
+        "code": "VN-05-M-I3-PQ2-VQ2",
+        "refs": "193552",
+        "text": "Ejector de buit en línia, d'alt buit i de 10 mm d'amplada, que genera buit a partir de l'aire comprimit mitjançant una tovera Laval. Al mòdul subministra el buit a la ventosa i té connexions ràpides QS-6.",
+        "specs": [
+          [
+            "Pressió de treball",
+            "1 ... 8 bar"
+          ],
+          [
+            "Pressió nominal de treball",
+            "6 bar"
+          ],
+          [
+            "Buit màxim",
+            "86 % (a 6 bar)"
+          ],
+          [
+            "Cabal d'aspiració màxim (respecte a l'atmosfera)",
+            "6,1 l/min"
+          ],
+          [
+            "Diàmetre nominal de la tovera Laval",
+            "0,45 mm"
+          ],
+          [
+            "Connexions (aire comprimit / buit)",
+            "QS-6 / QS-6"
+          ]
+        ],
+        "img": "Components/Part193552/img/thumb.jpg",
+        "pdf": "Components/Part193552/Documentation/DataSheet.pdf"
+      },
+      "Part189199": {
+        "name": "Suport de ventosa",
+        "nameEn": "Suction cup holder ESH",
+        "code": "ESH-HA-4-QS",
+        "refs": "189199",
+        "text": "Suport que subjecta la ventosa (fixació M6) i li fa arribar el buit a través de la connexió QS-6 de la part superior. No té compensació d'alçada i es fixa amb dues femelles hexagonals.",
+        "specs": [
+          [
+            "Connexió de buit",
+            "QS-6"
+          ],
+          [
+            "Fixació de la ventosa",
+            "M6"
+          ],
+          [
+            "Mida de suport de ventosa",
+            "Mida 4"
+          ],
+          [
+            "Tipus de fixació",
+            "Amb contrafemella"
+          ],
+          [
+            "Temperatura ambient",
+            "0 ... 60 °C"
+          ],
+          [
+            "Pes del producte",
+            "30 g"
+          ]
+        ],
+        "img": "Components/Part189199/img/thumb.jpg",
+        "pdf": "Components/Part189199/Documentation/DataSheet.pdf"
+      },
+      "Part191203": {
+        "name": "Filtre de buit",
+        "nameEn": "Vacuum filter ESF",
+        "code": "ESF-4A",
+        "refs": "191203",
+        "text": "Filtre per a circuits de buit que reté les partícules de l'aire aspirat, amb una finor de filtració de 10 µm. Es fixa a través de la connexió de buit, amb rosca exterior, i tant la connexió pneumàtica com la de buit són M6.",
+        "specs": [
+          [
+            "Finor de filtració",
+            "10 µm"
+          ],
+          [
+            "Pressió de treball",
+            "-0,95 ... 4 bar"
+          ],
+          [
+            "Cabal amb un buit de -0,75 bar",
+            "260 l/min"
+          ],
+          [
+            "Connexió pneumàtica i de buit",
+            "M6"
+          ],
+          [
+            "Temperatura ambient",
+            "0 ... 60 °C"
+          ],
+          [
+            "Pes del producte",
+            "19 g"
+          ]
+        ],
+        "img": "Components/Part191203/img/thumb.jpg",
+        "pdf": "Components/Part191203/Documentation/DataSheet.pdf"
+      },
+      "Part189401": {
+        "name": "Ventosa de manxa",
+        "nameEn": "Suction cup complete ESS",
+        "code": "ESS-20-CS",
+        "refs": "189401",
+        "text": "Ventosa rodona de silicona (VMQ) de 20 mm de diàmetre, amb manxa de 3,5 plecs, que subjecta les peces per buit. Es cargola amb la rosca M6 de la connexió de buit i es pot canviar fàcilment.",
+        "specs": [
+          [
+            "Diàmetre de la ventosa",
+            "20 mm"
+          ],
+          [
+            "Forma de la ventosa",
+            "Rodona, manxa de 3,5 plecs"
+          ],
+          [
+            "Pressió de treball nominal",
+            "-0,7 bar"
+          ],
+          [
+            "Força de retenció a la pressió nominal",
+            "8,2 N"
+          ],
+          [
+            "Connexió de buit",
+            "M6"
+          ],
+          [
+            "Material de la ventosa",
+            "VMQ (silicona)"
+          ]
+        ],
+        "img": "Components/Part189401/img/thumb.jpg",
+        "pdf": "Components/Part189401/Documentation/DataSheet.pdf"
+      },
+      "Part153329": {
+        "name": "Racor instantani reductor de 6 a 4 mm",
+        "nameEn": "Push-in connector QSM-6H",
+        "code": "QSM-6H-4",
+        "refs": "153329",
+        "text": "Racor instantani reductor de mida mini: per un costat té un maniguet d'endollar QS-6 (s'endolla a un racor de 6 mm) i per l'altre accepta tub de 4 mm de diàmetre exterior. Permet passar de 6 mm a 4 mm.",
+        "specs": [
+          [
+            "Connexió 1",
+            "Maniguet d'endollar QS-6"
+          ],
+          [
+            "Connexió 2",
+            "Per a tub de diàmetre exterior 4 mm"
+          ],
+          [
+            "Diàmetre nominal",
+            "2,6 mm"
+          ],
+          [
+            "Pressió de treball (tot el rang de temperatura)",
+            "-0,95 ... 6 bar"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 80 °C"
+          ],
+          [
+            "Pes del producte",
+            "2,4 g"
+          ]
+        ],
+        "img": "Components/Part153329/img/thumb.jpg",
+        "pdf": "Components/Part153329/Documentation/DataSheet.pdf"
+      },
+      "Part153328": {
+        "name": "Racor instantani reductor de 4 a 3 mm",
+        "nameEn": "Push-in connector QSM-4H",
+        "code": "QSM-4H-3",
+        "refs": "153328",
+        "text": "Racor instantani reductor de mida mini: per un costat té un maniguet d'endollar QS-4 (s'endolla a un racor de 4 mm) i per l'altre accepta tub de 3 mm de diàmetre exterior. Permet passar de 4 mm a 3 mm.",
+        "specs": [
+          [
+            "Connexió 1",
+            "Maniguet d'endollar QS-4"
+          ],
+          [
+            "Connexió 2",
+            "Per a tub de diàmetre exterior 3 mm"
+          ],
+          [
+            "Diàmetre nominal",
+            "1,7 mm"
+          ],
+          [
+            "Pressió de treball (tot el rang de temperatura)",
+            "-0,95 ... 6 bar"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 80 °C"
+          ],
+          [
+            "Pes del producte",
+            "0,8 g"
+          ]
+        ],
+        "img": "Components/Part153328/img/thumb.jpg",
+        "pdf": "Components/Part153328/Documentation/DataSheet.pdf"
+      },
+      "Part153252": {
+        "name": "Maniguet d'unió d'endollar de 6 mm",
+        "nameEn": "Push-in sleeve QSH",
+        "code": "QSH-6",
+        "refs": "153252",
+        "text": "Maniguet d'endollar amb connexió QS-6 als dos extrems (de 6 mm a 6 mm). Serveix per unir dos racors instantanis de 6 mm.",
+        "specs": [
+          [
+            "Connexió 1",
+            "Maniguet d'endollar QS-6"
+          ],
+          [
+            "Connexió 2",
+            "Maniguet d'endollar QS-6"
+          ],
+          [
+            "Diàmetre nominal",
+            "4 mm"
+          ],
+          [
+            "Pressió de treball (tot el rang de temperatura)",
+            "-0,95 ... 6 bar"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 80 °C"
+          ],
+          [
+            "Pes del producte",
+            "0,5 g"
+          ]
+        ],
+        "img": "Components/Part153252/img/thumb.jpg",
+        "pdf": "Components/Part153252/Documentation/DataSheet.pdf"
+      },
+      "Part8025739": {
+        "name": "Terminal mini d'E/S",
+        "nameEn": "Mini I/O Terminal",
+        "code": "",
+        "refs": "8025739",
+        "text": "És la interfície elèctrica central dels mòduls MPS: s'hi connecten amb borns de molla 4 entrades i 4 sortides digitals, 2 entrades analògiques i 1 sortida analògica, que es porten a una presa D-Sub HD de 15 pins per connectar el mòdul fàcilment (plug&play) amb un cable D-Sub HD. Els LED de les entrades i sortides mostren l'estat de commutació i faciliten la cerca sistemàtica d'avaries.",
+        "specs": [
+          [
+            "Tensió de funcionament",
+            "24 V CC"
+          ],
+          [
+            "E/S digitals (4 DI / 4 DO)",
+            "Màx. 24 V CC; màx. 2 A per sortida; màx. 4 A en total"
+          ],
+          [
+            "E/S analògiques (2 AI / 1 AO)",
+            "0 ... 10 V CC o ±10 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "D-Sub HD de 15 pins (3 files); born de molla 0,14 ... 0,5 mm²"
+          ],
+          [
+            "Indicadors",
+            "LED d'estat: blau (alimentació), verd (senyals d'entrada), taronja (senyals de sortida)"
+          ],
+          [
+            "Dimensions",
+            "45 mm x 77 mm x 42 mm"
+          ]
+        ],
+        "img": "Components/Part8025739/img/thumb.jpg",
+        "pdf": "Components/Part8025739/Documentation/DataSheet.pdf"
+      },
+      "Part8025738": {
+        "name": "Interfície C",
+        "nameEn": "C interface",
+        "code": "",
+        "refs": "8025738",
+        "text": "És la interfície entre els mòduls MPS i el PLC (connexió «Plug and Learn»): s'hi poden connectar un o dos mòduls a les preses D-Sub HD; les entrades i sortides digitals arriben al PLC per la presa SysLink de 24 pins (IEEE-488), i les analògiques es poden connectar a través de la presa D-Sub de 15 pins. Els LED d'estat mostren l'estat de les entrades i sortides i faciliten la cerca d'avaries.",
+        "specs": [
+          [
+            "Tensió de funcionament",
+            "24 V CC"
+          ],
+          [
+            "E/S digitals (8 DI / 8 DO)",
+            "Màx. 24 V CC; màx. 2 A per sortida; màx. 4 A en total"
+          ],
+          [
+            "E/S analògiques (4 AI / 2 AO)",
+            "0 ... 10 V CC o ±10 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "2x D-Sub HD de 15 pins (3 files); 1x presa IEEE-488 de 24 pins (SysLink); 1x D-Sub de 15 pins (2 files)"
+          ],
+          [
+            "Indicadors",
+            "LED d'estat: blau (alimentació), verd (senyals d'entrada), taronja (senyals de sortida)"
+          ],
+          [
+            "Dimensions",
+            "68 mm x 77 mm x 42 mm"
+          ]
+        ],
+        "img": "Components/Part8025738/img/thumb.jpg",
+        "pdf": "Components/Part8025738/Documentation/DataSheet.pdf"
+      },
+      "Part8033583": {
+        "name": "Cable D-Sub HD de 15 pins",
+        "nameEn": "15-pin D-Sub-HD cables",
+        "code": "",
+        "refs": "8033582, 8033583, 8042954, 8033584",
+        "text": "Cable de connexió amb un endoll D-Sub HD de 15 pins a cada extrem que uneix els mòduls MPS amb la interfície C a través del terminal mini d'E/S. Està disponible en longituds de 0,5 m, 1,0 m, 1,25 m i 2,0 m.",
+        "specs": [
+          [
+            "Connectors",
+            "2 endolls D-Sub HD de 15 pins (3 files)"
+          ]
+        ],
+        "img": "Components/Part8033583/img/thumb.jpg",
+        "pdf": ""
+      },
+      "Part540691": {
+        "name": "Vàlvula d'engegada amb filtre regulador",
+        "nameEn": "Start-up valve with filter control valve",
+        "code": "",
+        "refs": "540691",
+        "text": "Conjunt format per un filtre regulador amb manòmetre i una vàlvula d'engegada 3/2, muntat sobre un suport d'angle ajustable. El filtre amb separador d'aigua neteja l'aire comprimit de brutícia, escates de les canonades, rovell i condensat; el regulador l'ajusta a la pressió de treball fixada i en compensa les fluctuacions, i la vàlvula d'engegada dona pas a l'aire o descarrega tot el circuit de comandament.",
+        "specs": [
+          [
+            "Fluid",
+            "Aire comprimit"
+          ],
+          [
+            "Pressió d'entrada",
+            "100 ... 1000 kPa (1 ... 10 bar)"
+          ],
+          [
+            "Pressió de funcionament",
+            "50 ... 700 kPa (0,5 ... 7 bar)"
+          ],
+          [
+            "Cabal nominal estàndard",
+            "110 l/min (pressió d'entrada 1000 kPa, pressió de funcionament 600 kPa, pressió diferencial 100 kPa)"
+          ],
+          [
+            "Posició de muntatge",
+            "Vertical ±5°"
+          ],
+          [
+            "Connexió",
+            "Endoll d'acoblament per a presa d'acoblament G1/8; racor QS per a tub de plàstic PUN 6 x 1"
+          ]
+        ],
+        "img": "Components/Part540691/img/thumb.jpg",
+        "pdf": "Components/Part540691/Documentation/DataSheet_en.pdf"
+      },
+      "Sensor150855": {
+        "name": "Sensor de proximitat magnètic SME (contacte reed)",
+        "nameEn": "Proximity Sensor SME",
+        "code": "SME-8-K-LED-24",
+        "refs": "150855",
+        "text": "Sensor de proximitat elèctric amb contacte reed i cable, per a actuadors amb ranura en T. Al mòdul magatzem apilador detecta per efecte magnètic la posició del cilindre expulsor i indica l'estat de commutació amb un LED groc.",
+        "specs": [
+          [
+            "Principi de mesura",
+            "Magnètic, contacte reed"
+          ],
+          [
+            "Funció de l'element de commutació",
+            "Contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "12 ... 30 V CA/CC"
+          ],
+          [
+            "Corrent màxim de sortida",
+            "500 mA"
+          ],
+          [
+            "Connexió elèctrica",
+            "Cable de 3 fils, 2,5 m"
+          ],
+          [
+            "Indicador d'estat",
+            "LED groc"
+          ]
+        ],
+        "img": "Components/Sensor150855/img/thumb.jpg",
+        "pdf": "Components/Sensor150855/Documentation/DataSheet.pdf"
+      },
+      "Aktor19182": {
+        "name": "Cilindre normalitzat de doble efecte DSNU",
+        "nameEn": "Standard cylinder DSNU",
+        "code": "DSNU-8-100-P-A",
+        "refs": "19182",
+        "text": "Cilindre pneumàtic de doble efecte segons DIN ISO 6432, amb anells elàstics d'amortiment a les posicions finals i preparat per a la detecció de posició amb sensors de proximitat. Al mòdul magatzem apilador fa d'expulsor: empeny les peces fora del tub del magatzem.",
+        "specs": [
+          [
+            "Cursa",
+            "100 mm"
+          ],
+          [
+            "Diàmetre del pistó",
+            "8 mm"
+          ],
+          [
+            "Pressió de treball",
+            "1,5 ... 10 bar"
+          ],
+          [
+            "Força teòrica a 6 bar (avanç / retorn)",
+            "30,2 N / 22,6 N"
+          ],
+          [
+            "Amortiment",
+            "Elàstic a tots dos extrems (anells/plaques, P)"
+          ],
+          [
+            "Connexió pneumàtica",
+            "M5"
+          ]
+        ],
+        "img": "Components/Aktor19182/img/thumb.jpg",
+        "pdf": "Components/Aktor19182/Documentation/DataSheet.pdf"
+      },
+      "Aktor564212_M52": {
+        "name": "Electrovàlvula 5/2 monoestable",
+        "nameEn": "Solenoid valve VUVG",
+        "code": "VUVG",
+        "refs": "564212",
+        "text": "Electrovàlvula de 5/2 vies monoestable, d'una sola bobina, d'accionament elèctric i pilotada. Al mòdul magatzem apilador comanda el cilindre de doble efecte que expulsa les peces del tub del magatzem.",
+        "specs": [
+          [
+            "Funció de vàlvula",
+            "5/2 monoestable"
+          ],
+          [
+            "Tipus d'accionament",
+            "Elèctric, pilotat"
+          ],
+          [
+            "Cicle de treball",
+            "100 %"
+          ],
+          [
+            "Fluctuació de tensió admissible",
+            "±10 %"
+          ],
+          [
+            "Connexió elèctrica",
+            "A través de placa de connexió elèctrica"
+          ],
+          [
+            "Temperatura ambient",
+            "-5 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Aktor564212_M52/img/thumb.jpg",
+        "pdf": "Components/Aktor564212_M52/Documentation/DataSheet.pdf"
+      },
+      "Part175056": {
+        "name": "Vàlvula reguladora de cabal unidireccional",
+        "nameEn": "One-way flow control valve GRLA",
+        "code": "GRLA-M5-QS-4-LF-C",
+        "refs": "175056",
+        "text": "Vàlvula d'estrangulació amb antiretorn que es cargola en una connexió M5 i regula el cabal de l'aire d'escapament i, així, la velocitat del cilindre expulsor. Té una connexió ràpida QS-4 per al tub i s'ajusta amb un cargol de cap ranurat.",
+        "specs": [
+          [
+            "Connexions pneumàtiques",
+            "QS-4 (connexió 1) / M5 (connexió 2)"
+          ],
+          [
+            "Pressió de treball",
+            "0,2 ... 10 bar"
+          ],
+          [
+            "Cabal nominal en sentit d'estrangulació",
+            "40 l/min"
+          ],
+          [
+            "Cabal nominal en sentit antiretorn",
+            "50 ... 75 l/min"
+          ],
+          [
+            "Element d'ajust",
+            "Cargol de cap ranurat"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Part175056/img/thumb.jpg",
+        "pdf": "Components/Part175056/Documentation/DataSheet.pdf"
+      },
+      "Sensor150395": {
+        "name": "Sensor de proximitat inductiu",
+        "nameEn": "Inductive Proximity Sensor",
+        "code": "SIEN-M8NB-PS-S-L",
+        "refs": "150395",
+        "text": "Sensor de proximitat inductiu de mida M8x1 i amb distància de commutació normalitzada, que s'utilitza per detectar peces que contenen metall. Al mòdul de detecció reconeix les peces metàl·liques, i el seu senyal es combina amb el dels altres sensors per identificar cada peça.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Inductiu"
+          ],
+          [
+            "Distància de commutació nominal",
+            "2,5 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "10 ... 30 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 3 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "3000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor150395/img/thumb.jpg",
+        "pdf": "Components/Sensor150395/Documentation/DataSheet.pdf"
+      },
+      "Sensor553563": {
+        "name": "Barrera de llum de forquilla",
+        "nameEn": "Fork Light Barrier",
+        "code": "SOOF-P-FL-ST-C50-P",
+        "refs": "553563",
+        "text": "Barrera de llum optoelectrònica en forma de forquilla, de polímer i amb una obertura de 50 mm, que detecta els objectes que passen entre els dos braços i s'ajusta per Teach-In. Al mòdul de detecció detecta totes les peces, sigui quin sigui el material o el color, i el seu senyal es combina amb el dels altres sensors per identificar cada peça.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Optoelectrònic, llum vermella"
+          ],
+          [
+            "Obertura de la forquilla",
+            "50 mm"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert o tancat (commutable)"
+          ],
+          [
+            "Tensió de funcionament",
+            "10 ... 30 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 3 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "2000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor553563/img/thumb.jpg",
+        "pdf": "Components/Sensor553563/Documentation/DataSheet.pdf"
+      },
+      "Sensor8063218": {
+        "name": "Sensor retroreflector per a carril guia",
+        "nameEn": "Retro-reflective sensor for guide rail",
+        "code": "SOEG-RSG-Q20-PP-S-2L-TI + SOEZ-RFL-10",
+        "refs": "8063218 (sensor 537753, reflector 537787)",
+        "text": "Conjunt format per un emissor-receptor de llum vermella polaritzada i un reflector (mirall), que es pot muntar directament al carril guia d'una cinta transportadora o d'una rampa. A l'estació vigila el nivell d'ompliment de les rampes on es classifiquen les peces.",
+        "specs": [
+          [
+            "Principi de detecció",
+            "Llum vermella polaritzada, amb reflector (apte per a objectes transparents)"
+          ],
+          [
+            "Abast de treball",
+            "5 ... 500 mm (material de referència: reflector làser de 51 x 51 mm)"
+          ],
+          [
+            "Sortida de commutació",
+            "PNP, contacte normalment obert o tancat (commutable)"
+          ],
+          [
+            "Tensió de funcionament",
+            "10 ... 30 V CC"
+          ],
+          [
+            "Connexió elèctrica",
+            "Connector M8x1, 4 pins"
+          ],
+          [
+            "Freqüència màxima de commutació",
+            "1000 Hz"
+          ]
+        ],
+        "img": "Components/Sensor8063218/img/thumb.jpg",
+        "pdf": "Components/Sensor8063218/Documentation/DataSheet.pdf"
+      },
+      "Aktor8046324": {
+        "name": "Topall pneumàtic simple amb vàlvula",
+        "nameEn": "Stopper, simple, with valve",
+        "code": "AEVC-12-10-I-P + MHA1-M1H-3/2O-0,6-HC",
+        "refs": "8046324 (cilindre 188083, electrovàlvula 197020)",
+        "text": "Mòdul topall complet, format per un cilindre pneumàtic de cursa curta d'efecte simple i una electrovàlvula 3/2. A l'estació atura les peces sobre la cinta transportadora perquè els sensors del mòdul de detecció en puguin determinar el material i el color.",
+        "specs": [
+          [
+            "Cursa",
+            "10 mm"
+          ],
+          [
+            "Diàmetre del pistó",
+            "12 mm"
+          ],
+          [
+            "Força teòrica a 6 bar (avanç)",
+            "59 N"
+          ],
+          [
+            "Pressió de treball",
+            "Cilindre: 1,5 ... 10 bar; vàlvula: 0 ... 6 bar"
+          ],
+          [
+            "Funció de vàlvula",
+            "3/2 oberta monoestable"
+          ],
+          [
+            "Dades de la bobina",
+            "24 V CC (±10 %), 1 W"
+          ]
+        ],
+        "img": "Components/Aktor8046324/img/thumb.jpg",
+        "pdf": "Components/Aktor8046324/Documentation/DataSheet.pdf"
+      },
+      "Part8046639": {
+        "name": "Rampa 250",
+        "nameEn": "Slide 250",
+        "code": "",
+        "refs": "8046639",
+        "text": "Rampa que serveix per alimentar peces o per classificar-les. En aquesta estació, els desviadors elèctrics hi envien les peces segons el material i el color, i un sensor retroreflector en vigila el nivell d'ompliment.",
+        "specs": [],
+        "img": "Components/Part8046639/img/thumb.jpg",
+        "pdf": ""
+      }
+    }
+  };
+
+  // Fotos pujades a Google Drive: ruta de la foto a Festo -> ID del fitxer a Drive.
+  // Les que no hi són es carreguen des de la web de Festo Didactic.
+  var FESTO_DRIVE_IMAGES = {
+    "Components/Aktor19182/img/thumb.jpg": "19MSpz7gHoGgiK2xgMOjP23FMK5Awv465",
+    "Components/Aktor525675/img/thumb.jpg": "1jYpqOKHTMBeAr2SQkqkHLLaBZaHnFTfw",
+    "Components/Aktor532941/img/thumb.jpg": "1as-tquJPUNVsc242JPEMUSWu9eIMJSC_",
+    "Components/Aktor532952/img/thumb.jpg": "154o5vV9EeUnwtBsq-nOfeP6wVM_gKgxF",
+    "Components/Aktor543930/img/thumb.jpg": "1L9tNC6gdtQ133-2wZXupn874_Jw5YKm6",
+    "Components/Aktor564212_M52/img/thumb.jpg": "1t9L8cHS2It1KWtHSJIjLrPMTxvnC1F0w",
+    "Components/Aktor8046324/img/thumb.jpg": "1dIpkqY4O-RpBxd6L72nLhVqZJPEkkDwi",
+    "Components/Part153252/img/thumb.jpg": "1oeMAzmR63d_UbMuXmwjVte7B_MJFlyPv",
+    "Components/Part153328/img/thumb.jpg": "15yWq1hLRT7ivV29BI5bjE0n9_xmFWRKw",
+    "Components/Part153329/img/thumb.jpg": "1BXkW-xritLEKrdbdwaGmX6NBkCawNM7A",
+    "Components/Part153495/img/thumb.jpg": "14FIlLQDM6lT3WO-dwwhk6unwiSIGyMuf",
+    "Components/Part175041/img/thumb.jpg": "1JhGRC61e2hXMQTNDzrtITqNFuFEW8yDn",
+    "Components/Part175056/img/thumb.jpg": "1jNIADP5B8FeEYBLi-BZu68AWDiETQGIE",
+    "Components/Part189199/img/thumb.jpg": "1lXpdR17i5yKFvLs2N-hGXp6Vv-_C75oZ",
+    "Components/Part189401/img/thumb.jpg": "1AGtHdlZpaHrHEh4LmEIkIRWhgCha30n8",
+    "Components/Part191203/img/thumb.jpg": "1MdMlMeN5adY9gkcdNYZ48AFAwpDaEtl5",
+    "Components/Part193552/img/thumb.jpg": "1lLBosimDqybNPzfg2HPyd5noBlIfn3d6",
+    "Components/Part540691/img/thumb.jpg": "1UwJyiR2lCd9-0hQtxvbqOXHGbIZUdQUM",
+    "Components/Part8025738/img/thumb.jpg": "1mT52AiZRJ4U3smCsgOFC4T7fP50ligKn",
+    "Components/Part8025739/img/thumb.jpg": "1BHMw2nHotvSigu1s122fu8o1tNA7dJaP",
+    "Components/Part8033583/img/thumb.jpg": "1_Jzed1292yPJFpmYBB6uTKf2UzMB7vCM",
+    "Components/Part8034300/img/thumb.jpg": "19yRaObiEJLzD5Sk2X-wUf3CuXYV1O9bI",
+    "Components/Part8046639/img/thumb.jpg": "12K71YDbJlXsSlmRpf2kIioqTE_gbkoaO",
+    "Components/Part8064284/img/thumb.jpg": "1XNmhJkQk4b-EHxDJCPtuZh_LgcMNLEsR",
+    "Components/Sensor150395/img/thumb.jpg": "1I2mg0s0pVqgP-y2LvIqZGslhrEesD367",
+    "Components/Sensor150855/img/thumb.jpg": "1vYqd9oK6VqL5UZyU_oknpi-EyVRQa4Ln",
+    "Components/Sensor173210/img/thumb.jpg": "17hLvYc3z20GBhU5nzHg_H7o_00iO1zk4",
+    "Components/Sensor196959/img/thumb.jpg": "1F6wa-lLDk4ODneGaYubg7JxryXc645LF",
+    "Components/Sensor196960/img/thumb.jpg": "1-lvBBSxlgKakYnlJgcftQDx_c7anvT2p",
+    "Components/Sensor527458/img/thumb.jpg": "1h7yZCZ1X04q0t-VH1U0wjSPDJw6Uiyfo",
+    "Components/Sensor553563/img/thumb.jpg": "1xbbcFxMr-dKpno_mwMy5RaZXTmZ48vqm",
+    "Components/Sensor8063218/img/thumb.jpg": "1TardQwowdbeumXanqdqlmPakUdzJ0fjn",
+    "ConveyorModule/img/image.jpg": "1bcrW7RNYTniMgqvKydmxiN-eZCZlIEe-",
+    "ConveyorModule/img/thumb.jpg": "1XFTK9_H1CHjT1cFPFtS3SJwb5CTjfw-i",
+    "DetectionModule/img/image.jpg": "17seufoir8nqhaaf_p5jeZSuHjC_fS2H0",
+    "DetectionModule/img/thumb.jpg": "1BffhR3A1szwb-BQByXLfUW9VoarEB5Cu",
+    "PickandPlaceModule/img/image.jpg": "1ENdba0YNuTOrvGQg6TYOC3Uic8Q_kCbw",
+    "PickandPlaceModule/img/thumb.jpg": "1Uwlf-XZt4UDOXPVriNE0xLCZwz3y0My6",
+    "StackMagazineModule/img/image.jpg": "16vchkxRkuDWzg1IGgKRHrbdKErS-vERq",
+    "StackMagazineModule/img/thumb.jpg": "1gSWrm4YZDm-G1oeC1_0wM3BnGIvFTmnn"
+  };
+
+  // Fitxes tècniques (PDF) pujades a Google Drive: ruta del PDF a Festo -> ID del fitxer a Drive.
+  // Les que no hi són s'obren des de la web de Festo Didactic.
+  var FESTO_DRIVE_PDFS = {
+    "Components/Aktor19182/Documentation/DataSheet.pdf": "1pZNMhmv__CQJTeRtA9fOCGVmIr0N6jJE",
+    "Components/Aktor525675/Documentation/DataSheet.pdf": "1unmpMUoM7dcHzACkWG-4RIIIcXVEsUXs",
+    "Components/Aktor532941/Documentation/DataSheet.pdf": "1uMt7hI_qJQS8tHVXj32NRTq2SRwOEIII",
+    "Components/Aktor532952/Documentation/DataSheet_en.pdf": "19VNd0TaHz5EyVdhk9EgVyRa0ikVpB2HB",
+    "Components/Aktor543930/Documentation/DataSheet.pdf": "1oC1FmPb5DkYrbHgMgd__FIKez0sM-Q_k",
+    "Components/Aktor564212_M52/Documentation/DataSheet.pdf": "1K7uEJw_zXVCDJjOlvbyj0LOGeaiDoqBo",
+    "Components/Aktor8046324/Documentation/DataSheet.pdf": "1alk3YV6cMXjbmXFvE7F6mWkhYw0-p93t",
+    "Components/Part153252/Documentation/DataSheet.pdf": "1l2IGDdIgUHw0x4xf2GVk11k-r4pLFTJN",
+    "Components/Part153328/Documentation/DataSheet.pdf": "15Ab58eyerRlWIifXUCoMKcwWrwaRv_Ov",
+    "Components/Part153329/Documentation/DataSheet.pdf": "1l_El-KLTofbxvZH8VknflLdMWzwZfFAa",
+    "Components/Part153495/Documentation/DataSheet.pdf": "1_GNSgzXnrOkqqwQKPk2Sn4ceK111j0VM",
+    "Components/Part175041/Documentation/DataSheet.pdf": "1shXwO_FgCTXIOoc77Kj8D5JoiiojPN82",
+    "Components/Part175056/Documentation/DataSheet.pdf": "1ki40dTfyOAEICYiGM_GtW0bqKmxlU4_m",
+    "Components/Part189199/Documentation/DataSheet.pdf": "1fMME67WG2cUVeq8fjdsOcqcjoe8MAhUG",
+    "Components/Part189401/Documentation/DataSheet.pdf": "1HMaEONx9uWoSyPD5ZyODJA1FrvsslFpB",
+    "Components/Part191203/Documentation/DataSheet.pdf": "1N2gHr2NAOf5ONM2dxQGmAZAyxw5hI3BH",
+    "Components/Part193552/Documentation/DataSheet.pdf": "1dSwwr-LpX3edsVIGBd89K5jXam4uqtkD",
+    "Components/Part540691/Documentation/DataSheet_en.pdf": "1GpQcLrsrw6DHBSFcQere-wpNeUhsNDVp",
+    "Components/Part8025738/Documentation/DataSheet.pdf": "1auiq6X1_SLFySM00pJ5jH8u6-cuXdyTr",
+    "Components/Part8025739/Documentation/DataSheet.pdf": "10p4kz6jCzdOxZSThUAN-PIjE9ipYDm-J",
+    "Components/Part8064284/Documentation/DataSheet.pdf": "1OXcJ0Q1kqfip8q8XWew540wmS1z6NRhY",
+    "Components/Sensor150395/Documentation/DataSheet.pdf": "1s2IwpbMPfMpymLg0MOGTXrcpwpseezS5",
+    "Components/Sensor150855/Documentation/DataSheet.pdf": "1Mf5hTC-GqSPxih7RQL1XGSgGD-OhOSe3",
+    "Components/Sensor173210/Documentation/DataSheet.pdf": "16XDCUKAjf97_a-3Puotjbwt34Q-fyUSB",
+    "Components/Sensor196959/Documentation/DataSheet.pdf": "1yISYMuhOclrLUttO8QCzNKk_6BH8LxPr",
+    "Components/Sensor196960/Documentation/DataSheet.pdf": "1Sv2TOAQ1lwtaDaS9MNX1Nu5H5IVrmQrJ",
+    "Components/Sensor527458/Documentation/DataSheet.pdf": "1ujPqKJPhTJJFXmo0ggWkgUkGugPrEfvM",
+    "Components/Sensor553563/Documentation/DataSheet.pdf": "1Baa7rp_vr-CUMNUNJOo1dEP3XL5GEiFc",
+    "Components/Sensor8063218/Documentation/DataSheet.pdf": "1mqf7sbCspctg6C5ykx2l3i9ScS96o9kR"
+  };
+
+  function festoCatalog(station, folder, modules, others) {
+    return {
+      base: FESTO_COMPONENTS.base,
+      source: { label: "Festo Didactic InfoPortal · " + station, url: FESTO_COMPONENTS.base + folder + "/EN/Elements.html" },
+      intro: "Elements que formen l'estació segons la documentació de Festo Didactic. Clica un component per veure'n la fitxa amb les dades tècniques.",
+      modules: modules.map(function (k) { return FESTO_COMPONENTS.modules[k]; }),
+      groups: [{ key: "station", name: "Altres elements", items: others }],
+      items: FESTO_COMPONENTS.items
+    };
+  }
+
+  var CATALOG_DISTRIBUTING = festoCatalog("Distributing Conveyor Station", "DistributionConveyorStation", ["conveyor", "stack"], ["Aktor532952", "Part8025738", "Part8033583", "Part540691", "Part8034300"]);
+  var CATALOG_PICK_PLACE = festoCatalog("Pick and Place Station", "PickandPlaceStation", ["conveyor", "pickplace"], ["Aktor532952", "Part8025738", "Part8033583", "Part540691", "Part8034300"]);
+  var CATALOG_SORTING = festoCatalog("Sorting Station", "SortingStation", ["conveyor", "detection"], ["Sensor8063218", "Aktor8046324", "Aktor532952", "Part8046639", "Part8025738", "Part8033583", "Part540691"]);
+
+  var STATIONS = [
+    {
+      slug: "distributing-conveyor",
+      title: "Distributing Conveyor Station",
+      imageId: "1V2z0bdAIv0TssQggLAq7PGRHndPkw1MF",
+      videoId: "17QP8BIyBUt18p9VaqKIh5JbhtJsJ-tNw",
+      sections: {
+        esquemes: { pdf: "18WaYvo3N18UVMBxtNH4BJvIKo8-4bGPD" },
+        components: { catalog: CATALOG_DISTRIBUTING }
+      },
+      description: [
+        "L'estació de distribució/transportadora separa les peces emmagatzemades en el tub del magatzem apilador. Un cilindre de doble efecte empeny les peces cap a fora d'una en una.",
+        "El mòdul transportador porta la peça cap a la dreta o cap a l'esquerra. Si és necessari, la peça pot detenir-se i separar-se en la cinta transportadora."
+      ]
+    },
+    {
+      slug: "pick-and-place",
+      title: "Pick and Place Station",
+      imageId: "1d2sBMzKCqGozHc4iNX-eaXaCGb2Of2Xc",
+      videoId: "1dqghcQuXWaoBHcUy1dHYOPJmsc0D5PqC",
+      sections: {
+        esquemes: { pdf: "104ACTv_B9T1ZvIctjMwS3SsvQrxuXcDy" },
+        components: { catalog: CATALOG_PICK_PLACE }
+      },
+      description: [
+        "Les carcasses de les peces de treball col·locades en el transportador es detecten mitjançant sensors difusos o barreres fotoelèctriques. La peça de treball es transporta fins al separador elèctric situat en la cinta transportadora, on és detectada per un segon sensor difús. El mòdul recull una inserció de la peça de treball de la safata lliscant i la col·loca sobre la carcassa de la peça de treball.",
+        "La peça completa (carcassa i inserció) és alliberada pel separador i transportada fins al final de la cinta transportadora. Una barrera fotoelèctrica detecta la peça al final de la cinta transportadora."
+      ]
+    },
+    {
+      slug: "sorting",
+      title: "Sorting Station",
+      imageId: "11-R10iEWEhm_nlZXY9dhZEHOaxzN-mjR",
+      videoId: "1miOvlUw2UlK6ogMasl6DututKDaS3LBJ",
+      sections: {
+        esquemes: { pdf: "11fx7idZUYUNGkPIn4b3Kom96FsnmWbbk" },
+        components: { catalog: CATALOG_SORTING }
+      },
+      description: [
+        "L'estació distribueix les peces en tres rampes. Les peces col·locades a l'inici de la cinta transportadora són detectades per una barrera fotoelèctrica en forma de forqueta.",
+        "Les peces són detingudes per un topall pneumàtic per a determinar les seves característiques. Els sensors del mòdul de detecció determinen el material i el color de les peces (negre, vermell o metal·litzat).",
+        "Les peces es classifiquen en les rampes corresponents mitjançant deflectors accionats elèctricament. Un sensor retroreflector supervisa els nivells d'ompliment de les rampes."
+      ]
+    }
+  ];
+
+  // Botons comuns a totes les estacions. El contingut de cada botó va a STATIONS[i].sections[key]:
+  // { pdf: "ID de Google Drive" } per mostrar un PDF dins la pàgina, o un text HTML.
+  var BUTTONS = [
+    { key: "esquemes",   label: "Esquemes" },
+    { key: "io-plc",     label: "Entrades/Sortides PLC" },
+    { key: "grafcet",    label: "Grafcet" },
+    { key: "components", label: "Components" }
+  ];
+
+  // Segons de vídeo petit abans que s'amplii automàticament.
+  var PREVIEW_MS = 3000;
+  // Si el vídeo no comença en aquest temps, es fa servir el reproductor de Google Drive.
+  var LOAD_TIMEOUT_MS = 10000;
+
+  var REDUCED_MOTION = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  // ---------------------------------------------------------------------------
+  // Utilitats
+  // ---------------------------------------------------------------------------
+
+  function $(id) { return document.getElementById(id); }
+
+  function escapeHtml(s) {
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function setImage(img, id, alt) {
+    img.alt = alt;
+    img.onerror = function () {
+      img.onerror = null;
+      img.src = driveImgFallback(id);
+    };
+    img.src = driveImg(id);
+  }
+
+  function restartAnimation(el) {
+    el.classList.remove("enter");
+    void el.offsetWidth;
+    el.classList.add("enter");
+  }
+
+  function formatTime(t) {
+    if (!isFinite(t) || t < 0) t = 0;
+    var m = Math.floor(t / 60);
+    var s = Math.floor(t % 60);
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  // Rectangle on es veu el contingut d'un vídeo amb object-fit: contain.
+  function containRect(box, aspect) {
+    var w = box.width, h = w / aspect;
+    if (h > box.height) { h = box.height; w = h * aspect; }
+    return { left: box.left + (box.width - w) / 2, top: box.top + (box.height - h) / 2, width: w, height: h };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Pantalles
+  // ---------------------------------------------------------------------------
+
+  var home = $("home");
+  var station = $("station");
+  var hero = $("hero");
+  var pageTitle = $("page-title");
+  var breadcrumb = $("breadcrumb");
+  var stationImg = $("station-img");
+  var stationDesc = $("station-desc");
+  var buttonsEl = $("buttons");
+  var panelWrap = $("panel-wrap");
+  var panel = $("panel");
+
+  STATIONS.forEach(function (s, i) {
+    var a = document.createElement("a");
+    a.className = "card";
+    a.href = "#" + s.slug;
+    a.style.setProperty("--i", i);
+    a.innerHTML =
+      '<div class="card-img"><img loading="lazy"></div>' +
+      '<div class="card-body"><span class="card-title">' + escapeHtml(s.title) + '</span>' +
+      '<span class="arrow" aria-hidden="true">&rsaquo;</span></div>';
+    setImage(a.querySelector("img"), s.imageId, s.title);
+    home.appendChild(a);
+  });
+
+  function showHome() {
+    pageTitle.textContent = "Estacions de Festo";
+    breadcrumb.textContent = "";
+    breadcrumb.hidden = true;
+    clearPanel();
+    station.classList.add("hidden");
+    home.classList.remove("hidden");
+    restartAnimation(home);
+  }
+
+  function clearPanel() {
+    panel.innerHTML = "";
+    delete panel.dataset.key;
+    panelWrap.classList.remove("open");
+    catalog = null;
+  }
+
+  // Alçada del visor de documents. Dins de Google Sites "vh" és l'alçada del bloc incrustat,
+  // no la de la pantalla, així que també el limitem a la pantalla real.
+  function sizeDoc(doc) {
+    var h = Math.min(window.innerHeight * 0.78, 980);
+    if (window.screen && screen.availHeight) h = Math.min(h, screen.availHeight - 220);
+    doc.style.height = Math.max(360, Math.round(h)) + "px";
+  }
+
+  // Omple el panell de sota els botons. Retorna el requadre del document si n'hi ha.
+  function renderSection(key, label, content) {
+    panel.dataset.key = key;
+    var html = "<h3>" + escapeHtml(label) + "</h3>";
+    if (content && content.pdf) {
+      panel.innerHTML = html +
+        '<div class="doc"><div class="doc-loading"><span class="doc-spinner"></span>Carregant el document…</div>' +
+        '<iframe title="' + escapeHtml(label) + '"></iframe></div>';
+      var doc = panel.querySelector(".doc");
+      var frame = doc.querySelector("iframe");
+      sizeDoc(doc);
+      frame.addEventListener("load", function () { doc.classList.add("is-loaded"); });
+      frame.src = drivePreview(content.pdf);
+      return doc;
+    }
+    if (content && content.catalog) {
+      panel.innerHTML = html + renderCatalog(content.catalog);
+      setCatalogFilter("all");
+      return null;
+    }
+    panel.innerHTML = html + (content || "<p>Contingut en preparació.</p>");
+    return null;
+  }
+
+  function scrollToEl(el, block) {
+    try { el.scrollIntoView({ block: block, behavior: REDUCED_MOTION ? "auto" : "smooth" }); } catch (e) {}
+  }
+
+  // ---------------------------------------------------------------------------
+  // Components: catàleg amb fitxes
+  // ---------------------------------------------------------------------------
+
+  var catalog = null;        // catàleg que es mostra ara al panell
+  var catalogList = [];      // components del filtre actual
+  var catalogKey = "all";    // filtre actual
+
+  function catUrl(path) { return catalog.base + path; }
+
+  // Fotos dels components: des de Google Drive si la foto hi és (FESTO_DRIVE_IMAGES), si no des de Festo.
+  // Si la de Drive falla, es torna a provar amb la de Festo.
+  function catImg(path, alt, attrs) {
+    var id = FESTO_DRIVE_IMAGES[path];
+    var festo = catUrl(path);
+    var src = id ? "https://drive.google.com/thumbnail?id=" + id + "&sz=w800" : festo;
+    return '<img ' + (attrs || "") + 'alt="' + escapeHtml(alt || "") + '" src="' + src + '"' +
+      (id ? ' data-alt="' + festo + '"' : "") + ">";
+  }
+  // Fitxes tècniques: des de Google Drive si hi són (FESTO_DRIVE_PDFS), si no des de Festo.
+  function pdfUrl(path) {
+    var id = FESTO_DRIVE_PDFS[path];
+    return id ? "https://drive.google.com/file/d/" + id + "/view" : catUrl(path);
+  }
+  function imgFailed(img) {
+    var alt = img.getAttribute("data-alt");
+    if (alt) {
+      img.removeAttribute("data-alt");
+      img.src = alt;
+    } else if (img.parentNode) {
+      img.parentNode.classList.add("no-img");
+    }
+  }
+  function refText(refs) { return refs ? "Ref. " + refs : ""; }
+  function paragraphs(list) {
+    return (list || []).map(function (t) { return "<p>" + escapeHtml(t) + "</p>"; }).join("");
+  }
+  function findModule(key) {
+    return catalog.modules.filter(function (m) { return m.key === key; })[0];
+  }
+
+  function catFilters(cat) {
+    var all = [];
+    function add(ids) { ids.forEach(function (id) { if (all.indexOf(id) < 0) all.push(id); }); }
+    cat.modules.forEach(function (m) { add(m.items); });
+    cat.groups.forEach(function (g) { add(g.items); });
+    return [{ key: "all", label: "Tots", items: all }]
+      .concat(cat.modules.map(function (m) { return { key: m.key, label: m.name, items: m.items }; }))
+      .concat(cat.groups.map(function (g) { return { key: g.key, label: g.name, items: g.items }; }));
+  }
+
+  function renderCatalog(cat) {
+    catalog = cat;
+    var html = '<div class="comp">';
+    if (cat.intro) html += '<p class="comp-intro">' + escapeHtml(cat.intro) + "</p>";
+    html += '<div class="comp-modules">';
+    cat.modules.forEach(function (m, i) {
+      html += '<article class="comp-module" style="--i:' + i + '">' +
+        '<button type="button" class="comp-module-img" data-module="' + m.key + '" aria-label="' +
+        escapeHtml("Veure la fitxa: " + m.name) + '">' + catImg(m.img, "", 'loading="lazy" ') + "</button>" +
+        '<div class="comp-module-body"><span class="comp-kicker">Mòdul</span>' +
+        "<h4>" + escapeHtml(m.name) + "</h4>" +
+        '<p class="comp-ref">' + escapeHtml(m.nameEn + " · " + refText(m.refs)) + "</p>" +
+        paragraphs(m.text) +
+        (m.more && m.more.length ? "<details><summary>Muntatge i característiques</summary>" + paragraphs(m.more) + "</details>" : "") +
+        '<button type="button" class="comp-more" data-filter="' + m.key + '">Veure els ' + m.items.length +
+        ' components <span aria-hidden="true">&rsaquo;</span></button></div></article>';
+    });
+    html += '</div><div class="comp-filters" role="group" aria-label="Filtra els components">';
+    catFilters(cat).forEach(function (f) {
+      html += '<button type="button" class="comp-chip" data-filter="' + f.key + '" aria-pressed="false">' +
+        escapeHtml(f.label) + '<span class="n">' + f.items.length + "</span></button>";
+    });
+    html += '</div><div class="comp-grid"></div>';
+    if (cat.source) {
+      html += '<p class="comp-source">Font: <a href="' + cat.source.url + '" target="_blank" rel="noopener noreferrer">' +
+        escapeHtml(cat.source.label) + "</a></p>";
+    }
+    return html + "</div>";
+  }
+
+  function setCatalogFilter(key) {
+    var f = catFilters(catalog).filter(function (x) { return x.key === key; })[0];
+    if (!f) return;
+    Array.prototype.forEach.call(panel.querySelectorAll(".comp-chip"), function (c) {
+      c.setAttribute("aria-pressed", c.getAttribute("data-filter") === key ? "true" : "false");
+    });
+    catalogList = f.items;
+    catalogKey = key;
+    panel.querySelector(".comp-grid").innerHTML = f.items.map(function (id, i) {
+      var it = catalog.items[id];
+      return '<button type="button" class="comp-card" data-id="' + id + '" style="--i:' + i + '">' +
+        '<span class="comp-card-img">' + catImg(it.img, "", 'loading="lazy" ') + "</span>" +
+        '<span class="comp-card-body"><span class="comp-card-name">' + escapeHtml(it.name).replace(/\//g, "/<wbr>") + "</span>" +
+        (it.refs ? '<span class="comp-card-ref">' + escapeHtml(refText(it.refs)) + "</span>" : "") +
+        '<span class="comp-card-text">' + escapeHtml(it.text) + "</span></span></button>";
+    }).join("");
+  }
+
+  panel.addEventListener("click", function (e) {
+    if (!catalog) return;
+    var t = e.target.closest && e.target.closest("[data-filter], [data-id], [data-module]");
+    if (!t || !panel.contains(t)) return;
+    if (t.hasAttribute("data-id")) {
+      openSheet(t.getAttribute("data-id"), t);
+    } else if (t.hasAttribute("data-module")) {
+      openSheet("module:" + t.getAttribute("data-module"), t);
+    } else {
+      setCatalogFilter(t.getAttribute("data-filter"));
+      if (t.classList.contains("comp-more")) {
+        scrollToEl(panel.querySelector(".comp-filters"), "start");
+        focusQuietly(panel.querySelector('.comp-chip[aria-pressed="true"]'));
+      }
+    }
+  });
+  // Si una foto no es pot carregar, es mostra una icona en lloc d'un requadre buit.
+  panel.addEventListener("error", function (e) {
+    if (e.target.tagName === "IMG") imgFailed(e.target);
+  }, true);
+
+  // --- Fitxa d'un component ---
+
+  var sheet = $("sheet");
+  var sheetPanel = $("sheet-panel");
+  var sheetContent = $("sheet-content");
+  var sheetPrev = $("sheet-prev");
+  var sheetNext = $("sheet-next");
+  var sheetCount = $("sheet-count");
+  var sheetList = [];
+  var sheetIndex = -1;
+  var sheetReturn = null;
+  var sheetVis = null;
+  var sheetPoll = null;
+  var sheetToken = 0;
+
+  function sheetHtml(key) {
+    var img, kicker, title, sub, body;
+    if (key.indexOf("module:") === 0) {
+      var m = findModule(key.slice(7));
+      img = m.image || m.img;
+      kicker = "Mòdul";
+      title = m.name;
+      sub = m.nameEn + " · " + refText(m.refs);
+      body = '<div class="sheet-text">' + paragraphs(m.text) + paragraphs(m.more) + "</div>" +
+        (m.page ? '<a class="sheet-link" href="' + catUrl(m.page) + '" target="_blank" rel="noopener noreferrer">' +
+          'Més informació a Festo Didactic <span aria-hidden="true">&#8599;</span></a>' : "");
+    } else {
+      var it = catalog.items[key];
+      // Mòdul al qual pertany: el del filtre actiu o, si n'hi ha diversos, tots.
+      var owners = catalog.modules.concat(catalog.groups).filter(function (g) { return g.items.indexOf(key) >= 0; });
+      var owner = owners.filter(function (g) { return g.key === catalogKey; })[0];
+      img = it.img;
+      kicker = owner ? owner.name : (owners.map(function (g) { return g.name; }).join(" · ") || "Component");
+      title = it.name;
+      // El codi de tipus no es repeteix si ja forma part del nom de Festo.
+      var code = it.code && it.nameEn.indexOf(it.code) < 0 ? it.code : "";
+      sub = [it.nameEn, code, refText(it.refs)].filter(Boolean).join(" · ");
+      body = '<div class="sheet-text"><p>' + escapeHtml(it.text) + "</p></div>" +
+        (it.specs && it.specs.length ? '<table class="sheet-specs"><caption>Dades tècniques</caption><tbody>' +
+          it.specs.map(function (sp) {
+            return "<tr><th scope=\"row\">" + escapeHtml(sp[0]) + "</th><td>" + escapeHtml(sp[1]) + "</td></tr>";
+          }).join("") + "</tbody></table>" : "") +
+        (it.pdf ? '<a class="sheet-link" href="' + pdfUrl(it.pdf) + '" target="_blank" rel="noopener noreferrer">' +
+          'Fitxa tècnica del fabricant (PDF) <span aria-hidden="true">&#8599;</span></a>' : "");
+    }
+    return '<div class="sheet-img">' + catImg(img, title) + "</div>" +
+      '<div class="sheet-body"><span class="comp-kicker">' + escapeHtml(kicker) + "</span>" +
+      '<h3 id="sheet-title">' + escapeHtml(title) + "</h3>" +
+      '<p class="sheet-sub">' + escapeHtml(sub) + "</p>" + body + "</div>";
+  }
+
+  function renderSheet() {
+    sheetContent.innerHTML = sheetHtml(sheetList[sheetIndex]);
+    sheetContent.scrollTop = 0;
+    var img = sheetContent.querySelector(".sheet-img img");
+    img.addEventListener("error", function () { imgFailed(img); });
+    img.addEventListener("load", function () {
+      if (sheet.classList.contains("is-open") && sheetVis) layoutSheet(sheetVis, true);
+    });
+    sheetPrev.disabled = sheetIndex <= 0;
+    sheetNext.disabled = sheetIndex >= sheetList.length - 1;
+    sheetCount.textContent = sheetList.length > 1 ? (sheetIndex + 1) + " / " + sheetList.length : "";
+  }
+
+  function layoutSheet(vis, keepTop) {
+    sheetVis = vis;
+    var margin = vis.width < 600 ? 8 : 24;
+    var topInset = vis.top > 0 ? 64 : 0;      // barra fixa de Google Sites
+    var w = Math.min(vis.width - margin * 2, 980);
+    var maxH = Math.max(240, vis.height - topInset - margin * 2);
+    sheetPanel.style.width = w + "px";
+    sheetPanel.style.left = vis.left + (vis.width - w) / 2 + "px";
+    sheetPanel.style.maxHeight = maxH + "px";
+    var h = sheetPanel.offsetHeight;
+    var top = keepTop ? parseFloat(sheetPanel.style.top) : vis.top + topInset + Math.max(margin, (vis.height - topInset - h) / 2);
+    // Que no surti de la part visible.
+    top = Math.min(top, vis.top + vis.height - h - margin);
+    top = Math.max(top, vis.top + topInset + margin, 4);
+    sheetPanel.style.top = top + "px";
+  }
+
+  function openSheet(key, returnEl) {
+    sheetReturn = returnEl || null;
+    sheetList = key.indexOf("module:") === 0
+      ? catalog.modules.map(function (m) { return "module:" + m.key; })
+      : catalogList.slice();
+    sheetIndex = Math.max(0, sheetList.indexOf(key));
+    renderSheet();
+    var token = ++sheetToken;
+    sheet.hidden = false;
+    sheet.classList.remove("is-open");
+    lockScroll();
+    measureVisible(function open(vis, retried) {
+      if (token !== sheetToken) return;
+      // Si del marc de Google Sites només se'n veu una franja petita, el portem a la vista.
+      if (!retried && returnEl && vis.height < Math.min(window.innerHeight - 2, 360)) {
+        scrollToEl(returnEl, "center");
+        measureStable(function (v2) { open(v2, true); });
+        return;
+      }
+      layoutSheet(vis);
+      void sheetPanel.offsetWidth;
+      sheet.classList.add("is-open");
+      focusQuietly(sheetContent);
+      clearInterval(sheetPoll);
+      sheetPoll = setInterval(function () {
+        measureVisible(function (v) {
+          if (token !== sheetToken || !sheetVis) return;
+          if (v.height < 200 && v.height < window.innerHeight - 2) return;
+          if (Math.abs(v.top - sheetVis.top) > 4 || Math.abs(v.height - sheetVis.height) > 4 ||
+              Math.abs(v.width - sheetVis.width) > 4) layoutSheet(v);
+        });
+      }, 150);
+    });
+  }
+
+  function moveSheet(delta) {
+    var i = sheetIndex + delta;
+    if (i < 0 || i >= sheetList.length) return;
+    sheetIndex = i;
+    var navFocused = document.activeElement === sheetPrev || document.activeElement === sheetNext;
+    renderSheet();
+    if (navFocused && (delta > 0 ? sheetNext : sheetPrev).disabled) focusQuietly(delta > 0 ? sheetPrev : sheetNext);
+    $("sheet-status").textContent = $("sheet-title").textContent + ", " + (sheetIndex + 1) + " de " + sheetList.length;
+    sheetContent.classList.remove("swap");
+    void sheetContent.offsetWidth;
+    sheetContent.classList.add("swap");
+    if (sheetVis) layoutSheet(sheetVis, true);
+  }
+
+  function closeSheet(immediate) {
+    if (sheet.hidden) return;
+    var token = ++sheetToken;
+    clearInterval(sheetPoll);
+    sheetPoll = null;
+    sheet.classList.remove("is-open");
+    function done() {
+      if (token !== sheetToken) return;
+      sheet.hidden = true;
+      sheetContent.innerHTML = "";
+      unlockScroll();
+    }
+    if (immediate || REDUCED_MOTION) done(); else setTimeout(done, 320);
+    if (!immediate && sheetReturn && document.body.contains(sheetReturn)) focusQuietly(sheetReturn);
+  }
+
+  $("sheet-close").addEventListener("click", function () { closeSheet(); });
+  $("sheet-backdrop").addEventListener("click", function (e) { if (e.detail <= 1) closeSheet(); });
+  sheetPrev.addEventListener("click", function () { moveSheet(-1); });
+  sheetNext.addEventListener("click", function () { moveSheet(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (sheet.hidden || !sheet.classList.contains("is-open") || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeSheet();
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      moveSheet(e.key === "ArrowLeft" ? -1 : 1);
+    } else if (e.key === "Tab") {
+      // Mantenir el focus dins de la fitxa.
+      var items = Array.prototype.filter.call(sheetPanel.querySelectorAll("button, a[href]"), function (el) {
+        return !el.disabled && el.offsetParent !== null;
+      });
+      if (!items.length) return;
+      var first = items[0], last = items[items.length - 1];
+      if (!sheetPanel.contains(document.activeElement)) {
+        e.preventDefault(); (e.shiftKey ? last : first).focus();
+      } else if (e.shiftKey && (document.activeElement === first || document.activeElement === sheetPanel)) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+  });
+
+  window.addEventListener("resize", function () {
+    if (!sheet.hidden && sheet.classList.contains("is-open")) measureVisible(function (v) { layoutSheet(v); });
+  });
+
+  window.addEventListener("resize", function () {
+    var doc = panel.querySelector(".doc");
+    if (doc) sizeDoc(doc);
+  });
+
+  function showStation(s) {
+    pageTitle.textContent = s.title;
+    breadcrumb.innerHTML = '<a href="#">Inici</a> &rsaquo; ' + escapeHtml(s.title);
+    breadcrumb.hidden = false;
+    setImage(stationImg, s.imageId, s.title);
+    stationDesc.innerHTML = s.description.map(function (p) {
+      return "<p>" + escapeHtml(p) + "</p>";
+    }).join("");
+
+    buttonsEl.innerHTML = "";
+    clearPanel();
+    BUTTONS.forEach(function (b) {
+      var btn = document.createElement("button");
+      btn.className = "btn";
+      btn.type = "button";
+      btn.textContent = b.label;
+      btn.setAttribute("aria-expanded", "false");
+      btn.addEventListener("click", function () {
+        var wasActive = btn.classList.contains("active");
+        Array.prototype.forEach.call(buttonsEl.children, function (c) {
+          c.classList.remove("active");
+          c.setAttribute("aria-expanded", "false");
+        });
+        if (wasActive) {
+          panelWrap.classList.remove("open");
+          return;
+        }
+        btn.classList.add("active");
+        btn.setAttribute("aria-expanded", "true");
+        var doc;
+        if (panel.dataset.key === b.key) {
+          doc = panel.querySelector(".doc");
+          if (doc) sizeDoc(doc);
+        } else {
+          doc = renderSection(b.key, b.label, s.sections && s.sections[b.key]);
+          if (panelWrap.classList.contains("open")) {
+            panel.classList.remove("swap");
+            void panel.offsetWidth;
+            panel.classList.add("swap");
+          }
+        }
+        panelWrap.classList.add("open");
+        var comp = panel.querySelector(".comp");
+        setTimeout(function () {
+          if (!panelWrap.classList.contains("open")) return;
+          if (doc && panel.contains(doc)) {
+            // Un document és alt: el portem sencer a la vista.
+            scrollToEl(doc, "nearest");
+          } else if (comp && panel.contains(comp)) {
+            // Si el catàleg ha quedat massa avall, pugem els botons a dalt de tot.
+            measureVisible(function (vis) {
+              if (panel.getBoundingClientRect().top > vis.top + vis.height * 0.6) scrollToEl(buttonsEl, "start");
+            });
+          }
+        }, REDUCED_MOTION ? 60 : 420);
+      });
+      buttonsEl.appendChild(btn);
+    });
+
+    videoSetStation(s);
+
+    home.classList.add("hidden");
+    station.classList.remove("hidden");
+    restartAnimation(station);
+  }
+
+  function route() {
+    var slug = location.hash.replace("#", "");
+    var s = STATIONS.filter(function (x) { return x.slug === slug; })[0];
+    videoReset();
+    closeSheet(true);
+    if (s) showStation(s); else showHome();
+    restartAnimation(hero);
+    window.scrollTo(0, 0);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Vídeo: es reprodueix en passar per sobre de la imatge i s'amplia sol
+  // ---------------------------------------------------------------------------
+
+  var media = $("media");
+  var mediaVideo = $("media-video");
+  var player = $("player");
+  var stage = $("player-stage");
+  var slot = $("player-video");
+  var playerTitle = $("player-title");
+  var playBtn = $("player-play");
+  var range = $("player-range");
+  var curEl = $("player-current");
+  var totEl = $("player-total");
+  var fsBtn = $("player-fs");
+  var closeBtn = $("player-close");
+  var sentinel = $("viewport-sentinel");
+  var root = document.documentElement;
+
+  media.style.setProperty("--preview-ms", PREVIEW_MS + "ms");
+
+  var video = document.createElement("video");
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  video.preload = "auto";
+  mediaVideo.appendChild(video);
+
+  var iframe = null;           // reproductor de Google Drive (alternativa)
+  var current = null;          // estació actual
+  var state = "idle";          // idle | loading | preview | expanded
+  var fallback = false;        // el navegador no pot reproduir el fitxer directament
+  var hovering = false;
+  var cooldown = false;        // no tornar a començar fins que el ratolí surti de la imatge
+  var navHold = false;         // després de canviar de pantalla, esperar un moviment real del ratolí
+  var closing = false;
+  var loadTimedOut = false;    // el vídeo no ha arribat a temps (encara pot arribar més tard)
+  var closedAt = -1e9;
+  var previewTimer = null;
+  var resetTimer = null;
+  var loadTimer = null;
+  var pollTimer = null;
+  var rafId = 0;
+  var openToken = 0;
+  var scrubbing = false;
+  var lastVisible = null;
+  var fullscreenSupported = !!(document.fullscreenEnabled && stage.requestFullscreen);
+  if (!fullscreenSupported) fsBtn.classList.add("hidden");
+
+  function noop() {}
+
+  function videoAspect() {
+    return video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 16 / 9;
+  }
+
+  function videoSetStation(s) {
+    current = s;
+    fallback = false;
+    loadTimedOut = false;
+    clearTimeout(loadTimer);
+    loadTimer = null;
+    media.classList.remove("is-hint");
+    playerTitle.textContent = s.title;
+    video.src = driveVideo(s.videoId);
+    video.load();
+  }
+
+  function clearTimers() {
+    clearTimeout(previewTimer);
+    clearTimeout(resetTimer);
+    previewTimer = resetTimer = null;
+  }
+
+  function cancelSlotAnims() {
+    if (slot.getAnimations) slot.getAnimations().forEach(function (a) { a.cancel(); });
+  }
+
+  function playVideo() {
+    var p = video.play();
+    if (p && p.catch) {
+      p.catch(function (err) {
+        // El navegador no deixa començar el vídeo sol: cal un clic.
+        if (err && err.name === "NotAllowedError" && state !== "expanded") {
+          clearTimeout(loadTimer);
+          loadTimer = null;
+          stopPreview();
+          if (hovering) media.classList.add("is-hint");
+        }
+      });
+    }
+  }
+
+  // Un sol termini per estació: si el vídeo no arriba a temps, es fa servir el reproductor de Drive.
+  function armLoadTimeout() {
+    if (loadTimer || fallback || loadTimedOut) return;
+    loadTimer = setTimeout(function () {
+      loadTimer = null;
+      if (video.readyState >= 3) return;
+      loadTimedOut = true;
+      if (state === "loading" || state === "expanded") enterFallback();
+    }, LOAD_TIMEOUT_MS);
+  }
+  function checkLoadTimedOut() {
+    if (loadTimedOut && !fallback && video.readyState < 3) enterFallback();
+  }
+
+  function enterFallback() {
+    if (fallback || !current) return;
+    fallback = true;
+    clearTimeout(loadTimer);
+    loadTimer = null;
+    if (state === "loading" || state === "preview") {
+      stopPreview();
+      if (hovering) media.classList.add("is-hint");
+    } else if (state === "expanded") {
+      useIframe();
+    }
+  }
+
+  video.addEventListener("error", function () {
+    if (video.getAttribute("src")) enterFallback();
+  });
+  video.addEventListener("loadedmetadata", function () {
+    if (!video.videoWidth) enterFallback();
+  });
+  video.addEventListener("playing", function () {
+    clearTimeout(loadTimer);
+    loadTimer = null;
+    media.classList.remove("is-loading");
+    player.classList.remove("is-buffering");
+    if (state === "loading") {
+      state = "preview";
+      media.classList.add("is-playing");
+      void media.offsetWidth;
+      media.classList.add("is-counting");
+      previewTimer = setTimeout(expand, PREVIEW_MS);
+    }
+  });
+  video.addEventListener("waiting", function () {
+    if (state === "expanded") player.classList.add("is-buffering");
+  });
+  ["pause", "canplay", "ended", "seeked"].forEach(function (ev) {
+    video.addEventListener(ev, function () { player.classList.remove("is-buffering"); });
+  });
+  video.addEventListener("canplay", function () {
+    loadTimedOut = false;
+    if (fallback && state !== "expanded" && video.videoWidth && !video.error) {
+      fallback = false;
+      media.classList.remove("is-hint");
+    }
+  });
+  video.addEventListener("play", syncPlayState);
+  video.addEventListener("pause", syncPlayState);
+  video.addEventListener("ended", syncPlayState);
+  video.addEventListener("seeked", syncPlayState);
+  video.addEventListener("loadedmetadata", syncTime);
+  video.addEventListener("seeked", syncTime);
+
+  // --- Vista prèvia sobre la imatge ---
+
+  function startPreview() {
+    if (state !== "idle" || cooldown) return;
+    checkLoadTimedOut();
+    if (fallback) { media.classList.add("is-hint"); return; }
+    clearTimers();
+    state = "loading";
+    media.classList.add("is-loading");
+    if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
+    try { video.currentTime = 0; } catch (e) {}
+    playVideo();
+    armLoadTimeout();
+  }
+
+  function stopPreview() {
+    if (state !== "loading" && state !== "preview") return;
+    clearTimers();
+    state = "idle";
+    media.classList.remove("is-loading", "is-playing", "is-counting");
+    resetTimer = setTimeout(function () {
+      if (state === "idle") {
+        video.pause();
+        try { video.currentTime = 0; } catch (e) {}
+      }
+    }, 450);
+  }
+
+  media.addEventListener("pointerenter", function (e) {
+    if (e.pointerType === "touch") return;
+    hovering = true;
+    // Just després de tancar el reproductor o de canviar de pantalla el ratolí pot quedar
+    // sobre la imatge sense que l'usuari l'hi hagi posat: esperem que es mogui o en surti.
+    if (navHold || performance.now() - closedAt < 800) {
+      cooldown = true;
+      return;
+    }
+    startPreview();
+  });
+  media.addEventListener("pointermove", function (e) {
+    if (e.pointerType === "touch" || !navHold) return;
+    navHold = false;
+    if (performance.now() - closedAt >= 800) {
+      cooldown = false;
+      startPreview();
+    }
+  });
+  media.addEventListener("pointerleave", function (e) {
+    if (e.pointerType === "touch") return;
+    hovering = false;
+    cooldown = false;
+    navHold = false;
+    media.classList.remove("is-hint");
+    stopPreview();
+  });
+  media.addEventListener("click", function () {
+    if (state === "expanded") return;
+    checkLoadTimedOut();
+    if (!fallback && state === "idle") {
+      clearTimers();
+      if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
+      try { video.currentTime = 0; } catch (e) {}
+      playVideo();
+      armLoadTimeout();
+    }
+    expand();
+  });
+  media.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      e.stopPropagation();
+      media.click();
+    }
+  });
+
+  // --- Part visible de la pàgina ---
+  // Dins de Google Sites la web va dins d'un marc (iframe) que pot ser més alt que la
+  // pantalla. IntersectionObserver ens diu quina part del marc es veu realment.
+
+  function measureVisible(cb) {
+    var w = window.innerWidth, h = window.innerHeight;
+    var full = { left: 0, top: 0, width: w, height: h };
+    if (!("IntersectionObserver" in window)) { cb(full); return; }
+    var done = false;
+    var io = new IntersectionObserver(function (entries) {
+      if (done) return;
+      done = true;
+      io.disconnect();
+      var r = entries[entries.length - 1].intersectionRect;
+      var left = Math.max(0, r.left), top = Math.max(0, r.top);
+      var right = Math.min(w, r.left + r.width), bottom = Math.min(h, r.top + r.height);
+      if (right - left < 1 || bottom - top < 1) cb(full);
+      else cb({ left: left, top: top, width: right - left, height: bottom - top });
+    });
+    io.observe(sentinel);
+    setTimeout(function () {
+      if (!done) { done = true; io.disconnect(); cb(full); }
+    }, 300);
+  }
+
+  // Després de desplaçar la pàgina de Google Sites, esperem que la posició s'estabilitzi.
+  function measureStable(cb) {
+    var t0 = performance.now(), prev = null;
+    (function step() {
+      measureVisible(function (v) {
+        var stable = prev && Math.abs(v.top - prev.top) < 2 && Math.abs(v.height - prev.height) < 2;
+        if (stable || performance.now() - t0 > 600) cb(v);
+        else { prev = v; step(); }
+      });
+    })();
+  }
+
+  function layoutStage(vis) {
+    if (document.fullscreenElement) return;
+    lastVisible = vis;
+    var margin = vis.width < 600 ? 8 : 32;
+    // Si el marc queda tallat per dalt, la barra fixa de Google Sites pot tapar-ne una part.
+    var topInset = vis.top > 0 ? 64 : 0;
+    var head = 52, controls = 56;
+    var aspect = fallback ? 16 / 9 : videoAspect();
+    var availW = vis.width - margin * 2;
+    var availH = vis.height - topInset - margin * 2 - head - controls;
+    var w = Math.min(availW, Math.max(availH, 120) * aspect, 1280);
+    var h = w / aspect;
+    var total = head + h + controls;
+    var areaTop = vis.top + topInset, areaH = vis.height - topInset;
+    var top = Math.max(areaTop + 4, areaTop + (areaH - total) / 2);
+    top = Math.max(4, Math.min(top, window.innerHeight - total - 4));
+    stage.style.width = w + "px";
+    stage.style.left = vis.left + (vis.width - w) / 2 + "px";
+    stage.style.top = top + "px";
+    slot.style.height = h + "px";
+  }
+
+  function startPolling() {
+    stopPolling();
+    pollTimer = setInterval(function () {
+      measureVisible(function (vis) {
+        if (state !== "expanded" || !lastVisible) return;
+        // Si el visitant fa desaparèixer gairebé tot el marc, mantenim la mida que tenia.
+        if (vis.height < 200 && vis.height < window.innerHeight - 2) return;
+        if (Math.abs(vis.top - lastVisible.top) > 4 || Math.abs(vis.height - lastVisible.height) > 4 ||
+            Math.abs(vis.left - lastVisible.left) > 4 || Math.abs(vis.width - lastVisible.width) > 4) {
+          layoutStage(vis);
+        }
+      });
+    }, 100);
+  }
+  function stopPolling() {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+
+  // Bloqueja el desplaçament sense que la pàgina salti quan desapareix la barra de desplaçament.
+  function lockScroll() {
+    if (root.classList.contains("player-open")) return;
+    var sbw = window.innerWidth - root.clientWidth;
+    root.style.paddingRight = sbw > 0 ? sbw + "px" : "";
+    root.classList.add("player-open");
+  }
+  function unlockScroll() {
+    root.classList.remove("player-open");
+    root.style.paddingRight = "";
+  }
+
+  function focusQuietly(el) {
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+
+  // --- Reproductor ampliat ---
+
+  function useIframe() {
+    player.classList.add("is-fallback");
+    player.classList.remove("is-buffering");
+    video.pause();
+    if (video.parentNode === slot) mediaVideo.appendChild(video);
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      // Només demanem els permisos que aquesta pàgina té (evita avisos a la consola).
+      var fp = document.permissionsPolicy || document.featurePolicy;
+      var allow = ["autoplay", "fullscreen"].filter(function (f) {
+        return !fp || !fp.allowsFeature || fp.allowsFeature(f);
+      });
+      if (allow.length) iframe.setAttribute("allow", allow.join("; "));
+      if (allow.indexOf("fullscreen") >= 0) iframe.setAttribute("allowfullscreen", "");
+      iframe.title = "Vídeo";
+    }
+    var src = drivePreview(current.videoId);
+    if (iframe.getAttribute("src") !== src) iframe.src = src;
+    if (iframe.parentNode !== slot) slot.appendChild(iframe);
+    if (stage.contains(document.activeElement) && document.activeElement !== closeBtn) focusQuietly(closeBtn);
+    if (lastVisible) layoutStage(lastVisible);
+  }
+
+  function expand() {
+    if (state === "expanded" || !current) return;
+    cancelSlotAnims();
+    closing = false;
+    navHold = false;
+    clearTimeout(previewTimer);
+    clearTimeout(resetTimer);
+    var aspect = fallback ? 16 / 9 : videoAspect();
+    var from = containRect(mediaVideo.getBoundingClientRect(), aspect);
+    state = "expanded";
+    media.classList.remove("is-loading", "is-playing", "is-counting", "is-hint");
+    var token = ++openToken;
+
+    // El reproductor es prepara invisible i es mostra quan ja té la mida i la posició.
+    player.hidden = false;
+    stage.style.opacity = "0";
+    player.classList.remove("is-open", "is-settled", "is-ended");
+    lockScroll();
+    if (fallback) {
+      useIframe();
+    } else {
+      player.classList.remove("is-fallback");
+      if (video.readyState < 3) player.classList.add("is-buffering");
+      if (video.paused) playVideo();
+    }
+    syncPlayState();
+    syncTime();
+
+    measureVisible(function open(vis, retried) {
+      if (token !== openToken) return;
+      // Si del marc de Google Sites només se'n veu una franja massa petita, el portem a la vista.
+      if (!retried && vis.height < Math.min(window.innerHeight - 2, 360)) {
+        try { media.scrollIntoView({ block: "center" }); } catch (e) {}
+        measureStable(function (v2) {
+          from = containRect(mediaVideo.getBoundingClientRect(), aspect);
+          open(v2, true);
+        });
+        return;
+      }
+      if (!fallback && video.parentNode !== slot) slot.appendChild(video);
+      layoutStage(vis);
+      var to = slot.getBoundingClientRect();
+      stage.style.opacity = "";
+      void player.offsetWidth;
+      player.classList.add("is-open");
+      if (slot.animate && to.width > 0) {
+        var s = from.width / to.width;
+        slot.animate([
+          { transform: "translate(" + (from.left - to.left) + "px," + (from.top - to.top) + "px) scale(" + s + ")" },
+          { transform: "none" }
+        ], { duration: REDUCED_MOTION ? 1 : 560, easing: "cubic-bezier(0.22, 0.8, 0.24, 1)" });
+      }
+      setTimeout(function () {
+        if (token === openToken) player.classList.add("is-settled");
+      }, 600);
+      focusQuietly(fallback ? closeBtn : playBtn);
+      startPolling();
+      startRaf();
+    });
+  }
+
+  function finishClose() {
+    closing = false;
+    cancelSlotAnims();
+    stopPolling();
+    stopRaf();
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(noop);
+    player.hidden = true;
+    stage.style.opacity = "";
+    player.classList.remove("is-open", "is-settled", "is-buffering", "is-fallback", "is-fullscreen");
+    unlockScroll();
+    if (iframe && iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe);
+      iframe.removeAttribute("src");
+    }
+    state = "idle";
+    closedAt = performance.now();
+  }
+
+  function close() {
+    if (state !== "expanded" || closing) return;
+    closing = true;
+    var token = ++openToken;
+    stopPolling();
+    stopRaf();
+    var wasFullscreen = !!document.fullscreenElement;
+    if (wasFullscreen && document.exitFullscreen) document.exitFullscreen().catch(noop);
+    var withVideo = video.parentNode === slot;
+    // Si encara s'estava obrint, el tancament continua des d'on era.
+    var cur = getComputedStyle(slot).transform;
+    cancelSlotAnims();
+    var last = slot.getBoundingClientRect();
+    var to = containRect(mediaVideo.getBoundingClientRect(), fallback ? 16 / 9 : videoAspect());
+    player.classList.remove("is-open", "is-settled");
+    var done = false;
+    var anim = null;
+    function finish() {
+      if (done || token !== openToken) return;
+      done = true;
+      if (!withVideo && !fallback) {
+        // Tancat abans que el vídeo arribés al reproductor.
+        video.pause();
+        try { video.currentTime = 0; } catch (e) {}
+      }
+      if (withVideo) {
+        // El vídeo torna al seu lloc i es fon amb la foto.
+        mediaVideo.appendChild(video);
+        if (mediaVideo.animate) {
+          mediaVideo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED_MOTION ? 1 : 450, easing: "ease" });
+        }
+        resetTimer = setTimeout(function () {
+          if (state === "idle") {
+            video.pause();
+            try { video.currentTime = 0; } catch (e) {}
+          }
+        }, 500);
+      }
+      finishClose();
+      cooldown = hovering;
+      focusQuietly(media);
+    }
+    if (slot.animate && last.width > 0 && !wasFullscreen) {
+      var s = to.width / last.width;
+      var target = "translate(" + (to.left - last.left) + "px," + (to.top - last.top) + "px) scale(" + s + ")";
+      // Amb el reproductor de Drive no hi ha vídeo per fondre amb la foto: el requadre s'esvaeix en arribar.
+      var frames = withVideo
+        ? [{ transform: cur && cur !== "none" ? cur : "none" }, { transform: target }]
+        : [{ transform: cur && cur !== "none" ? cur : "none", opacity: 1 }, { opacity: 1, offset: 0.6 }, { transform: target, opacity: 0 }];
+      anim = slot.animate(frames, { duration: REDUCED_MOTION ? 1 : 460, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
+      anim.onfinish = finish;
+    } else if (slot.animate) {
+      anim = slot.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED_MOTION ? 1 : 300, fill: "forwards" });
+      anim.onfinish = finish;
+    }
+    setTimeout(finish, REDUCED_MOTION ? 20 : 520);
+  }
+
+  // Atura-ho tot de cop (canvi de pantalla).
+  function videoReset() {
+    ++openToken;
+    clearTimers();
+    media.classList.remove("is-loading", "is-playing", "is-counting", "is-hint");
+    if (state === "expanded") finishClose();
+    closing = false;
+    cancelSlotAnims();
+    if (video.parentNode !== mediaVideo) mediaVideo.appendChild(video);
+    video.pause();
+    state = "idle";
+    cooldown = false;
+    navHold = true;
+  }
+
+  function togglePlay() {
+    if (fallback) return;
+    if (video.ended) {
+      try { video.currentTime = 0; } catch (e) {}
+    }
+    if (video.paused || video.ended) playVideo(); else video.pause();
+  }
+
+  function syncPlayState() {
+    var playing = !video.paused && !video.ended;
+    player.classList.toggle("is-playing", playing);
+    player.classList.toggle("is-ended", video.ended);
+    playBtn.setAttribute("aria-label", playing ? "Pausar" : (video.ended ? "Tornar a veure" : "Reproduir"));
+  }
+
+  function syncTime() {
+    var d = isFinite(video.duration) ? video.duration : 0;
+    var t = video.currentTime || 0;
+    if (+range.max !== d) range.max = d;
+    if (!scrubbing) range.value = t;
+    var p = d ? Math.min(100, (t / d) * 100) : 0;
+    range.style.setProperty("--p", p + "%");
+    curEl.textContent = formatTime(t);
+    totEl.textContent = formatTime(d);
+  }
+
+  function startRaf() {
+    stopRaf();
+    (function tick() {
+      syncTime();
+      rafId = requestAnimationFrame(tick);
+    })();
+  }
+  function stopRaf() {
+    cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+
+  // Els clics mentre el reproductor s'obre (p. ex. el segon clic d'un doble clic) no compten.
+  function settled() {
+    return player.classList.contains("is-settled");
+  }
+
+  playBtn.addEventListener("click", togglePlay);
+  slot.addEventListener("click", function (e) {
+    if (settled() && e.target === video) togglePlay();
+  });
+  closeBtn.addEventListener("click", close);
+  $("player-backdrop").addEventListener("click", function (e) {
+    if (settled() && e.detail <= 1) close();
+  });
+  $("player-guard").addEventListener("focus", function () { focusQuietly(closeBtn); });
+
+  range.addEventListener("pointerdown", function () { scrubbing = true; });
+  range.addEventListener("input", function () {
+    var t = +range.value;
+    if (isFinite(t)) {
+      try { video.currentTime = t; } catch (e) {}
+      if (video.ended || t < (video.duration || 0)) player.classList.remove("is-ended");
+    }
+    syncTime();
+  });
+  range.addEventListener("change", function () { scrubbing = false; });
+  window.addEventListener("pointerup", function () { scrubbing = false; });
+
+  fsBtn.addEventListener("click", function () {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(noop);
+    } else {
+      stage.requestFullscreen().catch(noop);
+    }
+  });
+  document.addEventListener("fullscreenchange", function () {
+    var fs = document.fullscreenElement === stage;
+    player.classList.toggle("is-fullscreen", fs);
+    if (!fs && state === "expanded" && !closing) measureVisible(layoutStage);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (state !== "expanded" || e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = e.target && e.target.tagName;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+    } else if (e.key === "k" || (e.key === " " && tag !== "BUTTON")) {
+      if (fallback) return;
+      e.preventDefault();
+      togglePlay();
+    } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !fallback) {
+      e.preventDefault();
+      var d = e.key === "ArrowLeft" ? -5 : 5;
+      try { video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + d)); } catch (err) {}
+    } else if (e.key === "Tab") {
+      // Mantenir el focus dins del reproductor.
+      var items = Array.prototype.filter.call(stage.querySelectorAll("button, input, iframe"), function (el) {
+        return el.offsetParent !== null && !el.classList.contains("hidden") &&
+          getComputedStyle(el).visibility !== "hidden";
+      });
+      if (!items.length) return;
+      var first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  window.addEventListener("resize", function () {
+    if (state === "expanded" && !closing) measureVisible(layoutStage);
+  });
+
+  // ---------------------------------------------------------------------------
+
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+</body>
+</html>
