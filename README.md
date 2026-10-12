@@ -2,6 +2,14 @@
 
 Aplicació web (un sol fitxer `index.html`) per publicar a Google Sites.
 
+## Nomenclatura
+
+| Abreviatura | Significat |
+| --- | --- |
+| **PP** | Pàgina Principal (tria d'estació) |
+| **MA1 / MA2 / MA3** | Menú Apartat 1 (Distributing Conveyor), 2 (Pick and Place), 3 (Sorting) |
+| **MAxB1…B4** | Botons de l'apartat x: B1 Esquemes, B2 Entrades/Sortides PLC, B3 Grafcet, B4 Components |
+
 ## Parts de la pàgina (noms per demanar canvis)
 
 | Nom | On és |
@@ -39,5 +47,11 @@ compartits com a "Qualsevol persona amb l'enllaç".
 
 ## Afegir contingut als botons
 
-A `index.html`, afegeix a cada estació de `STATIONS` un objecte `sections`
-amb l'HTML de cada botó (`esquemes`, `io-plc`, `grafcet`, `components`).
+A `index.html`, cada estació de `STATIONS` té un objecte `sections` amb el contingut
+de cada botó (`esquemes`, `io-plc`, `grafcet`, `components`):
+
+- `{ pdf: "ID de Google Drive" }` mostra el PDF dins de la pàgina amb el visor de Drive
+  (ara: MA1B1, MA2B1 i MA3B1).
+- Un text HTML per a contingut escrit.
+
+Els PDF han d'estar compartits com a "Qualsevol persona amb l'enllaç".
