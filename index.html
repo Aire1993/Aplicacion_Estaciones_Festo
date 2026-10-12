@@ -351,9 +351,15 @@
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 0.4s var(--ease-out), opacity 0.35s ease;
+    visibility: hidden;
+    transition: grid-template-rows 0.4s var(--ease-out), opacity 0.35s ease, visibility 0s linear 0.4s;
   }
-  .panel-wrap.open { grid-template-rows: 1fr; opacity: 1; }
+  .panel-wrap.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
   .panel-inner { overflow: hidden; min-height: 0; }
   .panel {
     margin-top: 24px;
@@ -886,13 +892,29 @@
     pageTitle.textContent = "Estacions de Festo";
     breadcrumb.textContent = "";
     breadcrumb.hidden = true;
+    clearPanel();
     station.classList.add("hidden");
     home.classList.remove("hidden");
     restartAnimation(home);
   }
 
+  function clearPanel() {
+    panel.innerHTML = "";
+    delete panel.dataset.key;
+    panelWrap.classList.remove("open");
+  }
+
+  // Alçada del visor de documents. Dins de Google Sites "vh" és l'alçada del bloc incrustat,
+  // no la de la pantalla, així que també el limitem a la pantalla real.
+  function sizeDoc(doc) {
+    var h = Math.min(window.innerHeight * 0.78, 980);
+    if (window.screen && screen.availHeight) h = Math.min(h, screen.availHeight - 220);
+    doc.style.height = Math.max(360, Math.round(h)) + "px";
+  }
+
   // Omple el panell de sota els botons. Retorna el requadre del document si n'hi ha.
-  function renderSection(label, content) {
+  function renderSection(key, label, content) {
+    panel.dataset.key = key;
     var html = "<h3>" + escapeHtml(label) + "</h3>";
     if (content && content.pdf) {
       panel.innerHTML = html +
@@ -900,6 +922,7 @@
         '<iframe title="' + escapeHtml(label) + '"></iframe></div>';
       var doc = panel.querySelector(".doc");
       var frame = doc.querySelector("iframe");
+      sizeDoc(doc);
       frame.addEventListener("load", function () { doc.classList.add("is-loaded"); });
       frame.src = drivePreview(content.pdf);
       return doc;
@@ -907,6 +930,11 @@
     panel.innerHTML = html + (content || "<p>Contingut en preparació.</p>");
     return null;
   }
+
+  window.addEventListener("resize", function () {
+    var doc = panel.querySelector(".doc");
+    if (doc) sizeDoc(doc);
+  });
 
   function showStation(s) {
     pageTitle.textContent = s.title;
@@ -918,8 +946,7 @@
     }).join("");
 
     buttonsEl.innerHTML = "";
-    panel.innerHTML = "";
-    panelWrap.classList.remove("open");
+    clearPanel();
     BUTTONS.forEach(function (b) {
       var btn = document.createElement("button");
       btn.className = "btn";
@@ -938,19 +965,25 @@
         }
         btn.classList.add("active");
         btn.setAttribute("aria-expanded", "true");
-        var doc = renderSection(b.label, s.sections && s.sections[b.key]);
-        if (panelWrap.classList.contains("open")) {
-          panel.classList.remove("swap");
-          void panel.offsetWidth;
-          panel.classList.add("swap");
+        var doc;
+        if (panel.dataset.key === b.key) {
+          doc = panel.querySelector(".doc");
+          if (doc) sizeDoc(doc);
+        } else {
+          doc = renderSection(b.key, b.label, s.sections && s.sections[b.key]);
+          if (panelWrap.classList.contains("open")) {
+            panel.classList.remove("swap");
+            void panel.offsetWidth;
+            panel.classList.add("swap");
+          }
         }
         panelWrap.classList.add("open");
         // Un document és alt: un cop obert el panell, el portem a la vista.
         if (doc) {
           setTimeout(function () {
-            if (!panel.contains(doc)) return;
+            if (!panel.contains(doc) || !panelWrap.classList.contains("open")) return;
             try { doc.scrollIntoView({ block: "nearest", behavior: REDUCED_MOTION ? "auto" : "smooth" }); } catch (e) {}
-          }, REDUCED_MOTION ? 0 : 420);
+          }, REDUCED_MOTION ? 60 : 420);
         }
       });
       buttonsEl.appendChild(btn);
