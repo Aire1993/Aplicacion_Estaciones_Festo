@@ -2282,11 +2282,82 @@
 
   // Fotos pujades a Google Drive: ruta de la foto a Festo -> ID del fitxer a Drive.
   // Les que no hi són es carreguen des de la web de Festo Didactic.
-  var FESTO_DRIVE_IMAGES = {};
+  var FESTO_DRIVE_IMAGES = {
+    "Components/Aktor19182/img/thumb.jpg": "19MSpz7gHoGgiK2xgMOjP23FMK5Awv465",
+    "Components/Aktor525675/img/thumb.jpg": "1jYpqOKHTMBeAr2SQkqkHLLaBZaHnFTfw",
+    "Components/Aktor532941/img/thumb.jpg": "1as-tquJPUNVsc242JPEMUSWu9eIMJSC_",
+    "Components/Aktor532952/img/thumb.jpg": "154o5vV9EeUnwtBsq-nOfeP6wVM_gKgxF",
+    "Components/Aktor543930/img/thumb.jpg": "1L9tNC6gdtQ133-2wZXupn874_Jw5YKm6",
+    "Components/Aktor564212_M52/img/thumb.jpg": "1t9L8cHS2It1KWtHSJIjLrPMTxvnC1F0w",
+    "Components/Aktor8046324/img/thumb.jpg": "1dIpkqY4O-RpBxd6L72nLhVqZJPEkkDwi",
+    "Components/Part153252/img/thumb.jpg": "1oeMAzmR63d_UbMuXmwjVte7B_MJFlyPv",
+    "Components/Part153328/img/thumb.jpg": "15yWq1hLRT7ivV29BI5bjE0n9_xmFWRKw",
+    "Components/Part153329/img/thumb.jpg": "1BXkW-xritLEKrdbdwaGmX6NBkCawNM7A",
+    "Components/Part153495/img/thumb.jpg": "14FIlLQDM6lT3WO-dwwhk6unwiSIGyMuf",
+    "Components/Part175041/img/thumb.jpg": "1JhGRC61e2hXMQTNDzrtITqNFuFEW8yDn",
+    "Components/Part175056/img/thumb.jpg": "1jNIADP5B8FeEYBLi-BZu68AWDiETQGIE",
+    "Components/Part189199/img/thumb.jpg": "1lXpdR17i5yKFvLs2N-hGXp6Vv-_C75oZ",
+    "Components/Part189401/img/thumb.jpg": "1AGtHdlZpaHrHEh4LmEIkIRWhgCha30n8",
+    "Components/Part191203/img/thumb.jpg": "1MdMlMeN5adY9gkcdNYZ48AFAwpDaEtl5",
+    "Components/Part193552/img/thumb.jpg": "1lLBosimDqybNPzfg2HPyd5noBlIfn3d6",
+    "Components/Part540691/img/thumb.jpg": "1UwJyiR2lCd9-0hQtxvbqOXHGbIZUdQUM",
+    "Components/Part8025738/img/thumb.jpg": "1mT52AiZRJ4U3smCsgOFC4T7fP50ligKn",
+    "Components/Part8025739/img/thumb.jpg": "1BHMw2nHotvSigu1s122fu8o1tNA7dJaP",
+    "Components/Part8033583/img/thumb.jpg": "1_Jzed1292yPJFpmYBB6uTKf2UzMB7vCM",
+    "Components/Part8034300/img/thumb.jpg": "19yRaObiEJLzD5Sk2X-wUf3CuXYV1O9bI",
+    "Components/Part8046639/img/thumb.jpg": "12K71YDbJlXsSlmRpf2kIioqTE_gbkoaO",
+    "Components/Part8064284/img/thumb.jpg": "1XNmhJkQk4b-EHxDJCPtuZh_LgcMNLEsR",
+    "Components/Sensor150395/img/thumb.jpg": "1I2mg0s0pVqgP-y2LvIqZGslhrEesD367",
+    "Components/Sensor150855/img/thumb.jpg": "1vYqd9oK6VqL5UZyU_oknpi-EyVRQa4Ln",
+    "Components/Sensor173210/img/thumb.jpg": "17hLvYc3z20GBhU5nzHg_H7o_00iO1zk4",
+    "Components/Sensor196959/img/thumb.jpg": "1F6wa-lLDk4ODneGaYubg7JxryXc645LF",
+    "Components/Sensor196960/img/thumb.jpg": "1-lvBBSxlgKakYnlJgcftQDx_c7anvT2p",
+    "Components/Sensor527458/img/thumb.jpg": "1h7yZCZ1X04q0t-VH1U0wjSPDJw6Uiyfo",
+    "Components/Sensor553563/img/thumb.jpg": "1xbbcFxMr-dKpno_mwMy5RaZXTmZ48vqm",
+    "Components/Sensor8063218/img/thumb.jpg": "1TardQwowdbeumXanqdqlmPakUdzJ0fjn",
+    "ConveyorModule/img/image.jpg": "1bcrW7RNYTniMgqvKydmxiN-eZCZlIEe-",
+    "ConveyorModule/img/thumb.jpg": "1XFTK9_H1CHjT1cFPFtS3SJwb5CTjfw-i",
+    "DetectionModule/img/image.jpg": "17seufoir8nqhaaf_p5jeZSuHjC_fS2H0",
+    "DetectionModule/img/thumb.jpg": "1BffhR3A1szwb-BQByXLfUW9VoarEB5Cu",
+    "PickandPlaceModule/img/image.jpg": "1ENdba0YNuTOrvGQg6TYOC3Uic8Q_kCbw",
+    "PickandPlaceModule/img/thumb.jpg": "1Uwlf-XZt4UDOXPVriNE0xLCZwz3y0My6",
+    "StackMagazineModule/img/image.jpg": "16vchkxRkuDWzg1IGgKRHrbdKErS-vERq",
+    "StackMagazineModule/img/thumb.jpg": "1gSWrm4YZDm-G1oeC1_0wM3BnGIvFTmnn"
+  };
 
   // Fitxes tècniques (PDF) pujades a Google Drive: ruta del PDF a Festo -> ID del fitxer a Drive.
   // Les que no hi són s'obren des de la web de Festo Didactic.
-  var FESTO_DRIVE_PDFS = {};
+  var FESTO_DRIVE_PDFS = {
+    "Components/Aktor19182/Documentation/DataSheet.pdf": "1pZNMhmv__CQJTeRtA9fOCGVmIr0N6jJE",
+    "Components/Aktor525675/Documentation/DataSheet.pdf": "1unmpMUoM7dcHzACkWG-4RIIIcXVEsUXs",
+    "Components/Aktor532941/Documentation/DataSheet.pdf": "1uMt7hI_qJQS8tHVXj32NRTq2SRwOEIII",
+    "Components/Aktor532952/Documentation/DataSheet_en.pdf": "19VNd0TaHz5EyVdhk9EgVyRa0ikVpB2HB",
+    "Components/Aktor543930/Documentation/DataSheet.pdf": "1oC1FmPb5DkYrbHgMgd__FIKez0sM-Q_k",
+    "Components/Aktor564212_M52/Documentation/DataSheet.pdf": "1K7uEJw_zXVCDJjOlvbyj0LOGeaiDoqBo",
+    "Components/Aktor8046324/Documentation/DataSheet.pdf": "1alk3YV6cMXjbmXFvE7F6mWkhYw0-p93t",
+    "Components/Part153252/Documentation/DataSheet.pdf": "1l2IGDdIgUHw0x4xf2GVk11k-r4pLFTJN",
+    "Components/Part153328/Documentation/DataSheet.pdf": "15Ab58eyerRlWIifXUCoMKcwWrwaRv_Ov",
+    "Components/Part153329/Documentation/DataSheet.pdf": "1l_El-KLTofbxvZH8VknflLdMWzwZfFAa",
+    "Components/Part153495/Documentation/DataSheet.pdf": "1_GNSgzXnrOkqqwQKPk2Sn4ceK111j0VM",
+    "Components/Part175041/Documentation/DataSheet.pdf": "1shXwO_FgCTXIOoc77Kj8D5JoiiojPN82",
+    "Components/Part175056/Documentation/DataSheet.pdf": "1ki40dTfyOAEICYiGM_GtW0bqKmxlU4_m",
+    "Components/Part189199/Documentation/DataSheet.pdf": "1fMME67WG2cUVeq8fjdsOcqcjoe8MAhUG",
+    "Components/Part189401/Documentation/DataSheet.pdf": "1HMaEONx9uWoSyPD5ZyODJA1FrvsslFpB",
+    "Components/Part191203/Documentation/DataSheet.pdf": "1N2gHr2NAOf5ONM2dxQGmAZAyxw5hI3BH",
+    "Components/Part193552/Documentation/DataSheet.pdf": "1dSwwr-LpX3edsVIGBd89K5jXam4uqtkD",
+    "Components/Part540691/Documentation/DataSheet_en.pdf": "1GpQcLrsrw6DHBSFcQere-wpNeUhsNDVp",
+    "Components/Part8025738/Documentation/DataSheet.pdf": "1auiq6X1_SLFySM00pJ5jH8u6-cuXdyTr",
+    "Components/Part8025739/Documentation/DataSheet.pdf": "10p4kz6jCzdOxZSThUAN-PIjE9ipYDm-J",
+    "Components/Part8064284/Documentation/DataSheet.pdf": "1OXcJ0Q1kqfip8q8XWew540wmS1z6NRhY",
+    "Components/Sensor150395/Documentation/DataSheet.pdf": "1s2IwpbMPfMpymLg0MOGTXrcpwpseezS5",
+    "Components/Sensor150855/Documentation/DataSheet.pdf": "1Mf5hTC-GqSPxih7RQL1XGSgGD-OhOSe3",
+    "Components/Sensor173210/Documentation/DataSheet.pdf": "16XDCUKAjf97_a-3Puotjbwt34Q-fyUSB",
+    "Components/Sensor196959/Documentation/DataSheet.pdf": "1yISYMuhOclrLUttO8QCzNKk_6BH8LxPr",
+    "Components/Sensor196960/Documentation/DataSheet.pdf": "1Sv2TOAQ1lwtaDaS9MNX1Nu5H5IVrmQrJ",
+    "Components/Sensor527458/Documentation/DataSheet.pdf": "1ujPqKJPhTJJFXmo0ggWkgUkGugPrEfvM",
+    "Components/Sensor553563/Documentation/DataSheet.pdf": "1Baa7rp_vr-CUMNUNJOo1dEP3XL5GEiFc",
+    "Components/Sensor8063218/Documentation/DataSheet.pdf": "1mqf7sbCspctg6C5ykx2l3i9ScS96o9kR"
+  };
 
   function festoCatalog(station, folder, modules, others) {
     return {
