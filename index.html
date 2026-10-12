@@ -2111,6 +2111,10 @@
   // Les que no hi són es carreguen des de la web de Festo Didactic.
   var FESTO_DRIVE_IMAGES = {};
 
+  // Fitxes tècniques (PDF) pujades a Google Drive: ruta del PDF a Festo -> ID del fitxer a Drive.
+  // Les que no hi són s'obren des de la web de Festo Didactic.
+  var FESTO_DRIVE_PDFS = {};
+
   function festoCatalog(station, folder, modules, others) {
     return {
       base: FESTO_COMPONENTS.base,
@@ -2327,6 +2331,11 @@
     return '<img ' + (attrs || "") + 'alt="' + escapeHtml(alt || "") + '" src="' + src + '"' +
       (id ? ' data-alt="' + festo + '"' : "") + ">";
   }
+  // Fitxes tècniques: des de Google Drive si hi són (FESTO_DRIVE_PDFS), si no des de Festo.
+  function pdfUrl(path) {
+    var id = FESTO_DRIVE_PDFS[path];
+    return id ? "https://drive.google.com/file/d/" + id + "/view" : catUrl(path);
+  }
   function imgFailed(img) {
     var alt = img.getAttribute("data-alt");
     if (alt) {
@@ -2465,7 +2474,7 @@
           it.specs.map(function (sp) {
             return "<tr><th scope=\"row\">" + escapeHtml(sp[0]) + "</th><td>" + escapeHtml(sp[1]) + "</td></tr>";
           }).join("") + "</tbody></table>" : "") +
-        (it.pdf ? '<a class="sheet-link" href="' + catUrl(it.pdf) + '" target="_blank" rel="noopener noreferrer">' +
+        (it.pdf ? '<a class="sheet-link" href="' + pdfUrl(it.pdf) + '" target="_blank" rel="noopener noreferrer">' +
           'Fitxa tècnica del fabricant (PDF) <span aria-hidden="true">&#8599;</span></a>' : "");
     }
     return '<div class="sheet-img">' + catImg(img, title) + "</div>" +
