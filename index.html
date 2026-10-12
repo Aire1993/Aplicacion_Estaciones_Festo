@@ -1111,23 +1111,15 @@
     return "https://drive.google.com/file/d/" + id + "/preview";
   }
 
-  // Components de la Pick and Place Station (MA2B4). Dades: Festo Didactic InfoPortal i fitxes tècniques.
-  var CATALOG_PICK_PLACE = {
+  // Components de les estacions (botó Components). Dades: Festo Didactic InfoPortal i fitxes tècniques.
+  // Els mòduls i components són compartits: cada estació només diu quins en té.
+  var FESTO_COMPONENTS = {
     "base": "https://ip.festo-didactic.com/InfoPortal/MPS/",
-    "source": {
-      "label": "Festo Didactic InfoPortal · Pick and Place Station",
-      "url": "https://ip.festo-didactic.com/InfoPortal/MPS/PickandPlaceStation/EN/Elements.html"
-    },
-    "intro": "Elements que formen l'estació segons la documentació de Festo Didactic. Clica un component per veure'n la fitxa amb les dades tècniques.",
-    "modules": [
-      {
-        "key": "conveyor",
+    "modules": {
+      "conveyor": {
         "name": "Mòdul transportador",
         "nameEn": "Conveyor Module",
         "refs": "8032692, 8033135",
-        "img": "ConveyorModule/img/thumb.jpg",
-        "image": "ConveyorModule/img/image.jpg",
-        "page": "ConveyorModule/EN/index.html",
         "text": [
           "Transporta les peces i les pot retenir en espera. Uns sensors òptics amb cable de fibra òptica comproven si hi ha peça abans del separador i al final de la cinta.",
           "La cinta l'acciona un motoreductor de corrent continu. Un electroimant amb separador pot aturar i separar les peces, i les posicions finals es controlen amb sensors inductius."
@@ -1137,6 +1129,10 @@
           "Es subministra completament muntat, amb el controlador del motor integrat, que permet el gir en tots dos sentits.",
           "Si es treu el pont entre els borns 6 i 8 del controlador del motor, el born 6 es pot connectar al born 11/12 del terminal mini d'E/S per regular la velocitat de la cinta amb un senyal analògic de 0 ... 10 V."
         ],
+        "key": "conveyor",
+        "img": "ConveyorModule/img/thumb.jpg",
+        "image": "ConveyorModule/img/image.jpg",
+        "page": "ConveyorModule/EN/index.html",
         "items": [
           "Sensor196959",
           "Sensor196960",
@@ -1146,14 +1142,10 @@
           "Part8025739"
         ]
       },
-      {
-        "key": "pickplace",
+      "pickplace": {
         "name": "Mòdul Pick&Place",
         "nameEn": "Pick and Place Module (Suction Gripper)",
         "refs": "8031659",
-        "img": "PickandPlaceModule/img/thumb.jpg",
-        "image": "PickandPlaceModule/img/image.jpg",
-        "page": "PickandPlaceModule/EN/index.html",
         "text": [
           "Manipulador pneumàtic que munta les peces amb una ventosa. Es basa en unitats de lliscament (minicarros) de precisió, i les posicions finals dels carros es detecten elèctricament amb sensors de proximitat.",
           "La posició dels sensors, la posició de muntatge i l'alçada de muntatge es poden ajustar."
@@ -1163,6 +1155,10 @@
           "Amb un regulador de pressió es pot ajustar la força de la unitat de lliscament vertical (eix Z).",
           "Es subministra complet: unitats de lliscament, generador de buit, filtre de buit, ventosa de manxa, pressòstat, terminal de vàlvules, regulador de pressió i interfície elèctrica."
         ],
+        "key": "pickplace",
+        "img": "PickandPlaceModule/img/thumb.jpg",
+        "image": "PickandPlaceModule/img/image.jpg",
+        "page": "PickandPlaceModule/EN/index.html",
         "items": [
           "Sensor173210",
           "Sensor527458",
@@ -1179,21 +1175,34 @@
           "Part153252",
           "Part8025739"
         ]
-      }
-    ],
-    "groups": [
-      {
-        "key": "station",
-        "name": "Altres elements",
+      },
+      "stack": {
+        "name": "Mòdul magatzem apilador",
+        "nameEn": "Stack Magazine Module",
+        "refs": "8032171, 8032172",
+        "text": [
+          "Separa les peces d'un magatzem. Al tub s'hi poden apilar fins a 7 peces en qualsevol ordre, i girant el tub es poden separar fins a 17 tapes de peça.",
+          "Un cilindre de doble efecte empeny la peça de més avall fora del magatzem per gravetat, contra un topall extern, i la deixa al suport: aquest és el punt de transferència al mòdul següent."
+        ],
+        "more": [
+          "Una barrera de llum sota el tub comprova si el magatzem és buit. Opcionalment, a la base s'hi pot cargolar un sensor optoelectrònic que detecta les tapes i les peces; també se'n pot instal·lar un al suport.",
+          "La posició del cilindre expulsor es detecta elèctricament amb sensors de proximitat, i la velocitat d'avanç i de retorn es regula de manera contínua amb vàlvules reguladores de cabal unidireccionals.",
+          "Si s'hi afegeix la base, se'n pot ajustar l'alçada per acoblar-lo directament, per exemple, a un mòdul transportador."
+        ],
+        "key": "stack",
+        "img": "StackMagazineModule/img/thumb.jpg",
+        "image": "StackMagazineModule/img/image.jpg",
+        "page": "StackMagazineModule/EN/index.html",
         "items": [
-          "Aktor532952",
-          "Part8025738",
-          "Part8033583",
-          "Part540691",
-          "Part8034300"
+          "Sensor150855",
+          "Sensor196960",
+          "Aktor19182",
+          "Aktor564212_M52",
+          "Part175056",
+          "Part8025739"
         ]
       }
-    ],
+    },
     "items": {
       "Sensor196959": {
         "name": "Sensor de reflexió difusa de fibra òptica",
@@ -1954,6 +1963,146 @@
         ],
         "img": "Components/Part540691/img/thumb.jpg",
         "pdf": "Components/Part540691/Documentation/DataSheet_en.pdf"
+      },
+      "Sensor150855": {
+        "name": "Sensor de proximitat magnètic SME (contacte reed)",
+        "nameEn": "Proximity Sensor SME",
+        "code": "SME-8-K-LED-24",
+        "refs": "150855",
+        "text": "Sensor de proximitat elèctric amb contacte reed i cable, per a actuadors amb ranura en T. Al mòdul magatzem apilador detecta per efecte magnètic la posició del cilindre expulsor i indica l'estat de commutació amb un LED groc.",
+        "specs": [
+          [
+            "Principi de mesura",
+            "Magnètic, contacte reed"
+          ],
+          [
+            "Funció de l'element de commutació",
+            "Contacte normalment obert"
+          ],
+          [
+            "Tensió de funcionament",
+            "12 ... 30 V CA/CC"
+          ],
+          [
+            "Corrent màxim de sortida",
+            "500 mA"
+          ],
+          [
+            "Connexió elèctrica",
+            "Cable de 3 fils, 2,5 m"
+          ],
+          [
+            "Indicador d'estat",
+            "LED groc"
+          ]
+        ],
+        "img": "Components/Sensor150855/img/thumb.jpg",
+        "pdf": "Components/Sensor150855/Documentation/DataSheet.pdf"
+      },
+      "Aktor19182": {
+        "name": "Cilindre normalitzat de doble efecte DSNU",
+        "nameEn": "Standard cylinder DSNU",
+        "code": "DSNU-8-100-P-A",
+        "refs": "19182",
+        "text": "Cilindre pneumàtic de doble efecte segons DIN ISO 6432, amb anells elàstics d'amortiment a les posicions finals i preparat per a la detecció de posició amb sensors de proximitat. Al mòdul magatzem apilador fa d'expulsor: empeny les peces fora del tub del magatzem.",
+        "specs": [
+          [
+            "Cursa",
+            "100 mm"
+          ],
+          [
+            "Diàmetre del pistó",
+            "8 mm"
+          ],
+          [
+            "Pressió de treball",
+            "1,5 ... 10 bar"
+          ],
+          [
+            "Força teòrica a 6 bar (avanç / retorn)",
+            "30,2 N / 22,6 N"
+          ],
+          [
+            "Amortiment",
+            "Elàstic a tots dos extrems (anells/plaques, P)"
+          ],
+          [
+            "Connexió pneumàtica",
+            "M5"
+          ]
+        ],
+        "img": "Components/Aktor19182/img/thumb.jpg",
+        "pdf": "Components/Aktor19182/Documentation/DataSheet.pdf"
+      },
+      "Aktor564212_M52": {
+        "name": "Electrovàlvula 5/2 monoestable",
+        "nameEn": "Solenoid valve VUVG",
+        "code": "VUVG",
+        "refs": "564212",
+        "text": "Electrovàlvula de 5/2 vies monoestable, d'una sola bobina, d'accionament elèctric i pilotada. Al mòdul magatzem apilador comanda el cilindre de doble efecte que expulsa les peces del tub del magatzem.",
+        "specs": [
+          [
+            "Funció de vàlvula",
+            "5/2 monoestable"
+          ],
+          [
+            "Tipus d'accionament",
+            "Elèctric, pilotat"
+          ],
+          [
+            "Cicle de treball",
+            "100 %"
+          ],
+          [
+            "Fluctuació de tensió admissible",
+            "±10 %"
+          ],
+          [
+            "Connexió elèctrica",
+            "A través de placa de connexió elèctrica"
+          ],
+          [
+            "Temperatura ambient",
+            "-5 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Aktor564212_M52/img/thumb.jpg",
+        "pdf": "Components/Aktor564212_M52/Documentation/DataSheet.pdf"
+      },
+      "Part175056": {
+        "name": "Vàlvula reguladora de cabal unidireccional",
+        "nameEn": "One-way flow control valve GRLA",
+        "code": "GRLA-M5-QS-4-LF-C",
+        "refs": "175056",
+        "text": "Vàlvula d'estrangulació amb antiretorn que es cargola en una connexió M5 i regula el cabal de l'aire d'escapament i, així, la velocitat del cilindre expulsor. Té una connexió ràpida QS-4 per al tub i s'ajusta amb un cargol de cap ranurat.",
+        "specs": [
+          [
+            "Connexions pneumàtiques",
+            "QS-4 (connexió 1) / M5 (connexió 2)"
+          ],
+          [
+            "Pressió de treball",
+            "0,2 ... 10 bar"
+          ],
+          [
+            "Cabal nominal en sentit d'estrangulació",
+            "40 l/min"
+          ],
+          [
+            "Cabal nominal en sentit antiretorn",
+            "50 ... 75 l/min"
+          ],
+          [
+            "Element d'ajust",
+            "Cargol de cap ranurat"
+          ],
+          [
+            "Temperatura ambient",
+            "-10 ... 60 °C"
+          ]
+        ],
+        "img": "Components/Part175056/img/thumb.jpg",
+        "pdf": "Components/Part175056/Documentation/DataSheet.pdf"
       }
     }
   };
@@ -1962,6 +2111,20 @@
   // Les que no hi són es carreguen des de la web de Festo Didactic.
   var FESTO_DRIVE_IMAGES = {};
 
+  function festoCatalog(station, folder, modules, others) {
+    return {
+      base: FESTO_COMPONENTS.base,
+      source: { label: "Festo Didactic InfoPortal · " + station, url: FESTO_COMPONENTS.base + folder + "/EN/Elements.html" },
+      intro: "Elements que formen l'estació segons la documentació de Festo Didactic. Clica un component per veure'n la fitxa amb les dades tècniques.",
+      modules: modules.map(function (k) { return FESTO_COMPONENTS.modules[k]; }),
+      groups: [{ key: "station", name: "Altres elements", items: others }],
+      items: FESTO_COMPONENTS.items
+    };
+  }
+
+  var CATALOG_DISTRIBUTING = festoCatalog("Distributing Conveyor Station", "DistributionConveyorStation", ["conveyor", "stack"], ["Aktor532952", "Part8025738", "Part8033583", "Part540691", "Part8034300"]);
+  var CATALOG_PICK_PLACE = festoCatalog("Pick and Place Station", "PickandPlaceStation", ["conveyor", "pickplace"], ["Aktor532952", "Part8025738", "Part8033583", "Part540691", "Part8034300"]);
+
   var STATIONS = [
     {
       slug: "distributing-conveyor",
@@ -1969,7 +2132,8 @@
       imageId: "1V2z0bdAIv0TssQggLAq7PGRHndPkw1MF",
       videoId: "17QP8BIyBUt18p9VaqKIh5JbhtJsJ-tNw",
       sections: {
-        esquemes: { pdf: "18WaYvo3N18UVMBxtNH4BJvIKo8-4bGPD" }
+        esquemes: { pdf: "18WaYvo3N18UVMBxtNH4BJvIKo8-4bGPD" },
+        components: { catalog: CATALOG_DISTRIBUTING }
       },
       description: [
         "L'estació de distribució/transportadora separa les peces emmagatzemades en el tub del magatzem apilador. Un cilindre de doble efecte empeny les peces cap a fora d'una en una.",
@@ -2293,7 +2457,9 @@
       img = it.img;
       kicker = owner ? owner.name : (owners.map(function (g) { return g.name; }).join(" · ") || "Component");
       title = it.name;
-      sub = [it.nameEn, it.code, refText(it.refs)].filter(Boolean).join(" · ");
+      // El codi de tipus no es repeteix si ja forma part del nom de Festo.
+      var code = it.code && it.nameEn.indexOf(it.code) < 0 ? it.code : "";
+      sub = [it.nameEn, code, refText(it.refs)].filter(Boolean).join(" · ");
       body = '<div class="sheet-text"><p>' + escapeHtml(it.text) + "</p></div>" +
         (it.specs && it.specs.length ? '<table class="sheet-specs"><caption>Dades tècniques</caption><tbody>' +
           it.specs.map(function (sp) {
