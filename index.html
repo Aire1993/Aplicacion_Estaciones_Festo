@@ -579,7 +579,7 @@
     border-top: 3px solid var(--festo-blue);
     flex: 1;
   }
-  .comp-card-name { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .comp-card-name { font-size: 15px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
   .comp-card-ref { font-size: 12px; color: var(--text-muted); }
   .comp-card-text {
     margin-top: 4px;
@@ -653,11 +653,21 @@
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-auto-rows: max-content;  /* si no hi cap, es desplaça en lloc d'encongir-se */
+    overscroll-behavior: contain; /* no arrossega la pàgina de Google Sites en arribar al final */
     min-height: 0;
     flex: 1;
     overflow: auto;
   }
   .sheet-content.swap { animation: fade-in 0.3s ease; }
+  .sheet-content:focus { outline: none; }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
   .sheet-img {
     display: flex;
     align-items: center;
@@ -1036,10 +1046,11 @@
     <button class="sheet-close" id="sheet-close" type="button" aria-label="Tancar la fitxa">
       <svg viewBox="0 0 20 20"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
-    <div class="sheet-content" id="sheet-content"></div>
+    <div class="sheet-content" id="sheet-content" tabindex="-1"></div>
     <div class="sheet-nav">
       <button type="button" id="sheet-prev">&lsaquo; Anterior</button>
       <span id="sheet-count"></span>
+      <span class="sr-only" id="sheet-status" aria-live="polite"></span>
       <button type="button" id="sheet-next">Següent &rsaquo;</button>
     </div>
   </div>
@@ -1118,13 +1129,13 @@
         "image": "ConveyorModule/img/image.jpg",
         "page": "ConveyorModule/EN/index.html",
         "text": [
-          "Transporta les peces i les pot retenir en espera. Uns detectors òptics amb cable de fibra òptica comproven si hi ha peça abans del separador i al final de la cinta.",
-          "La cinta l'acciona un motoreductor de corrent continu. Un electroimant amb separador pot aturar i separar les peces, i les posicions finals es controlen amb detectors inductius."
+          "Transporta les peces i les pot retenir en espera. Uns sensors òptics amb cable de fibra òptica comproven si hi ha peça abans del separador i al final de la cinta.",
+          "La cinta l'acciona un motoreductor de corrent continu. Un electroimant amb separador pot aturar i separar les peces, i les posicions finals es controlen amb sensors inductius."
         ],
         "more": [
           "Es pot muntar sobre una placa perfilada, un peu de perfil o un bastidor ranurat, i el motor de CC es pot col·locar on convingui. És apte per a peces de 40 mm de diàmetre (per exemple, els jocs de peces «Body» o «Cylinder for assembly»).",
           "Es subministra completament muntat, amb el controlador del motor integrat, que permet el gir en tots dos sentits.",
-          "Si es treu el pont entre els borns 6 i 8 del controlador del motor, el born 6 es pot connectar al born 11/12 del terminal d'E/S per regular la velocitat de la cinta amb un senyal analògic de 0…10 V."
+          "Si es treu el pont entre els borns 6 i 8 del controlador del motor, el born 6 es pot connectar al born 11/12 del terminal mini d'E/S per regular la velocitat de la cinta amb un senyal analògic de 0 ... 10 V."
         ],
         "items": [
           "Sensor196959",
@@ -1144,11 +1155,11 @@
         "image": "PickandPlaceModule/img/image.jpg",
         "page": "PickandPlaceModule/EN/index.html",
         "text": [
-          "Manipulador pneumàtic que munta les peces amb una ventosa. Es basa en unitats de lliscament de precisió, i les posicions finals dels carros es detecten elèctricament amb detectors de proximitat.",
-          "La posició dels detectors, la posició de muntatge i l'alçada de muntatge es poden ajustar."
+          "Manipulador pneumàtic que munta les peces amb una ventosa. Es basa en unitats de lliscament (minicarros) de precisió, i les posicions finals dels carros es detecten elèctricament amb sensors de proximitat.",
+          "La posició dels sensors, la posició de muntatge i l'alçada de muntatge es poden ajustar."
         ],
         "more": [
-          "Una ventosa de manxa agafa les peces. Directament a la ventosa hi ha muntat un filtre de buit que evita que la brutícia arribi al generador de buit, i un pressòstat indica que la peça està ben agafada.",
+          "Una ventosa de manxa agafa les peces. Directament a la ventosa hi ha muntat un filtre de buit que evita que la brutícia arribi al generador de buit, i un sensor de pressió de buit (pressòstat) indica que la peça està ben agafada.",
           "Amb un regulador de pressió es pot ajustar la força de la unitat de lliscament vertical (eix Z).",
           "Es subministra complet: unitats de lliscament, generador de buit, filtre de buit, ventosa de manxa, pressòstat, terminal de vàlvules, regulador de pressió i interfície elèctrica."
         ],
@@ -1205,7 +1216,7 @@
           ],
           [
             "Tensió de funcionament",
-            "24 V DC (10 ... 30 V)"
+            "24 V CC (10 ... 30 V)"
           ],
           [
             "Connexió elèctrica",
@@ -1240,7 +1251,7 @@
           ],
           [
             "Tensió de funcionament",
-            "24 V DC (10 ... 30 V)"
+            "24 V CC (10 ... 30 V)"
           ],
           [
             "Connexió elèctrica",
@@ -1259,7 +1270,7 @@
         "nameEn": "Proximity Sensor SME",
         "code": "SME-10-KL-LED-24",
         "refs": "173210",
-        "text": "Sensor de proximitat elèctric amb contacte reed i cable, per a actuadors amb ranura en C. Al mòdul Pick and Place es munta a la ranura d'un actuador, commuta per efecte magnètic i indica el seu estat amb un LED groc.",
+        "text": "Sensor de proximitat elèctric amb contacte reed i cable, per a actuadors amb ranura en C. Al mòdul Pick&Place es munta a la ranura d'un actuador, commuta per efecte magnètic i indica el seu estat amb un LED groc.",
         "specs": [
           [
             "Principi de mesura",
@@ -1271,7 +1282,7 @@
           ],
           [
             "Tensió de funcionament",
-            "12 ... 27 V AC/DC"
+            "12 ... 27 V CA/CC"
           ],
           [
             "Corrent màxim de sortida",
@@ -1294,7 +1305,7 @@
         "nameEn": "Pressure sensor SDE5",
         "code": "SDE5-V1-O-Q6-P-M8",
         "refs": "527458",
-        "text": "Sensor de pressió per a buit amb connector M8, que mesura la pressió relativa entre 0 i -1 bar amb un element piezoresistiu. Al mòdul Pick and Place, que treballa amb una ventosa, activa una sortida PNP quan el buit arriba al llindar ajustat.",
+        "text": "Sensor de pressió per a buit amb connector M8, que mesura la pressió relativa entre 0 i -1 bar amb un element piezoresistiu. Al mòdul Pick&Place, que treballa amb una ventosa, activa una sortida PNP quan el buit arriba al llindar ajustat.",
         "specs": [
           [
             "Rang de mesura (pressió relativa)",
@@ -1310,7 +1321,7 @@
           ],
           [
             "Tensió de funcionament",
-            "15 ... 30 V DC"
+            "15 ... 30 V CC"
           ],
           [
             "Connexió elèctrica",
@@ -1337,7 +1348,7 @@
           ],
           [
             "Tensió nominal",
-            "24 VDC"
+            "24 V CC"
           ],
           [
             "Angle de gir",
@@ -1403,19 +1414,19 @@
         "specs": [
           [
             "Tensió nominal",
-            "24 V DC ±10%, molt baixa tensió de seguretat (SELV, PELV)"
+            "24 V CC ±10 %, molt baixa tensió de seguretat (SELV, PELV)"
           ],
           [
             "Corrent permanent del motor",
-            "4 A DC"
+            "4 A CC"
           ],
           [
             "Entrades de control",
-            "1 lògic: 10 ... 24 V DC; 0 lògic: 0 ... 4 V DC"
+            "1 lògic: 10 ... 24 V CC; 0 lògic: 0 ... 4 V CC"
           ],
           [
             "Entrada analògica (consigna de velocitat)",
-            "0 … 10 V DC, tolerant a 24 V, resistència d'entrada aprox. 100 kΩ"
+            "0 ... 10 V CC, tolerant a 24 V, resistència d'entrada aprox. 100 kΩ"
           ],
           [
             "Sortida digital «a punt per funcionar»",
@@ -1423,7 +1434,7 @@
           ],
           [
             "Temperatura ambient",
-            "5 … 40 °C"
+            "5 ... 40 °C"
           ]
         ],
         "img": "Components/Part8064284/img/thumb.jpg",
@@ -1440,7 +1451,7 @@
         "pdf": ""
       },
       "Aktor543930": {
-        "name": "Minicarro pneumàtic",
+        "name": "Minicarro pneumàtic (unitat de lliscament)",
         "nameEn": "Mini slide DGSL",
         "code": "DGSL-8-50-PA",
         "refs": "543930",
@@ -1491,7 +1502,7 @@
           ],
           [
             "Tensió nominal de funcionament",
-            "24 V DC (+/- 10 %)"
+            "24 V CC (±10 %)"
           ],
           [
             "Cabal nominal màxim",
@@ -1518,7 +1529,7 @@
         "specs": [
           [
             "Connexions pneumàtiques",
-            "QS-3 (port 1) / M3 (port 2)"
+            "QS-3 (connexió 1) / M3 (connexió 2)"
           ],
           [
             "Pressió de treball",
@@ -1565,7 +1576,7 @@
           ],
           [
             "Connexions pneumàtiques",
-            "QS-4 (port 1) / QS-4 (port 2)"
+            "QS-4 (connexió 1) / QS-4 (connexió 2)"
           ],
           [
             "Indicació de pressió",
@@ -1685,7 +1696,7 @@
         "pdf": "Components/Part191203/Documentation/DataSheet.pdf"
       },
       "Part189401": {
-        "name": "Ventosa",
+        "name": "Ventosa de manxa",
         "nameEn": "Suction cup complete ESS",
         "code": "ESS-20-CS",
         "refs": "189401",
@@ -1833,19 +1844,19 @@
         "specs": [
           [
             "Tensió de funcionament",
-            "24 V DC"
+            "24 V CC"
           ],
           [
             "E/S digitals (4 DI / 4 DO)",
-            "Màx. 24 V DC; màx. 2 A per sortida; màx. 4 A en total"
+            "Màx. 24 V CC; màx. 2 A per sortida; màx. 4 A en total"
           ],
           [
             "E/S analògiques (2 AI / 1 AO)",
-            "0 … 10 V DC o ±10 V DC"
+            "0 ... 10 V CC o ±10 V CC"
           ],
           [
             "Connexió elèctrica",
-            "D-Sub HD de 15 pins (3 files); born de molla 0,14 … 0,5 mm²"
+            "D-Sub HD de 15 pins (3 files); born de molla 0,14 ... 0,5 mm²"
           ],
           [
             "Indicadors",
@@ -1868,15 +1879,15 @@
         "specs": [
           [
             "Tensió de funcionament",
-            "24 V DC"
+            "24 V CC"
           ],
           [
             "E/S digitals (8 DI / 8 DO)",
-            "Màx. 24 V DC; màx. 2 A per sortida; màx. 4 A en total"
+            "Màx. 24 V CC; màx. 2 A per sortida; màx. 4 A en total"
           ],
           [
             "E/S analògiques (4 AI / 2 AO)",
-            "0 – 10 V DC o ±10 V DC"
+            "0 ... 10 V CC o ±10 V CC"
           ],
           [
             "Connexió elèctrica",
@@ -1907,7 +1918,7 @@
           ]
         ],
         "img": "Components/Part8033583/img/thumb.jpg",
-        "pdf": "Components/Part8033583/Documentation/DataSheet.pdf"
+        "pdf": ""
       },
       "Part540691": {
         "name": "Vàlvula d'engegada amb filtre regulador",
@@ -1922,11 +1933,11 @@
           ],
           [
             "Pressió d'entrada",
-            "100 a 1000 kPa (1 a 10 bar)"
+            "100 ... 1000 kPa (1 ... 10 bar)"
           ],
           [
             "Pressió de funcionament",
-            "50 a 700 kPa (0,5 a 7 bar)"
+            "50 ... 700 kPa (0,5 ... 7 bar)"
           ],
           [
             "Cabal nominal estàndard",
@@ -2135,6 +2146,7 @@
 
   var catalog = null;        // catàleg que es mostra ara al panell
   var catalogList = [];      // components del filtre actual
+  var catalogKey = "all";    // filtre actual
 
   function catUrl(path) { return catalog.base + path; }
   function refText(refs) { return refs ? "Ref. " + refs : ""; }
@@ -2192,11 +2204,12 @@
       c.setAttribute("aria-pressed", c.getAttribute("data-filter") === key ? "true" : "false");
     });
     catalogList = f.items;
+    catalogKey = key;
     panel.querySelector(".comp-grid").innerHTML = f.items.map(function (id, i) {
       var it = catalog.items[id];
       return '<button type="button" class="comp-card" data-id="' + id + '" style="--i:' + i + '">' +
         '<span class="comp-card-img"><img loading="lazy" alt="" src="' + catUrl(it.img) + '"></span>' +
-        '<span class="comp-card-body"><span class="comp-card-name">' + escapeHtml(it.name) + "</span>" +
+        '<span class="comp-card-body"><span class="comp-card-name">' + escapeHtml(it.name).replace(/\//g, "/<wbr>") + "</span>" +
         (it.refs ? '<span class="comp-card-ref">' + escapeHtml(refText(it.refs)) + "</span>" : "") +
         '<span class="comp-card-text">' + escapeHtml(it.text) + "</span></span></button>";
     }).join("");
@@ -2212,7 +2225,10 @@
       openSheet("module:" + t.getAttribute("data-module"), t);
     } else {
       setCatalogFilter(t.getAttribute("data-filter"));
-      if (t.classList.contains("comp-more")) scrollToEl(panel.querySelector(".comp-filters"), "start");
+      if (t.classList.contains("comp-more")) {
+        scrollToEl(panel.querySelector(".comp-filters"), "start");
+        focusQuietly(panel.querySelector('.comp-chip[aria-pressed="true"]'));
+      }
     }
   });
   // Si una foto no es pot carregar, es mostra una icona en lloc d'un requadre buit.
@@ -2248,9 +2264,11 @@
           'Més informació a Festo Didactic <span aria-hidden="true">&#8599;</span></a>' : "");
     } else {
       var it = catalog.items[key];
-      var owner = catalog.modules.concat(catalog.groups).filter(function (g) { return g.items.indexOf(key) >= 0; })[0];
+      // Mòdul al qual pertany: el del filtre actiu o, si n'hi ha diversos, tots.
+      var owners = catalog.modules.concat(catalog.groups).filter(function (g) { return g.items.indexOf(key) >= 0; });
+      var owner = owners.filter(function (g) { return g.key === catalogKey; })[0];
       img = it.img;
-      kicker = owner ? owner.name : "Component";
+      kicker = owner ? owner.name : (owners.map(function (g) { return g.name; }).join(" · ") || "Component");
       title = it.name;
       sub = [it.nameEn, it.code, refText(it.refs)].filter(Boolean).join(" · ");
       body = '<div class="sheet-text"><p>' + escapeHtml(it.text) + "</p></div>" +
@@ -2272,6 +2290,9 @@
     sheetContent.scrollTop = 0;
     var img = sheetContent.querySelector(".sheet-img img");
     img.addEventListener("error", function () { img.parentNode.classList.add("no-img"); });
+    img.addEventListener("load", function () {
+      if (sheet.classList.contains("is-open") && sheetVis) layoutSheet(sheetVis, true);
+    });
     sheetPrev.disabled = sheetIndex <= 0;
     sheetNext.disabled = sheetIndex >= sheetList.length - 1;
     sheetCount.textContent = sheetList.length > 1 ? (sheetIndex + 1) + " / " + sheetList.length : "";
@@ -2305,12 +2326,18 @@
     sheet.hidden = false;
     sheet.classList.remove("is-open");
     lockScroll();
-    measureVisible(function (vis) {
+    measureVisible(function open(vis, retried) {
       if (token !== sheetToken) return;
+      // Si del marc de Google Sites només se'n veu una franja petita, el portem a la vista.
+      if (!retried && returnEl && vis.height < Math.min(window.innerHeight - 2, 360)) {
+        scrollToEl(returnEl, "center");
+        measureStable(function (v2) { open(v2, true); });
+        return;
+      }
       layoutSheet(vis);
       void sheetPanel.offsetWidth;
       sheet.classList.add("is-open");
-      focusQuietly(sheetPanel);
+      focusQuietly(sheetContent);
       clearInterval(sheetPoll);
       sheetPoll = setInterval(function () {
         measureVisible(function (v) {
@@ -2327,7 +2354,10 @@
     var i = sheetIndex + delta;
     if (i < 0 || i >= sheetList.length) return;
     sheetIndex = i;
+    var navFocused = document.activeElement === sheetPrev || document.activeElement === sheetNext;
     renderSheet();
+    if (navFocused && (delta > 0 ? sheetNext : sheetPrev).disabled) focusQuietly(delta > 0 ? sheetPrev : sheetNext);
+    $("sheet-status").textContent = $("sheet-title").textContent + ", " + (sheetIndex + 1) + " de " + sheetList.length;
     sheetContent.classList.remove("swap");
     void sheetContent.offsetWidth;
     sheetContent.classList.add("swap");
@@ -2351,7 +2381,7 @@
   }
 
   $("sheet-close").addEventListener("click", function () { closeSheet(); });
-  $("sheet-backdrop").addEventListener("click", function () { closeSheet(); });
+  $("sheet-backdrop").addEventListener("click", function (e) { if (e.detail <= 1) closeSheet(); });
   sheetPrev.addEventListener("click", function () { moveSheet(-1); });
   sheetNext.addEventListener("click", function () { moveSheet(1); });
 
@@ -2370,7 +2400,9 @@
       });
       if (!items.length) return;
       var first = items[0], last = items[items.length - 1];
-      if (e.shiftKey && (document.activeElement === first || document.activeElement === sheetPanel)) {
+      if (!sheetPanel.contains(document.activeElement)) {
+        e.preventDefault(); (e.shiftKey ? last : first).focus();
+      } else if (e.shiftKey && (document.activeElement === first || document.activeElement === sheetPanel)) {
         e.preventDefault(); last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
         e.preventDefault(); first.focus();
@@ -2778,6 +2810,7 @@
 
   // Bloqueja el desplaçament sense que la pàgina salti quan desapareix la barra de desplaçament.
   function lockScroll() {
+    if (root.classList.contains("player-open")) return;
     var sbw = window.innerWidth - root.clientWidth;
     root.style.paddingRight = sbw > 0 ? sbw + "px" : "";
     root.classList.add("player-open");
