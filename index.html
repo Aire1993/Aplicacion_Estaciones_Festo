@@ -367,6 +367,45 @@
     margin-bottom: 8px;
   }
   .panel p { color: var(--text-muted); }
+
+  /* Document PDF dins del panell (visor de Google Drive) */
+  .doc {
+    position: relative;
+    height: min(78vh, 980px);
+    min-height: 420px;
+    margin-top: 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+  }
+  .doc iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .doc.is-loaded iframe { opacity: 1; }
+  .doc-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .doc-spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid rgba(0, 145, 220, 0.25);
+    border-top-color: var(--festo-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
   .panel.swap { animation: fade-in 0.35s ease; }
 
   .back {
@@ -583,6 +622,8 @@
     .hero-inner { padding: 28px 16px; }
     main { padding: 28px 16px 48px; }
     .topbar-inner, .footer-inner { padding-left: 16px; padding-right: 16px; }
+    .panel { padding: 16px; }
+    .doc { height: 70vh; min-height: 360px; }
   }
   @media (max-width: 520px) {
     .brand-sub { display: none; }
@@ -708,7 +749,8 @@
   function driveVideo(id) {
     return "https://drive.google.com/uc?export=download&id=" + id;
   }
-  function driveVideoPlayer(id) {
+  // Visor de Google Drive incrustat (vídeos que el navegador no pot reproduir i documents PDF).
+  function drivePreview(id) {
     return "https://drive.google.com/file/d/" + id + "/preview";
   }
 
@@ -718,6 +760,9 @@
       title: "Distributing Conveyor Station",
       imageId: "1V2z0bdAIv0TssQggLAq7PGRHndPkw1MF",
       videoId: "17QP8BIyBUt18p9VaqKIh5JbhtJsJ-tNw",
+      sections: {
+        esquemes: { pdf: "18WaYvo3N18UVMBxtNH4BJvIKo8-4bGPD" }
+      },
       description: [
         "L'estació de distribució/transportadora separa les peces emmagatzemades en el tub del magatzem apilador. Un cilindre de doble efecte empeny les peces cap a fora d'una en una.",
         "El mòdul transportador porta la peça cap a la dreta o cap a l'esquerra. Si és necessari, la peça pot detenir-se i separar-se en la cinta transportadora."
@@ -728,6 +773,9 @@
       title: "Pick and Place Station",
       imageId: "1d2sBMzKCqGozHc4iNX-eaXaCGb2Of2Xc",
       videoId: "1dqghcQuXWaoBHcUy1dHYOPJmsc0D5PqC",
+      sections: {
+        esquemes: { pdf: "104ACTv_B9T1ZvIctjMwS3SsvQrxuXcDy" }
+      },
       description: [
         "Les carcasses de les peces de treball col·locades en el transportador es detecten mitjançant sensors difusos o barreres fotoelèctriques. La peça de treball es transporta fins al separador elèctric situat en la cinta transportadora, on és detectada per un segon sensor difús. El mòdul recull una inserció de la peça de treball de la safata lliscant i el col·loca sobre la carcassa de la peça de treball.",
         "La peça completa (carcassa i inserció) és alliberada pel separador i transportada fins al final de la cinta transportadora. Una barrera fotoelèctrica detecta la peça al final de la cinta transportadora."
@@ -738,6 +786,9 @@
       title: "Sorting Station",
       imageId: "11-R10iEWEhm_nlZXY9dhZEHOaxzN-mjR",
       videoId: "1miOvlUw2UlK6ogMasl6DututKDaS3LBJ",
+      sections: {
+        esquemes: { pdf: "11fx7idZUYUNGkPIn4b3Kom96FsnmWbbk" }
+      },
       description: [
         "L'estació distribueix les peces en tres rampes. Les peces col·locades a l'inici de la cinta transportadora són detectades per una barrera fotoelèctrica en forma de forqueta.",
         "Les peces són detingudes per un topall pneumàtic per a determinar les seves característiques. Els sensors del mòdul de detecció determinen el material i el color de les peces (negre, vermell o metal·litzat).",
@@ -746,8 +797,8 @@
     }
   ];
 
-  // Botons comuns a totes les estacions. El contingut de cada estació s'afegirà més endavant
-  // a STATIONS[i].sections[key] (HTML).
+  // Botons comuns a totes les estacions. El contingut de cada botó va a STATIONS[i].sections[key]:
+  // { pdf: "ID de Google Drive" } per mostrar un PDF dins la pàgina, o un text HTML.
   var BUTTONS = [
     { key: "esquemes",   label: "Esquemes" },
     { key: "io-plc",     label: "Entrades/Sortides PLC" },
@@ -833,21 +884,41 @@
 
   function showHome() {
     pageTitle.textContent = "Estacions de Festo";
-    breadcrumb.textContent = "Inici";
+    breadcrumb.textContent = "";
+    breadcrumb.hidden = true;
     station.classList.add("hidden");
     home.classList.remove("hidden");
     restartAnimation(home);
   }
 
+  // Omple el panell de sota els botons. Retorna el requadre del document si n'hi ha.
+  function renderSection(label, content) {
+    var html = "<h3>" + escapeHtml(label) + "</h3>";
+    if (content && content.pdf) {
+      panel.innerHTML = html +
+        '<div class="doc"><div class="doc-loading"><span class="doc-spinner"></span>Carregant el document…</div>' +
+        '<iframe title="' + escapeHtml(label) + '"></iframe></div>';
+      var doc = panel.querySelector(".doc");
+      var frame = doc.querySelector("iframe");
+      frame.addEventListener("load", function () { doc.classList.add("is-loaded"); });
+      frame.src = drivePreview(content.pdf);
+      return doc;
+    }
+    panel.innerHTML = html + (content || "<p>Contingut en preparació.</p>");
+    return null;
+  }
+
   function showStation(s) {
     pageTitle.textContent = s.title;
     breadcrumb.innerHTML = '<a href="#">Inici</a> &rsaquo; ' + escapeHtml(s.title);
+    breadcrumb.hidden = false;
     setImage(stationImg, s.imageId, s.title);
     stationDesc.innerHTML = s.description.map(function (p) {
       return "<p>" + escapeHtml(p) + "</p>";
     }).join("");
 
     buttonsEl.innerHTML = "";
+    panel.innerHTML = "";
     panelWrap.classList.remove("open");
     BUTTONS.forEach(function (b) {
       var btn = document.createElement("button");
@@ -867,15 +938,20 @@
         }
         btn.classList.add("active");
         btn.setAttribute("aria-expanded", "true");
-        var content = s.sections && s.sections[b.key];
-        panel.innerHTML = "<h3>" + escapeHtml(b.label) + "</h3>" +
-          (content || "<p>Contingut en preparació.</p>");
+        var doc = renderSection(b.label, s.sections && s.sections[b.key]);
         if (panelWrap.classList.contains("open")) {
           panel.classList.remove("swap");
           void panel.offsetWidth;
           panel.classList.add("swap");
         }
         panelWrap.classList.add("open");
+        // Un document és alt: un cop obert el panell, el portem a la vista.
+        if (doc) {
+          setTimeout(function () {
+            if (!panel.contains(doc)) return;
+            try { doc.scrollIntoView({ block: "nearest", behavior: REDUCED_MOTION ? "auto" : "smooth" }); } catch (e) {}
+          }, REDUCED_MOTION ? 0 : 420);
+        }
       });
       buttonsEl.appendChild(btn);
     });
@@ -1242,7 +1318,7 @@
       if (allow.indexOf("fullscreen") >= 0) iframe.setAttribute("allowfullscreen", "");
       iframe.title = "Vídeo";
     }
-    var src = driveVideoPlayer(current.videoId);
+    var src = drivePreview(current.videoId);
     if (iframe.getAttribute("src") !== src) iframe.src = src;
     if (iframe.parentNode !== slot) slot.appendChild(iframe);
     if (stage.contains(document.activeElement) && document.activeElement !== closeBtn) focusQuietly(closeBtn);
