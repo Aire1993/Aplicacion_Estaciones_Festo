@@ -2576,7 +2576,7 @@
       buit:      { plc: "I0.6", tag: "C2BG3", desc: "Magatzem buit" },
       start:     { plc: "I1.0", tag: "S1", desc: "Polsador START" },
       stop:      { plc: "I1.1", tag: "S2", desc: "Polsador STOP (normalment tancat: 1 = no premut)" },
-      auto:      { plc: "I1.2", tag: "S3", desc: "Selector AUTO/MAN (1 = AUTO)" },
+      man:       { plc: "I1.2", tag: "S3", desc: "Selector AUTO/MAN (0 = AUTO, 1 = MAN)" },
       reset:     { plc: "I1.3", tag: "S4", desc: "Polsador RESET" },
       seta:      { plc: "I1.5", tag: "EMERG", desc: "Seta d'emergència (1 = no premuda)" },
       cinta:     { plc: "Q0.0", tag: "G1MA1", tagAct: "G1MA1 endavant", fn: "Cinta endavant", desc: "Motor de la cinta endavant (controlador G1KF1)" },
@@ -2622,7 +2622,7 @@
           { from: 21, to: 22, c: "X0 * recollit", fn: "Producció a l'etapa 0 i expulsor recollit",
             note: "Posició inicial de Festo: expulsor recollit i motor de la cinta parat. Comprovar X0 assegura que el forçat s'ha fet abans de continuar." },
           { from: 22, to: 23, c: "^start", fn: "Es prem START" },
-          { from: 23, to: 22, c: "X4 * final * /auto", fn: "MAN i fi de cicle (etapa 4 i peça retirada)",
+          { from: 23, to: 22, c: "X4 * final * man", fn: "MAN i fi de cicle (etapa 4 i peça retirada)",
             note: "En MAN, quan acaba el cicle torna a preparada i espera un altre START. En AUTO es queda a l'etapa 23 i la producció continua." }
         ]
       },
