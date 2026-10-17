@@ -601,6 +601,172 @@
   .panel .comp-source { margin-top: 18px; font-size: 12px; }
   .comp-source a { color: var(--festo-blue); }
 
+  /* ---------- Grafcet (dins del panell) ---------- */
+  .gf-intro { margin-bottom: 18px; max-width: 920px; }
+  .gf-intro b { color: var(--text); font-weight: 600; }
+  .gf-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-bottom: 16px;
+  }
+  .gf-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+  .gf-tab {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 14px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .gf-tab b { color: var(--festo-blue); font-weight: 700; margin-right: 2px; }
+  .gf-tab:hover { border-color: var(--festo-blue); color: var(--festo-blue); }
+  .gf-tab[aria-pressed="true"] { background: var(--festo-blue); border-color: var(--festo-blue); color: #fff; }
+  .gf-tab[aria-pressed="true"] b { color: #fff; }
+  .gf-tab:focus-visible,
+  .gf-level:focus-visible,
+  .gf-zoom:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+  .gf-arrow { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .gf-arrow span { font-size: 16px; }
+  .gf-levels { display: inline-flex; background: var(--bg); border: 1px solid var(--border); }
+  .gf-level {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 13px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 0;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .gf-level + .gf-level { border-left: 1px solid var(--border); }
+  .gf-level:hover { color: var(--festo-blue); }
+  .gf-level[aria-pressed="true"] { background: var(--text); color: #fff; }
+  .gf-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    gap: 20px;
+    align-items: start;
+  }
+  .gf-figure { min-width: 0; background: var(--bg); border: 1px solid var(--border); }
+  .gf-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .gf-title { font-weight: 600; }
+  .gf-title .comp-kicker { margin-right: 4px; }
+  .gf-lv { font-weight: 400; font-size: 13px; color: var(--text-muted); }
+  .gf-zoom {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 10px;
+    background: transparent;
+    color: var(--festo-blue);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .gf-zoom:hover { border-color: var(--festo-blue); background: var(--bg-soft); }
+  .gf-zoom svg { width: 15px; height: 15px; }
+  .gf-scroll { overflow-x: auto; overscroll-behavior-x: contain; padding: 8px 4px; }
+  .panel .gf-wide-hint { display: none; padding: 8px 16px 0; font-size: 12px; }
+  .gf-figure.is-wide .gf-wide-hint { display: block; }
+  .gf-scroll .gf-svg { display: block; margin: 0 auto; }
+  .gf-svg { font-family: inherit; }
+  .gf-svg .ln { fill: none; stroke: #1f2a33; stroke-width: 1.5; }
+  .gf-svg .arw { fill: #1f2a33; }
+  .gf-svg .bar { stroke: #1f2a33; stroke-width: 3.5; }
+  .gf-svg .box { fill: #fff; stroke: #1f2a33; stroke-width: 1.5; transition: fill 0.2s ease, stroke 0.2s ease; }
+  .gf-svg .box.in { fill: none; }
+  .gf-svg .num { font-size: 15px; font-weight: 700; fill: #1f2a33; text-anchor: middle; }
+  .gf-svg .txt { font-size: 13px; fill: #1f2a33; }
+  .gf-svg .txt.frc { font-weight: 600; }
+  .gf-svg .cmt { font-size: 13px; font-style: italic; fill: #6b7680; }
+  .gf-svg .hit { fill: transparent; stroke: none; }
+  .gf-svg [data-el] { cursor: pointer; outline: none; }
+  .gf-svg .gf-tr .txt { transition: fill 0.2s ease; }
+  .gf-svg .gf-step.is-hot .box,
+  .gf-svg .gf-step.is-rel .box,
+  .gf-svg .gf-step.is-pin .box { fill: #e6f3fb; stroke: var(--festo-blue); }
+  .gf-svg .gf-step.is-hot .box.in,
+  .gf-svg .gf-step.is-rel .box.in,
+  .gf-svg .gf-step.is-pin .box.in { fill: none; }
+  .gf-svg .gf-tr.is-hot .bar,
+  .gf-svg .gf-tr.is-rel .bar,
+  .gf-svg .gf-tr.is-pin .bar { stroke: var(--festo-blue); }
+  .gf-svg .gf-tr.is-hot .txt,
+  .gf-svg .gf-tr.is-rel .txt,
+  .gf-svg .gf-tr.is-pin .txt { fill: var(--festo-blue-dark); }
+  .gf-svg .gf-tr.is-pin .hit { fill: #e6f3fb; }
+  .gf-svg [data-el]:focus-visible .box:not(.in) { stroke-width: 3; stroke: var(--festo-blue); }
+  .gf-svg [data-el]:focus-visible .hit { stroke: var(--festo-blue); stroke-dasharray: 3 3; }
+  .gf-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .panel .gf-about { font-size: 14px; }
+  .gf-info {
+    min-height: 132px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--festo-blue);
+    font-size: 14px;
+  }
+  .gf-info h4 { font-size: 17px; font-weight: 600; line-height: 1.3; margin: 2px 0 6px; color: var(--text); }
+  .panel .gf-info p { margin-top: 6px; }
+  .panel .gf-info .gf-sub { margin: 0; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .panel .gf-info .gf-hint { margin: 0; }
+  .gf-acts { list-style: none; margin: 2px 0 0; }
+  .gf-acts li { padding: 3px 0; }
+  .gf-acts b { font-weight: 600; color: var(--text); }
+  .gf-note { display: block; font-size: 13px; color: var(--text-muted); }
+  .gf-levels-dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 4px 0 2px; }
+  .gf-levels-dl dt { font-size: 12px; color: var(--text-muted); padding-top: 2px; }
+  .gf-levels-dl dd { font-weight: 600; overflow-wrap: anywhere; }
+  .gf-not { text-decoration: overline; }
+  .gf-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .gf-table caption { text-align: left; font-weight: 600; font-size: 14px; padding-bottom: 6px; }
+  .gf-table th,
+  .gf-table td { text-align: left; vertical-align: top; padding: 5px 8px; border-bottom: 1px solid var(--border); }
+  .gf-table thead th { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .gf-table .gf-group th {
+    padding-top: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--festo-blue);
+    background: var(--bg-soft);
+  }
+  .gf-table td.c-plc,
+  .gf-table td.c-tag { white-space: nowrap; }
+  .gf-table.lv-plc td.c-plc,
+  .gf-table.lv-tag td.c-tag,
+  .gf-table.lv-fn td.c-fn { font-weight: 600; color: var(--text); }
+  .gf-table tr[data-var] { transition: background 0.2s ease; }
+  .gf-table tr.is-hot,
+  .gf-table tr.is-rel { background: #e6f3fb; }
+  .panel .gf-unused { margin-top: 8px; font-size: 12px; }
+
   /* Fitxa d'un component (finestra emergent) */
   .sheet[hidden] { display: none; }
   .sheet {
@@ -744,6 +910,13 @@
   .sheet-nav button:hover { border-color: var(--festo-blue); background: var(--bg-soft); }
   .sheet-nav button:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
   .sheet-nav button[disabled] { visibility: hidden; }
+  /* Grafcet ampliat dins de la mateixa finestra */
+  .sheet-content.is-gf { grid-template-columns: minmax(0, 1fr); }
+  .sheet-gf { padding: 18px 24px 20px; min-width: 0; }
+  .sheet-gf-head { margin-right: 44px; margin-bottom: 8px; }
+  .sheet-gf-head h3 { font-size: 22px; font-weight: 600; line-height: 1.3; }
+  .sheet-gf-chart { overflow: auto; }
+  .sheet-gf-chart svg { display: block; margin: 0 auto; }
 
   /* ---------- Peu de pàgina (contingut pendent) ---------- */
   .site-footer {
@@ -938,6 +1111,7 @@
   /* ---------- Responsive ---------- */
   @media (max-width: 1000px) {
     .comp-modules { grid-template-columns: 1fr; }
+    .gf-main { grid-template-columns: 1fr; }
   }
   @media (max-width: 900px) {
     .detail { grid-template-columns: 1fr; gap: 24px; }
@@ -960,9 +1134,15 @@
     .sheet-img img { max-height: 220px; }
     .sheet-body { padding: 18px 18px 20px; }
     .sheet-body h3 { font-size: 20px; }
+    .sheet-gf { padding: 14px 14px 16px; }
+    .sheet-gf-head h3 { font-size: 19px; }
   }
   @media (max-width: 520px) {
     .brand-sub { display: none; }
+    .gf-arrow, .gf-lv { display: none; }
+    .gf-tabs { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+    .gf-tab { padding: 8px 6px; font-size: 13px; }
+    .gf-tab b { display: block; }
     .school-link img { height: 36px; }
     .player-time.total { display: none; }
   }
@@ -2374,6 +2554,111 @@
   var CATALOG_PICK_PLACE = festoCatalog("Pick and Place Station", "PickandPlaceStation", ["conveyor", "pickplace"], ["Aktor532952", "Part8025738", "Part8033583", "Part540691", "Part8034300"]);
   var CATALOG_SORTING = festoCatalog("Sorting Station", "SortingStation", ["conveyor", "detection"], ["Sensor8063218", "Aktor8046324", "Aktor532952", "Part8046639", "Part8025738", "Part8033583", "Part540691"]);
 
+  // Grafcet de cada estació (botó Grafcet), segons la norma IEC 60848.
+  // Tres grafcets parcials jerarquitzats: Seguretat (GS) força Conducció (GC) i Producció (GP),
+  // i Conducció força Producció.
+  // - vars: senyals amb el text dels tres nivells: PLC (adreça), Tecnològic (etiqueta dels esquemes)
+  //   i Funcional (desc; "fn" és el text curt de les accions).
+  // - Condicions de les transicions ("c"): noms de vars, X12 = etapa 12 activa, "*" = I, "+" = O,
+  //   "/" = negat, "^" = flanc de pujada. "fn" és la mateixa condició en paraules.
+  // - Accions de les etapes ("act"): { v: senyal }, { v: senyal, cond: condició } (acció condicionada) o
+  //   ordre de forçat { force: "GP", to: "INIT" } ("INIT" = situació inicial, "" = cap etapa activa, "8" = etapa 8).
+  var GRAFCET_DISTRIBUTING = {
+    source: {
+      label: "Festo Didactic InfoPortal · Distributing Conveyor Station",
+      url: "https://ip.festo-didactic.com/InfoPortal/MPS/DistributionConveyorStation/EN/index.html"
+    },
+    vars: {
+      inici:     { plc: "I0.0", tag: "G1BG1", desc: "Peça a l'inici de la cinta" },
+      final:     { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)" },
+      recollit:  { plc: "I0.4", tag: "C2BG1", desc: "Expulsor recollit" },
+      avancat:   { plc: "I0.5", tag: "C2BG2", desc: "Expulsor avançat" },
+      buit:      { plc: "I0.6", tag: "C2BG3", desc: "Magatzem buit" },
+      start:     { plc: "I1.0", tag: "S1", desc: "Polsador START" },
+      stop:      { plc: "I1.1", tag: "S2", desc: "Polsador STOP (normalment tancat: 1 = no premut)" },
+      auto:      { plc: "I1.2", tag: "S3", desc: "Selector AUTO/MAN (1 = AUTO)" },
+      reset:     { plc: "I1.3", tag: "S4", desc: "Polsador RESET" },
+      seta:      { plc: "I1.5", tag: "EMERG", desc: "Seta d'emergència (1 = no premuda)" },
+      cinta:     { plc: "Q0.0", tag: "G1MA1", tagAct: "G1MA1 endavant", fn: "Cinta endavant", desc: "Motor de la cinta endavant (controlador G1KF1)" },
+      expulsor:  { plc: "Q0.4", tag: "C2MB1", fn: "Avançar l'expulsor", desc: "Avançar l'expulsor (electrovàlvula 5/2 que torna per molla)" },
+      llumStart: { plc: "Q1.0", tag: "P1", fn: "Llum START", desc: "Llum del polsador START" },
+      llumReset: { plc: "Q1.1", tag: "P2", fn: "Llum RESET", desc: "Llum del polsador RESET" },
+      llumBuit:  { plc: "Q1.2", tag: "P3", fn: "Llum MAGATZEM BUIT", desc: "Llum de magatzem buit" },
+      clk:       { plc: "Clock_1Hz", tag: "1 Hz", fn: "1 Hz", desc: "Rellotge d'1 Hz del PLC (marca de cicle, p. ex. M0.5)" }
+    },
+    unused: "I0.1 (G1BG2, peça a la posició intermèdia), Q0.1 (cinta enrere) i Q0.2 (G1MB1, separador)",
+    charts: [
+      {
+        key: "GS", name: "Seguretat",
+        about: "Té la prioritat més alta. Si es prem STOP o la seta d'emergència, deixa la producció sense cap etapa activa (tot aturat) i torna la conducció a l'etapa 20. Quan s'alliberen, cal tornar a fer RESET.",
+        steps: [
+          { n: 100, init: true, row: 0, name: "Funcionament normal",
+            note: "Situació inicial: STOP i seta d'emergència sense prémer." },
+          { n: 101, row: 1, name: "Aturada", act: [{ force: "GP", to: "" }, { force: "GC", to: "INIT" }],
+            note: "Mentre està activa, el grafcet de producció no té cap etapa activa: el motor s'atura i l'expulsor torna enrere (la vàlvula torna per molla). La conducció queda a l'etapa 20." }
+        ],
+        trans: [
+          { from: 100, to: 101, c: "/stop + /seta", fn: "STOP o seta premuts",
+            note: "STOP és un contacte normalment tancat i la seta dona 1 quan no està premuda: per això es comproven negats." },
+          { from: 101, to: 100, c: "stop * seta", fn: "STOP i seta alliberats",
+            note: "Torna al funcionament normal, però la conducció és a l'etapa 20: cal fer RESET." }
+        ]
+      },
+      {
+        key: "GC", name: "Conducció",
+        about: "Grafcet de conducció o de modes de marxa. Gestiona el panell de comandament: posada a zero amb RESET, estació preparada i producció en mode AUTO (cicles seguits) o MAN (un sol cicle).",
+        steps: [
+          { n: 20, init: true, row: 0, name: "No inicialitzada", act: [{ v: "llumReset", cond: "clk" }],
+            note: "Situació inicial i després d'una aturada. La llum RESET fa pampallugues per demanar la posada a zero." },
+          { n: 21, row: 1, name: "Posada a zero", act: [{ force: "GP", to: "INIT" }],
+            note: "Posa la producció a la situació inicial (etapa 0): motor parat i expulsor recollit." },
+          { n: 22, row: 2, name: "Preparada", act: [{ v: "llumStart" }],
+            note: "La llum START indica que l'estació està preparada per començar." },
+          { n: 23, row: 3, name: "En producció",
+            note: "La producció pot fer cicles. En AUTO en fa de seguits; en MAN només un." }
+        ],
+        trans: [
+          { from: 20, to: 21, c: "^reset", fn: "Es prem RESET" },
+          { from: 21, to: 22, c: "X0 * recollit", fn: "Producció a l'etapa 0 i expulsor recollit",
+            note: "Posició inicial de Festo: expulsor recollit i motor de la cinta parat. Comprovar X0 assegura que el forçat s'ha fet abans de continuar." },
+          { from: 22, to: 23, c: "^start", fn: "Es prem START" },
+          { from: 23, to: 22, c: "X4 * final * /auto", fn: "MAN i fi de cicle (etapa 4 i peça retirada)",
+            note: "En MAN, quan acaba el cicle torna a preparada i espera un altre START. En AUTO es queda a l'etapa 23 i la producció continua." }
+        ]
+      },
+      {
+        key: "GP", name: "Producció",
+        about: "La seqüència de l'estació segons Festo Didactic: l'expulsor treu una peça del magatzem i la cinta la porta fins al final. Si el magatzem és buit, s'encén la llum i s'espera que es carregui i es premi START.",
+        steps: [
+          { n: 0, init: true, row: 0, name: "Repòs",
+            note: "Posició inicial: expulsor recollit i motor de la cinta parat." },
+          { n: 1, row: 1, name: "Expulsor avançant", act: [{ v: "expulsor" }],
+            note: "Festo, pas 1: l'expulsor avança i empeny la peça de sota del magatzem cap a la cinta." },
+          { n: 2, row: 2, name: "Expulsor tornant",
+            note: "Festo, pas 2: l'expulsor torna enrere. No cal cap acció: sense senyal, la vàlvula torna per molla." },
+          { n: 3, row: 3, name: "Transport", act: [{ v: "cinta" }],
+            note: "Festo, passos 2 i 3: amb l'expulsor recollit, la cinta porta la peça fins al final." },
+          { n: 4, row: 4, name: "Peça al final",
+            note: "Festo, pas 4: el motor s'atura. Afegit: s'espera que es retiri la peça abans de començar un cicle nou." },
+          { n: 10, row: 1, col: 1, name: "Magatzem buit", act: [{ v: "llumBuit" }],
+            note: "Nota de Festo: si el magatzem és buit, s'encén la llum MAGATZEM BUIT. Cal carregar peces i confirmar amb START." }
+        ],
+        trans: [
+          { from: 0, to: 1, c: "X23 * recollit * /inici * final * /buit", fn: "En producció, expulsor recollit, cinta lliure i magatzem amb peces",
+            note: "Condicions d'inici de Festo: expulsor recollit, cap peça a l'inici de la cinta i magatzem amb peces. Afegit: el final de la cinta també ha d'estar lliure." },
+          { from: 0, to: 10, c: "X23 * buit", fn: "En producció i magatzem buit" },
+          { from: 1, to: 2, c: "avancat", fn: "Expulsor avançat" },
+          { from: 2, to: 3, c: "recollit", fn: "Expulsor recollit" },
+          { from: 3, to: 4, c: "/final", fn: "Peça al final de la cinta",
+            note: "El sensor G1BG3 dona 1 quan NO hi ha peça al final: la peça hi arriba quan el senyal passa a 0." },
+          { from: 4, to: 0, c: "final", fn: "Peça retirada",
+            note: "Afegit: no es comença un cicle nou fins que el final de la cinta queda lliure." },
+          { from: 10, to: 0, c: "/buit * ^start", fn: "Magatzem amb peces i es prem START" }
+        ]
+      }
+    ]
+  };
+
   var STATIONS = [
     {
       slug: "distributing-conveyor",
@@ -2382,6 +2667,7 @@
       videoId: "17QP8BIyBUt18p9VaqKIh5JbhtJsJ-tNw",
       sections: {
         esquemes: { pdf: "18WaYvo3N18UVMBxtNH4BJvIKo8-4bGPD" },
+        grafcet: { grafcet: GRAFCET_DISTRIBUTING },
         components: { catalog: CATALOG_DISTRIBUTING }
       },
       description: [
@@ -2421,7 +2707,8 @@
   ];
 
   // Botons comuns a totes les estacions. El contingut de cada botó va a STATIONS[i].sections[key]:
-  // { pdf: "ID de Google Drive" } per mostrar un PDF dins la pàgina, o un text HTML.
+  // { pdf: "ID de Google Drive" } per mostrar un PDF dins la pàgina, { catalog: ... } (components),
+  // { grafcet: ... } (grafcet de l'estació) o un text HTML.
   var BUTTONS = [
     { key: "esquemes",   label: "Esquemes" },
     { key: "io-plc",     label: "Entrades/Sortides PLC" },
@@ -2520,6 +2807,7 @@
     delete panel.dataset.key;
     panelWrap.classList.remove("open");
     catalog = null;
+    gf = null;
   }
 
   // Alçada del visor de documents. Dins de Google Sites "vh" és l'alçada del bloc incrustat,
@@ -2548,6 +2836,11 @@
     if (content && content.catalog) {
       panel.innerHTML = html + renderCatalog(content.catalog);
       setCatalogFilter("all");
+      return null;
+    }
+    if (content && content.grafcet) {
+      panel.innerHTML = html + renderGrafcet(content.grafcet);
+      drawGrafcet();
       return null;
     }
     panel.innerHTML = html + (content || "<p>Contingut en preparació.</p>");
@@ -2695,6 +2988,7 @@
 
   function sheetHtml(key) {
     var img, kicker, title, sub, body;
+    if (key.indexOf("gf:") === 0) return gfSheetHtml(+key.slice(3));
     if (key.indexOf("module:") === 0) {
       var m = findModule(key.slice(7));
       img = m.image || m.img;
@@ -2732,11 +3026,14 @@
   function renderSheet() {
     sheetContent.innerHTML = sheetHtml(sheetList[sheetIndex]);
     sheetContent.scrollTop = 0;
+    sheetContent.classList.toggle("is-gf", sheetList[sheetIndex].indexOf("gf:") === 0);
     var img = sheetContent.querySelector(".sheet-img img");
-    img.addEventListener("error", function () { imgFailed(img); });
-    img.addEventListener("load", function () {
-      if (sheet.classList.contains("is-open") && sheetVis) layoutSheet(sheetVis, true);
-    });
+    if (img) {
+      img.addEventListener("error", function () { imgFailed(img); });
+      img.addEventListener("load", function () {
+        if (sheet.classList.contains("is-open") && sheetVis) layoutSheet(sheetVis, true);
+      });
+    }
     sheetPrev.disabled = sheetIndex <= 0;
     sheetNext.disabled = sheetIndex >= sheetList.length - 1;
     sheetCount.textContent = sheetList.length > 1 ? (sheetIndex + 1) + " / " + sheetList.length : "";
@@ -2751,6 +3048,7 @@
     sheetPanel.style.width = w + "px";
     sheetPanel.style.left = vis.left + (vis.width - w) / 2 + "px";
     sheetPanel.style.maxHeight = maxH + "px";
+    gfFitSheet(w, maxH);
     var h = sheetPanel.offsetHeight;
     var top = keepTop ? parseFloat(sheetPanel.style.top) : vis.top + topInset + Math.max(margin, (vis.height - topInset - h) / 2);
     // Que no surti de la part visible.
@@ -2761,8 +3059,8 @@
 
   function openSheet(key, returnEl) {
     sheetReturn = returnEl || null;
-    sheetList = key.indexOf("module:") === 0
-      ? catalog.modules.map(function (m) { return "module:" + m.key; })
+    sheetList = key.indexOf("gf:") === 0 ? gf.charts.map(function (c, i) { return "gf:" + i; })
+      : key.indexOf("module:") === 0 ? catalog.modules.map(function (m) { return "module:" + m.key; })
       : catalogList.slice();
     sheetIndex = Math.max(0, sheetList.indexOf(key));
     renderSheet();
@@ -2863,6 +3161,537 @@
     if (doc) sizeDoc(doc);
   });
 
+  // ---------------------------------------------------------------------------
+  // Grafcet: dibuix (SVG) i explicació de cada etapa i transició
+  // ---------------------------------------------------------------------------
+
+  var GF_LEVELS = [
+    { key: "fn", label: "Funcional", name: "funcional", hint: "en paraules" },
+    { key: "tag", label: "Tecnològic", name: "tecnològic", hint: "etiquetes dels esquemes" },
+    { key: "plc", label: "PLC", name: "PLC", hint: "adreces d'entrades i sortides" }
+  ];
+  // Mides del dibuix (px): etapa, distància entre files, marge, separació entre retorns.
+  var GF = { step: 44, row: 124, pad: 20, lane: 14, font: 13, labelW: 230 };
+
+  var gf = null;          // grafcet de l'estació que es mostra al panell
+  var gfChart = 2;        // grafcet parcial que es mostra (per defecte, Producció)
+  var gfLevel = "fn";     // nivell de descripció
+  var gfPinned = "";      // element seleccionat amb un clic
+  var gfCtx = null, gfFont = "";
+
+  function gfTextWidth(s, weight, italic) {
+    if (!gfCtx) {
+      gfCtx = document.createElement("canvas").getContext("2d");
+      gfFont = getComputedStyle(document.body).fontFamily;
+    }
+    gfCtx.font = (italic ? "italic " : "") + (weight || 400) + " " + GF.font + "px " + gfFont;
+    return gfCtx.measureText(s).width;
+  }
+
+  function gfAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
+  function gfTokens(c) { return c.match(/[A-Za-z_]\w*|[\/^*+()]/g) || []; }
+  function gfIsStepVar(id) { return /^X\d+$/.test(id); }
+  function gfVarsOf(c) {
+    return gfTokens(c).filter(function (t) { return /^[A-Za-z_]/.test(t); });
+  }
+  function gfLevelName(key) {
+    return GF_LEVELS.filter(function (l) { return l.key === key; })[0].name;
+  }
+
+  // Etapa n de qualsevol dels grafcets parcials.
+  function gfFindStep(n) {
+    for (var i = 0; i < gf.charts.length; i++) {
+      var s = gf.charts[i].steps.filter(function (x) { return x.n === n; })[0];
+      if (s) return { chart: gf.charts[i], step: s };
+    }
+    return null;
+  }
+
+  // Parts d'una condició al nivell PLC o Tecnològic: [{ t: text, neg: negat }]
+  function gfCondParts(c, level) {
+    var parts = [], neg = false, edge = "";
+    gfTokens(c).forEach(function (t) {
+      if (t === "/") neg = true;
+      else if (t === "^") edge = "↑";
+      else if (t === "*") parts.push({ t: " · " });
+      else if (t === "+") parts.push({ t: " + " });
+      else if (t === "(" || t === ")") parts.push({ t: t });
+      else {
+        if (edge) parts.push({ t: edge });
+        parts.push({ t: gfIsStepVar(t) ? t : gf.vars[t][level], neg: neg });
+        neg = false;
+        edge = "";
+      }
+    });
+    return parts;
+  }
+
+  function gfLabelParts(t, level) {
+    return level === "fn" ? [{ t: t.fn }] : gfCondParts(t.c, level);
+  }
+
+  // Parteix el text en línies d'una amplada màxima (les parts negades no es parteixen).
+  function gfWrap(parts, maxW) {
+    var lines = [[]], w = 0, widths = [0];
+    parts.forEach(function (p) {
+      var bits = p.neg ? [p.t] : p.t.match(/\S+\s*|\s+/g) || [];
+      bits.forEach(function (b) {
+        var line = lines[lines.length - 1];
+        var bw = gfTextWidth(b);
+        if (w + bw > maxW && line.length) {
+          b = b.replace(/^\s+/, "");
+          if (!b) return;
+          bw = gfTextWidth(b);
+          lines.push(line = []);
+          widths.push(w = 0);
+        }
+        var last = line[line.length - 1];
+        if (last && !!last.neg === !!p.neg && !p.neg) last.t += b;
+        else line.push({ t: b, neg: p.neg });
+        w += bw;
+        widths[widths.length - 1] = w;
+      });
+    });
+    return { lines: lines, w: Math.ceil(Math.max.apply(null, widths)) };
+  }
+
+  function gfActText(a, level) {
+    if (a.force) return a.force + "{" + a.to + "}";
+    var v = gf.vars[a.v];
+    return level === "fn" ? v.fn : level === "tag" ? (v.tagAct || v.tag) : v.plc;
+  }
+
+  function gfCondText(c, level) {
+    return gfCondParts(c, level).map(function (p) { return p.t; }).join("");
+  }
+
+  // --- Posició de cada element ---
+
+  function gfLayout(chart, level) {
+    var S = GF.step, steps = {}, cols = [], out = {}, maxRow = 0;
+    chart.steps.forEach(function (s) {
+      var acts = (s.act || []).map(function (a) {
+        var txt = gfActText(a, level);
+        var w = Math.ceil(gfTextWidth(txt, a.force ? 600 : 400)) + 22;
+        var cw = a.cond ? Math.ceil(gfTextWidth(gfActText({ v: a.cond }, level))) : 0;
+        return { a: a, txt: txt, w: Math.max(w, cw + 12), cond: a.cond ? gfActText({ v: a.cond }, level) : "" };
+      });
+      var col = s.col || 0;
+      var ext = acts.length
+        ? S / 2 + 22 + acts.reduce(function (sum, x) { return sum + x.w; }, 0)
+        : S / 2 + 14 + Math.ceil(gfTextWidth('"' + s.name + '"', 400, true));
+      steps[s.n] = { s: s, col: col, row: s.row, acts: acts };
+      cols[col] = Math.max(cols[col] || 0, ext);
+      out[s.n] = [];
+      maxRow = Math.max(maxRow, s.row);
+    });
+    var trans = chart.trans.map(function (t, i) {
+      var a = steps[t.from], b = steps[t.to];
+      var loop = b.row <= a.row;
+      var lab = gfWrap(gfLabelParts(t, level), level === "fn" ? GF.labelW : 320);
+      var col = loop ? a.col : b.col;
+      cols[col] = Math.max(cols[col] || 0, 19 + lab.w);
+      var tr = { t: t, i: i, a: a, b: b, loop: loop, col: col, lab: lab };
+      out[t.from].push(tr);
+      return tr;
+    });
+    // Retorns cap amunt: per l'esquerra si surten de la primera columna, si no per la dreta.
+    var left = 0, right = 0, entries = {};
+    trans.forEach(function (tr) {
+      if (!tr.loop) return;
+      tr.side = tr.a.col === 0 ? "left" : "right";
+      tr.lane = tr.side === "left" ? left++ : right++;
+      tr.entry = entries[tr.t.to] = (entries[tr.t.to] || 0) + 1;
+    });
+    var maxEntry = 0;
+    Object.keys(entries).forEach(function (k) { maxEntry = Math.max(maxEntry, entries[k]); });
+    var colX = [];
+    for (var c = 0; c < cols.length; c++) {
+      colX[c] = c === 0
+        ? GF.pad + 6 + (left ? (left - 1) * GF.lane + 18 : 0) + S / 2
+        : colX[c - 1] + cols[c - 1] + 36 + S / 2;
+    }
+    var rightEdge = colX[cols.length - 1] + cols[cols.length - 1];
+    var top = GF.pad + 30 + 8 * Math.max(0, maxEntry - 1);
+    Object.keys(steps).forEach(function (n) {
+      var st = steps[n];
+      st.x = colX[st.col];
+      st.top = top + st.row * GF.row;
+      st.bottom = st.top + S;
+      st.cy = st.top + S / 2;
+    });
+    var maxY = top + maxRow * GF.row + S;
+    trans.forEach(function (tr) {
+      tr.x = colX[tr.col];
+      tr.y = tr.a.bottom + 34;
+      tr.div = out[tr.t.from].length > 1;
+      maxY = Math.max(maxY, tr.y + tr.lab.lines.length * 8 + 4);
+      if (tr.loop) {
+        // Per sota del text de la condició.
+        tr.yLoop = tr.y + Math.max(18, tr.lab.lines.length * 8 + 14);
+        tr.laneX = tr.side === "left"
+          ? colX[0] - S / 2 - 18 - tr.lane * GF.lane
+          : rightEdge + 18 + tr.lane * GF.lane;
+        tr.yIn = tr.b.top - 14 - 8 * (tr.entry - 1);
+        maxY = Math.max(maxY, tr.yLoop);
+      }
+    });
+    var w = (right ? rightEdge + 18 + (right - 1) * GF.lane + 6 : rightEdge) + GF.pad;
+    return { steps: steps, trans: trans, out: out, w: Math.ceil(w), h: Math.ceil(maxY + GF.pad) };
+  }
+
+  // --- Dibuix ---
+
+  function gfTspans(lines, x, y) {
+    var lh = 16, y0 = y - (lines.length - 1) * lh / 2 + 4.5;
+    return lines.map(function (line, i) {
+      return '<tspan x="' + x + '" y="' + (y0 + i * lh) + '">' + line.map(function (p) {
+        return p.neg ? '<tspan text-decoration="overline">' + escapeHtml(p.t) + "</tspan>" : escapeHtml(p.t);
+      }).join("") + "</tspan>";
+    }).join("");
+  }
+
+  function gfLine(x1, y1, x2, y2) {
+    return '<line class="ln" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/>';
+  }
+  function gfPath(d, cls) { return '<path class="' + (cls || "ln") + '" d="' + d + '"/>'; }
+
+  function gfStepLabel(s, chart, level) {
+    var acts = (s.act || []).map(function (a) { return gfActText(a, level); });
+    return "Etapa " + s.n + ", " + s.name + (acts.length ? ". Accions: " + acts.join(", ") : "");
+  }
+
+  function gfSvg(chart, level, interactive) {
+    var L = gfLayout(chart, level), S = GF.step, o = [];
+    // Enllaços i transicions
+    Object.keys(L.out).forEach(function (n) {
+      var list = L.out[n], a = L.steps[n];
+      if (!list.length) return;
+      if (list.length > 1) {
+        // Divergència en O: una sola línia horitzontal i una transició a cada branca.
+        var yDiv = a.bottom + 12, xs = list.map(function (tr) { return tr.x; }).concat(a.x);
+        o.push(gfLine(a.x, a.bottom, a.x, yDiv));
+        o.push(gfLine(Math.min.apply(null, xs), yDiv, Math.max.apply(null, xs), yDiv));
+        list.forEach(function (tr) { o.push(gfLine(tr.x, yDiv, tr.x, tr.y)); });
+      } else {
+        o.push(gfLine(a.x, a.bottom, a.x, list[0].y));
+      }
+    });
+    L.trans.forEach(function (tr) {
+      var b = tr.b;
+      if (!tr.loop) {
+        o.push(gfLine(tr.x, tr.y, tr.x, b.top));
+      } else {
+        // Retorn cap amunt, amb fletxa a la línia que puja.
+        o.push(gfPath("M" + tr.x + " " + tr.y + "V" + tr.yLoop + "H" + tr.laneX + "V" + tr.yIn + "H" + b.x + "V" + b.top));
+        var ym = Math.round((tr.yLoop + tr.yIn) / 2);
+        o.push(gfPath("M" + (tr.laneX - 4.5) + " " + (ym + 4) + "L" + tr.laneX + " " + (ym - 5) + "L" + (tr.laneX + 4.5) + " " + (ym + 4) + "Z", "arw"));
+      }
+    });
+    // Etapes i transicions en l'ordre de lectura (també és l'ordre del tabulador).
+    var trG = L.trans.map(function (tr) {
+      var t = tr.t, lx = tr.x + 19, h = tr.lab.lines.length * 16 + 8;
+      var label = "Transició de l'etapa " + t.from + " a la " + t.to + ": " + t.fn;
+      return '<g class="gf-tr" data-el="t' + tr.i + '" data-vars="' + gfVarsOf(t.c).join(" ") + '"' +
+        (interactive ? ' tabindex="0" role="button" aria-label="' + gfAttr(label) + '"' : "") + ">" +
+        '<rect class="hit" x="' + (tr.x - 14) + '" y="' + (tr.y - h / 2) + '" width="' + (tr.lab.w + 33) + '" height="' + h + '"/>' +
+        '<line class="bar" x1="' + (tr.x - 11) + '" y1="' + tr.y + '" x2="' + (tr.x + 11) + '" y2="' + tr.y + '"/>' +
+        '<text class="txt">' + gfTspans(tr.lab.lines, lx, tr.y) + "</text></g>";
+    });
+    chart.steps.forEach(function (s) {
+      var st = L.steps[s.n], x0 = st.x - S / 2;
+      var vars = [];
+      (s.act || []).forEach(function (a) { if (a.v) vars.push(a.v); if (a.cond) vars.push(a.cond); });
+      var g = '<g class="gf-step" data-el="s' + s.n + '" data-vars="' + vars.join(" ") + '"' +
+        (interactive ? ' tabindex="0" role="button" aria-label="' + gfAttr(gfStepLabel(s, chart, level)) + '"' : "") + ">" +
+        '<rect class="box" x="' + x0 + '" y="' + st.top + '" width="' + S + '" height="' + S + '"/>' +
+        (s.init ? '<rect class="box in" x="' + (x0 + 4) + '" y="' + (st.top + 4) + '" width="' + (S - 8) + '" height="' + (S - 8) + '"/>' : "") +
+        '<text class="num" x="' + st.x + '" y="' + (st.cy + 5) + '">' + s.n + "</text>";
+      if (st.acts.length) {
+        var x = st.x + S / 2 + 22, y = st.cy - 15;
+        g += gfLine(st.x + S / 2, st.cy, x, st.cy);
+        st.acts.forEach(function (ac) {
+          g += '<rect class="box act" x="' + x + '" y="' + y + '" width="' + ac.w + '" height="30"/>';
+          if (ac.a.force) {
+            // Ordre de forçat: requadre doble.
+            g += '<rect class="box in" x="' + (x + 3) + '" y="' + (y + 3) + '" width="' + (ac.w - 6) + '" height="24"/>';
+          }
+          if (ac.cond) {
+            // Acció condicionada: la condició va a sobre, amb una línia curta.
+            g += gfLine(x + ac.w / 2, y, x + ac.w / 2, y - 10) +
+              '<text class="txt" text-anchor="middle" x="' + (x + ac.w / 2) + '" y="' + (y - 14) + '">' + escapeHtml(ac.cond) + "</text>";
+          }
+          g += '<text class="txt' + (ac.a.force ? " frc" : "") + '" x="' + (x + 11) + '" y="' + (st.cy + 4.5) + '">' + escapeHtml(ac.txt) + "</text>";
+          x += ac.w;
+        });
+      } else {
+        // Comentari (entre cometes, com diu la norma).
+        g += '<text class="cmt" x="' + (st.x + S / 2 + 14) + '" y="' + (st.cy + 4.5) + '">"' + escapeHtml(s.name) + '"</text>';
+      }
+      o.push(g + "</g>");
+      L.out[s.n].forEach(function (tr) { o.push(trG[tr.i]); });
+    });
+    return {
+      w: L.w, h: L.h,
+      html: '<svg class="gf-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + L.w + " " + L.h + '" width="' + L.w + '" height="' + L.h + '"' +
+        ' data-w="' + L.w + '" data-h="' + L.h + '" role="group" aria-label="' + gfAttr("Grafcet " + chart.key + ", " + chart.name) + '">' +
+        o.join("") + "</svg>"
+    };
+  }
+
+  // --- Panell ---
+
+  function renderGrafcet(data) {
+    gf = data;
+    gfPinned = "";
+    var html = '<div class="gf"><p class="gf-intro">Grafcet de l\'estació segons la norma IEC 60848, dividit en tres grafcets ' +
+      "jerarquitzats: <b>Seguretat</b> mana sobre els altres dos, <b>Conducció</b> gestiona el panell i els modes de marxa, " +
+      "i <b>Producció</b> fa la seqüència de l'estació. Els superiors manen sobre els inferiors amb ordres de forçat (requadre doble, p. ex. GP{INIT}).</p>" +
+      '<div class="gf-bar"><div class="gf-tabs" role="group" aria-label="Grafcets parcials">';
+    data.charts.forEach(function (c, i) {
+      if (i) html += '<span class="gf-arrow" aria-hidden="true">força <span>&rsaquo;</span></span>';
+      html += '<button type="button" class="gf-tab" data-chart="' + i + '" aria-pressed="false"><b>' + c.key + "</b> " + escapeHtml(c.name) + "</button>";
+    });
+    html += '</div><div class="gf-levels" role="group" aria-label="Nivell de descripció">';
+    GF_LEVELS.forEach(function (l) {
+      html += '<button type="button" class="gf-level" data-level="' + l.key + '" aria-pressed="false" title="' + gfAttr(l.label + ": " + l.hint) + '">' + l.label + "</button>";
+    });
+    html += "</div></div>" +
+      '<div class="gf-main"><figure class="gf-figure"><figcaption class="gf-head"><span class="gf-title"></span>' +
+      '<button type="button" class="gf-zoom" aria-label="Amplia el grafcet"><svg viewBox="0 0 20 20" aria-hidden="true">' +
+      '<path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Amplia</button></figcaption>' +
+      '<p class="gf-wide-hint">Llisca cap al costat per veure tot el grafcet.</p><div class="gf-scroll"></div></figure>' +
+      '<div class="gf-side"><p class="gf-about"></p><div class="gf-info" aria-live="polite"></div><div class="gf-vars"></div></div></div>' +
+      '<p class="comp-source">Font: <a href="' + data.source.url + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(data.source.label) +
+      "</a> (seqüència, taula d'assignació i esquemes). La seguretat i la conducció segueixen l'estructura GEMMA habitual.</p></div>";
+    return html;
+  }
+
+  function drawGrafcet() {
+    var chart = gf.charts[gfChart];
+    Array.prototype.forEach.call(panel.querySelectorAll(".gf-tab"), function (b) {
+      b.setAttribute("aria-pressed", +b.getAttribute("data-chart") === gfChart ? "true" : "false");
+    });
+    Array.prototype.forEach.call(panel.querySelectorAll(".gf-level"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-level") === gfLevel ? "true" : "false");
+    });
+    panel.querySelector(".gf-title").innerHTML = '<span class="comp-kicker">' + chart.key + "</span> " + escapeHtml(chart.name) +
+      ' <span class="gf-lv">· nivell ' + gfLevelName(gfLevel) + "</span>";
+    panel.querySelector(".gf-scroll").innerHTML = gfSvg(chart, gfLevel, true).html;
+    gfCheckWide();
+    panel.querySelector(".gf-about").textContent = chart.about;
+    panel.querySelector(".gf-vars").innerHTML = gfVarsTable(chart);
+    gfSetPinned(gfPinned);
+  }
+
+  // Si el grafcet no hi cap d'amplada (mòbils), s'avisa que es pot lliscar.
+  function gfCheckWide() {
+    var sc = panel.querySelector(".gf-scroll");
+    if (sc) sc.parentNode.classList.toggle("is-wide", sc.scrollWidth > sc.clientWidth + 2);
+  }
+  window.addEventListener("resize", function () { if (gf) gfCheckWide(); });
+
+  // Senyals que fa servir un grafcet parcial, en l'ordre de la taula.
+  function gfChartVars(chart) {
+    var list = [];
+    function add(id) { if (list.indexOf(id) < 0) list.push(id); }
+    chart.steps.forEach(function (s) {
+      (s.act || []).forEach(function (a) { if (a.v) add(a.v); if (a.cond) add(a.cond); });
+    });
+    chart.trans.forEach(function (t) { gfVarsOf(t.c).forEach(add); });
+    function group(id) {
+      if (gfIsStepVar(id)) return 2;
+      var p = gf.vars[id].plc;
+      return /^I/.test(p) ? 0 : /^Q/.test(p) ? 1 : 3;
+    }
+    return list.sort(function (a, b) {
+      var ga = group(a), gb = group(b);
+      if (ga !== gb) return ga - gb;
+      var pa = gfIsStepVar(a) ? a : gf.vars[a].plc, pb = gfIsStepVar(b) ? b : gf.vars[b].plc;
+      return pa < pb ? -1 : pa > pb ? 1 : 0;
+    }).map(function (id) { return { id: id, group: group(id) }; });
+  }
+
+  function gfVarsTable(chart) {
+    var names = ["Entrades", "Sortides", "Etapes d'altres grafcets", "Altres"];
+    var html = '<table class="gf-table lv-' + gfLevel + '"><caption>Senyals d\'aquest grafcet</caption>' +
+      '<thead><tr><th scope="col" class="c-plc">PLC</th><th scope="col" class="c-tag">Etiqueta</th><th scope="col" class="c-fn">Descripció</th></tr></thead><tbody>';
+    var last = -1;
+    gfChartVars(chart).forEach(function (r) {
+      if (r.group !== last) {
+        html += '<tr class="gf-group"><th colspan="3" scope="colgroup">' + names[r.group] + "</th></tr>";
+        last = r.group;
+      }
+      var plc, tag, desc;
+      if (gfIsStepVar(r.id)) {
+        var f = gfFindStep(+r.id.slice(1));
+        plc = r.id;
+        tag = f ? f.chart.key : "";
+        desc = f ? "Etapa " + f.step.n + " de " + f.chart.key + " activa (" + f.step.name.toLowerCase() + ")" : "";
+      } else {
+        var v = gf.vars[r.id];
+        plc = v.plc; tag = v.tag; desc = v.desc;
+      }
+      html += '<tr data-var="' + r.id + '"><td class="c-plc">' + escapeHtml(plc) + '</td><td class="c-tag">' + escapeHtml(tag) +
+        '</td><td class="c-fn">' + escapeHtml(desc) + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    if (chart.key === "GP" && gf.unused) html += '<p class="gf-unused">No s\'utilitzen en aquesta seqüència: ' + escapeHtml(gf.unused) + ".</p>";
+    return html;
+  }
+
+  function gfCondHtml(c, level) {
+    return gfCondParts(c, level).map(function (p) {
+      return p.neg ? '<span class="gf-not">' + escapeHtml(p.t) + "</span>" : escapeHtml(p.t);
+    }).join("");
+  }
+
+  function gfActHtml(a) {
+    if (a.force) {
+      var target = gf.charts.filter(function (c) { return c.key === a.force; })[0];
+      var name = "el grafcet de " + target.name.toLowerCase();
+      var init = target.steps.filter(function (x) { return x.init; }).map(function (x) { return x.n; }).join(", ");
+      return "<li><b>" + escapeHtml(gfActText(a, "plc")) + "</b> · " + escapeHtml(
+        a.to === "INIT" ? "Força " + name + " a la situació inicial (etapa " + init + ")." :
+        a.to ? "Força " + name + " a l'etapa " + a.to + "." :
+        "Deixa " + name + " sense cap etapa activa.") + "</li>";
+    }
+    var v = gf.vars[a.v];
+    var html = "<li><b>" + escapeHtml(v.fn) + "</b> · " + escapeHtml(v.tagAct || v.tag) + " · " + escapeHtml(v.plc);
+    if (a.cond) {
+      var cv = gf.vars[a.cond];
+      html += '<span class="gf-note">Acció condicionada: només quan ' + escapeHtml(cv.plc) + " = 1 (" + escapeHtml(cv.desc.toLowerCase()) + "), és a dir, fa pampallugues.</span>";
+    }
+    return html + "</li>";
+  }
+
+  function gfShowInfo(id) {
+    var box = panel.querySelector(".gf-info");
+    if (!box) return;
+    var chart = gf.charts[gfChart], html;
+    var s = id && id.charAt(0) === "s" ? chart.steps.filter(function (x) { return "s" + x.n === id; })[0] : null;
+    var t = id && id.charAt(0) === "t" ? chart.trans[+id.slice(1)] : null;
+    if (s) {
+      html = '<span class="comp-kicker">' + chart.key + " · Etapa " + s.n + (s.init ? " (inicial)" : "") + "</span>" +
+        "<h4>" + escapeHtml(s.name) + "</h4>" +
+        (s.act && s.act.length ? '<p class="gf-sub">Accions</p><ul class="gf-acts">' + s.act.map(gfActHtml).join("") + "</ul>"
+          : '<p class="gf-sub">Sense accions</p>') +
+        (s.note ? "<p>" + escapeHtml(s.note) + "</p>" : "");
+    } else if (t) {
+      html = '<span class="comp-kicker">' + chart.key + " · Transició " + t.from + " → " + t.to + "</span>" +
+        "<h4>" + escapeHtml(t.fn) + "</h4>" +
+        '<dl class="gf-levels-dl"><dt>Tecnològic</dt><dd>' + gfCondHtml(t.c, "tag") + "</dd><dt>PLC</dt><dd>" + gfCondHtml(t.c, "plc") + "</dd></dl>" +
+        (t.note ? "<p>" + escapeHtml(t.note) + "</p>" : "");
+    } else {
+      html = '<p class="gf-hint">Passa el ratolí per sobre d\'una etapa o d\'una transició (o toca-la) per veure\'n l\'explicació.</p>';
+    }
+    box.innerHTML = html;
+  }
+
+  // Ressalta l'element del dibuix i els senyals que fa servir (o al revés, des de la taula).
+  function gfHighlight(el, varId) {
+    var svg = panel.querySelector(".gf-svg");
+    if (!svg) return;
+    Array.prototype.forEach.call(panel.querySelectorAll(".is-hot, .is-rel"), function (x) {
+      x.classList.remove("is-hot", "is-rel");
+    });
+    if (el) {
+      el.classList.add("is-hot");
+      (el.getAttribute("data-vars") || "").split(" ").filter(Boolean).forEach(function (v) {
+        var row = panel.querySelector('.gf-table tr[data-var="' + v + '"]');
+        if (row) row.classList.add("is-rel");
+      });
+    } else if (varId) {
+      Array.prototype.forEach.call(svg.querySelectorAll("[data-el]"), function (x) {
+        if ((" " + x.getAttribute("data-vars") + " ").indexOf(" " + varId + " ") >= 0) x.classList.add("is-rel");
+      });
+      var r = panel.querySelector('.gf-table tr[data-var="' + varId + '"]');
+      if (r) r.classList.add("is-hot");
+    }
+  }
+
+  function gfSetPinned(id) {
+    gfPinned = id;
+    Array.prototype.forEach.call(panel.querySelectorAll(".gf-svg .is-pin"), function (x) { x.classList.remove("is-pin"); });
+    var el = id && panel.querySelector('.gf-svg [data-el="' + id + '"]');
+    if (el) el.classList.add("is-pin");
+    gfShowInfo(id);
+  }
+
+  panel.addEventListener("click", function (e) {
+    if (!gf || !e.target.closest) return;
+    var t = e.target.closest(".gf-tab, .gf-level, .gf-zoom, [data-el]");
+    if (!t || !panel.contains(t)) return;
+    if (t.classList.contains("gf-tab")) {
+      gfChart = +t.getAttribute("data-chart");
+      gfPinned = "";
+      drawGrafcet();
+    } else if (t.classList.contains("gf-level")) {
+      gfLevel = t.getAttribute("data-level");
+      drawGrafcet();
+    } else if (t.classList.contains("gf-zoom")) {
+      openSheet("gf:" + gfChart, t);
+    } else {
+      var id = t.getAttribute("data-el");
+      gfSetPinned(gfPinned === id ? "" : id);
+    }
+  });
+  panel.addEventListener("keydown", function (e) {
+    if (!gf || (e.key !== "Enter" && e.key !== " ")) return;
+    var t = e.target.closest && e.target.closest("[data-el]");
+    if (!t) return;
+    e.preventDefault();
+    t.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+  function gfHover(e) {
+    if (!gf || !e.target.closest) return;
+    var el = e.target.closest(".gf-svg [data-el]");
+    var row = !el && e.target.closest(".gf-table tr[data-var]");
+    if (el) {
+      if (el.classList.contains("is-hot")) return;
+      gfHighlight(el);
+      gfShowInfo(el.getAttribute("data-el"));
+    } else if (row && !row.classList.contains("is-hot")) {
+      gfHighlight(null, row.getAttribute("data-var"));
+    }
+  }
+  function gfLeave(e) {
+    if (!gf || !e.target.closest) return;
+    var from = e.target.closest(".gf-svg [data-el], .gf-table tr[data-var]");
+    if (!from) return;
+    var to = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".gf-svg [data-el], .gf-table tr[data-var]");
+    if (to === from) return;
+    if (!to) { gfHighlight(null); gfShowInfo(gfPinned); }
+  }
+  panel.addEventListener("mouseover", gfHover);
+  panel.addEventListener("mouseout", gfLeave);
+  panel.addEventListener("focusin", gfHover);
+  panel.addEventListener("focusout", gfLeave);
+
+  // --- Grafcet ampliat (a la finestra de les fitxes) ---
+
+  function gfSheetHtml(i) {
+    var chart = gf.charts[i];
+    return '<div class="sheet-gf"><div class="sheet-gf-head"><span class="comp-kicker">Grafcet · nivell ' +
+      gfLevelName(gfLevel) + '</span><h3 id="sheet-title">' + chart.key + " · " + escapeHtml(chart.name) + "</h3></div>" +
+      '<div class="sheet-gf-chart">' + gfSvg(chart, gfLevel, false).html + "</div></div>";
+  }
+
+  // Mida del grafcet ampliat: tan gran com hi càpiga a la part visible.
+  function gfFitSheet(panelW, maxH) {
+    var svg = sheetContent.querySelector(".sheet-gf-chart svg");
+    if (!svg) return;
+    var w = +svg.getAttribute("data-w"), h = +svg.getAttribute("data-h");
+    var head = sheetContent.querySelector(".sheet-gf-head").offsetHeight;
+    var nav = sheetPanel.querySelector(".sheet-nav").offsetHeight;
+    var availW = panelW - 48, availH = maxH - nav - head - 60;
+    var k = Math.min(availW / w, availH / h, 2);
+    // A les pantalles petites no l'encongim tant que no es pugui llegir: es desplaça.
+    if (k < 0.8) k = Math.max(0.8, Math.min(1, availW / w));
+    svg.setAttribute("width", Math.round(w * k));
+    svg.setAttribute("height", Math.round(h * k));
+  }
+
   function showStation(s) {
     pageTitle.textContent = s.title;
     breadcrumb.innerHTML = '<a href="#">Inici</a> &rsaquo; ' + escapeHtml(s.title);
@@ -2905,7 +3734,7 @@
           }
         }
         panelWrap.classList.add("open");
-        var comp = panel.querySelector(".comp");
+        var comp = panel.querySelector(".comp, .gf");
         setTimeout(function () {
           if (!panelWrap.classList.contains("open")) return;
           if (doc && panel.contains(doc)) {
