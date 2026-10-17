@@ -52,6 +52,8 @@ de cada botó (`esquemes`, `io-plc`, `grafcet`, `components`):
 
 - `{ pdf: "ID de Google Drive" }` mostra el PDF dins de la pàgina amb el visor de Drive
   (ara: MA1B1, MA2B1 i MA3B1).
+- `{ catalog: ... }` mostra el catàleg de components (MA1B4, MA2B4, MA3B4).
+- `{ grafcet: ... }` dibuixa el grafcet de l'estació (ara: MA1B3).
 - Un text HTML per a contingut escrit.
 
 Els PDF han d'estar compartits com a "Qualsevol persona amb l'enllaç".
@@ -66,3 +68,29 @@ peces repetides comparteixen les mateixes dades.
 - `FESTO_DRIVE_IMAGES`: fotos pujades a Google Drive (ruta de la foto a Festo → ID de Drive).
   Les que no hi són, o que fallen, es carreguen des de la web de Festo.
 - `FESTO_DRIVE_PDFS`: fitxes tècniques pujades a Google Drive. Les que no hi són s'obren des de Festo.
+
+## Grafcet (MA1B3)
+
+Grafcet de l'estació segons la norma IEC 60848, dibuixat a la mateixa pàgina (SVG) a partir de
+les dades de `GRAFCET_DISTRIBUTING`. Té tres grafcets parcials jerarquitzats:
+
+| Grafcet | Què fa |
+| --- | --- |
+| **GS · Seguretat** | Seta d'emergència o STOP mantingut 3 s: ho atura tot i obliga a fer RESET. Força GC i GP. |
+| **GC · Conducció** | Panell de comandament: RESET (només en MAN), estació preparada, AUTO (cicles seguits) o MAN (un cicle). Un STOP curt deixa acabar el cicle i atura l'automàtic. La llum de magatzem buit segueix sempre el sensor. Força GP. |
+| **GP · Producció** | La seqüència de l'estació segons Festo Didactic. |
+
+RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC oficial de Festo.
+
+- Es pot veure en tres nivells: **Funcional** (en paraules), **Tecnològic** (etiquetes dels esquemes)
+  i **PLC** (adreces). Les adreces són les de la documentació de Festo (byte 0 = estació, byte 1 = panell).
+- Passant el ratolí per sobre (o tocant) una etapa o una transició se'n veu l'explicació, i a la taula
+  es ressalten els senyals que fa servir. **Amplia** mostra el grafcet en gran.
+- `vars`: cada senyal amb l'adreça (`plc`), l'etiqueta (`tag`) i la descripció (`desc`). Les sortides que
+  fan d'acció porten també `fn` (text de l'acció al nivell funcional) i, si cal, `tagAct` (text al nivell
+  tecnològic, p. ex. `G1MA1 endavant`).
+- Condicions de les transicions (`c`): noms de `vars`, `X12` = etapa 12 activa, `*` = I, `+` = O,
+  `/` = negat, `^` = flanc de pujada i `3s/` = temporització (`3s//stop`: STOP premut durant 3 s).
+  `fn` és la mateixa condició en paraules.
+- Accions de les etapes (`act`): `{ v: "senyal" }`, condicionada `{ v: "senyal", cond: "condició", condFn: "en paraules" }`,
+  o ordre de forçat `{ force: "GP", to: "INIT" }` (`"INIT"` = situació inicial, `""` = cap etapa activa, `"8"` = etapa 8).
