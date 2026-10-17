@@ -2560,8 +2560,10 @@
   // - vars: senyals amb el text dels tres nivells: PLC (adreça), Tecnològic (etiqueta dels esquemes)
   //   i Funcional (desc; "fn" és el text curt de les accions).
   // - Condicions de les transicions ("c"): noms de vars, X12 = etapa 12 activa, "*" = I, "+" = O,
-  //   "/" = negat, "^" = flanc de pujada. "fn" és la mateixa condició en paraules.
-  // - Accions de les etapes ("act"): { v: senyal }, { v: senyal, cond: condició } (acció condicionada) o
+  //   "/" = negat, "^" = flanc de pujada, "3s/" = temporització (3 s després que es compleixi el que
+  //   segueix). "fn" és la mateixa condició en paraules.
+  // - Accions de les etapes ("act"): { v: senyal }, { v: senyal, cond: condició, condFn: en paraules }
+  //   (acció condicionada) o
   //   ordre de forçat { force: "GP", to: "INIT" } ("INIT" = situació inicial, "" = cap etapa activa, "8" = etapa 8).
   var GRAFCET_DISTRIBUTING = {
     source: {
@@ -2570,6 +2572,7 @@
     },
     vars: {
       inici:     { plc: "I0.0", tag: "G1BG1", desc: "Peça a l'inici de la cinta" },
+      mig:       { plc: "I0.1", tag: "G1BG2", desc: "Peça a la posició intermèdia de la cinta" },
       final:     { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)" },
       recollit:  { plc: "I0.4", tag: "C2BG1", desc: "Expulsor recollit" },
       avancat:   { plc: "I0.5", tag: "C2BG2", desc: "Expulsor avançat" },
@@ -2583,52 +2586,53 @@
       expulsor:  { plc: "Q0.4", tag: "C2MB1", fn: "Avançar l'expulsor", desc: "Avançar l'expulsor (electrovàlvula 5/2 que torna per molla)" },
       llumStart: { plc: "Q1.0", tag: "P1", fn: "Llum START", desc: "Llum del polsador START" },
       llumReset: { plc: "Q1.1", tag: "P2", fn: "Llum RESET", desc: "Llum del polsador RESET" },
-      llumBuit:  { plc: "Q1.2", tag: "P3", fn: "Llum MAGATZEM BUIT", desc: "Llum de magatzem buit" },
-      clk:       { plc: "Clock_1Hz", tag: "1 Hz", fn: "1 Hz", desc: "Rellotge d'1 Hz del PLC (marca de cicle, p. ex. M0.5)" }
+      llumBuit:  { plc: "Q1.2", tag: "P3", fn: "Llum MAGATZEM BUIT", desc: "Llum de magatzem buit" }
     },
-    unused: "I0.1 (G1BG2, peça a la posició intermèdia), Q0.1 (cinta enrere) i Q0.2 (G1MB1, separador)",
+    unused: "Q0.1 (cinta enrere) i Q0.2 (G1MB1, separador)",
     charts: [
       {
         key: "GS", name: "Seguretat",
-        about: "Té la prioritat més alta. Si es prem STOP o la seta d'emergència, deixa la producció sense cap etapa activa (tot aturat) i torna la conducció a l'etapa 20. Quan s'alliberen, cal tornar a fer RESET.",
+        about: "Té la prioritat més alta. Si es prem la seta d'emergència o es manté STOP premut 3 s, ho atura tot: la producció es queda sense cap etapa activa i la conducció torna a l'etapa 20. Després cal tornar a fer RESET.",
         steps: [
           { n: 100, init: true, row: 0, name: "Funcionament normal",
-            note: "Situació inicial: STOP i seta d'emergència sense prémer." },
-          { n: 101, row: 1, name: "Aturada", act: [{ force: "GP", to: "" }, { force: "GC", to: "INIT" }],
-            note: "Mentre està activa, el grafcet de producció no té cap etapa activa: el motor s'atura i l'expulsor torna enrere (la vàlvula torna per molla). La conducció queda a l'etapa 20." }
+            note: "Situació inicial. Una pulsació curta de STOP no actua aquí: la gestiona el grafcet de conducció." },
+          { n: 101, row: 1, name: "Aturada total", act: [{ force: "GP", to: "" }, { force: "GC", to: "INIT" }],
+            note: "Com al programa de PLC de Festo, tot torna a la situació inicial: la producció es queda sense cap etapa activa (el motor s'atura i l'expulsor torna enrere per la molla de la vàlvula) i la conducció torna a l'etapa 20." }
         ],
         trans: [
-          { from: 100, to: 101, c: "/stop + /seta", fn: "STOP o seta premuts",
-            note: "STOP és un contacte normalment tancat i la seta dona 1 quan no està premuda: per això es comproven negats." },
+          { from: 100, to: 101, c: "/seta + 3s//stop", fn: "Seta premuda o STOP premut durant 3 s",
+            note: "La seta dona 1 quan no està premuda i STOP és un contacte normalment tancat: per això es comproven negats. «3s/» és una temporització: la condició es compleix quan STOP fa 3 s que està premut." },
           { from: 101, to: 100, c: "stop * seta", fn: "STOP i seta alliberats",
-            note: "Torna al funcionament normal, però la conducció és a l'etapa 20: cal fer RESET." }
+            note: "Torna al funcionament normal, però la conducció és a l'etapa 20: cal fer RESET amb el selector en MAN." }
         ]
       },
       {
         key: "GC", name: "Conducció",
-        about: "Grafcet de conducció o de modes de marxa. Gestiona el panell de comandament: posada a zero amb RESET, estació preparada i producció en mode AUTO (cicles seguits) o MAN (un sol cicle).",
+        about: "Grafcet de conducció o de modes de marxa. Gestiona el panell de comandament: posada a zero amb RESET (només amb el selector en MAN), estació preparada i producció en AUTO (cicles seguits) o MAN (un sol cicle). Una pulsació curta de STOP deixa acabar el cicle en curs i atura l'automàtic.",
         steps: [
-          { n: 20, init: true, row: 0, name: "No inicialitzada", act: [{ v: "llumReset", cond: "clk" }],
-            note: "Situació inicial i després d'una aturada. La llum RESET fa pampallugues per demanar la posada a zero." },
-          { n: 21, row: 1, name: "Posada a zero", act: [{ force: "GP", to: "INIT" }],
-            note: "Posa la producció a la situació inicial (etapa 0): motor parat i expulsor recollit." },
-          { n: 22, row: 2, name: "Preparada", act: [{ v: "llumStart" }],
-            note: "La llum START indica que l'estació està preparada per començar." },
+          { n: 20, init: true, row: 0, name: "No inicialitzada", act: [{ v: "llumReset", cond: "man", condFn: "MAN" }],
+            note: "Situació inicial i després d'una aturada total. Amb el selector en MAN, la llum RESET s'encén fixa per demanar la posada a zero." },
+          { n: 21, row: 1, name: "Posada a zero", act: [{ force: "GP", to: "INIT" }, { v: "llumReset", cond: "man", condFn: "MAN" }],
+            note: "Posa la producció a la situació inicial (etapa 0): motor parat i expulsor recollit. La llum RESET continua encesa fins que acaba." },
+          { n: 22, row: 2, name: "Preparada", act: [{ v: "llumStart", cond: "X0", condFn: "GP en repòs" }],
+            note: "La llum START s'encén quan es pot començar: l'estació està preparada i la producció és en repòs (etapa 0)." },
           { n: 23, row: 3, name: "En producció",
             note: "La producció pot fer cicles. En AUTO en fa de seguits; en MAN només un." }
         ],
         trans: [
-          { from: 20, to: 21, c: "^reset", fn: "Es prem RESET" },
-          { from: 21, to: 22, c: "X0 * recollit", fn: "Producció a l'etapa 0 i expulsor recollit",
-            note: "Posició inicial de Festo: expulsor recollit i motor de la cinta parat. Comprovar X0 assegura que el forçat s'ha fet abans de continuar." },
-          { from: 22, to: 23, c: "^start", fn: "Es prem START" },
-          { from: 23, to: 22, c: "X4 * final * man", fn: "MAN i fi de cicle (etapa 4 i peça retirada)",
-            note: "En MAN, quan acaba el cicle torna a preparada i espera un altre START. En AUTO es queda a l'etapa 23 i la producció continua." }
+          { from: 20, to: 21, c: "^reset * man", fn: "Es prem RESET amb el selector en MAN",
+            note: "Com al programa de PLC de Festo, RESET només funciona amb el selector en MAN (I1.2 = 1)." },
+          { from: 21, to: 22, c: "X0 * recollit * /inici * /mig * final * /buit", fn: "Producció a l'etapa 0, expulsor recollit, cinta buida i magatzem amb peces",
+            note: "Com al programa de PLC de Festo, la posada a zero acaba quan l'expulsor és recollit, no hi ha cap peça a la cinta (ni a l'inici, ni al mig, ni al final) i el magatzem té peces. Comprovar X0 assegura que el forçat s'ha fet." },
+          { from: 22, to: 23, c: "^start * X0", fn: "Es prem START amb la producció en repòs",
+            note: "Si s'ha aturat amb STOP, START no actua fins que acaba el cicle en curs (la producció torna a l'etapa 0)." },
+          { from: 23, to: 22, c: "/stop + X4 * final * man", fn: "STOP premut, o MAN i fi de cicle (etapa 4 i peça retirada)",
+            note: "Com al programa de PLC de Festo, una pulsació curta de STOP atura l'automàtic: el cicle en curs acaba i l'estació queda preparada, sense haver de fer RESET. En MAN, torna a preparada quan acaba el cicle." }
         ]
       },
       {
         key: "GP", name: "Producció",
-        about: "La seqüència de l'estació segons Festo Didactic: l'expulsor treu una peça del magatzem i la cinta la porta fins al final. Si el magatzem és buit, s'encén la llum i s'espera que es carregui i es premi START.",
+        about: "La seqüència de l'estació segons Festo Didactic: l'expulsor treu una peça del magatzem i la cinta la porta fins al final. Si el magatzem és buit, la llum MAGATZEM BUIT s'encén fins que es torna a carregar.",
         steps: [
           { n: 0, init: true, row: 0, name: "Repòs",
             note: "Posició inicial: expulsor recollit i motor de la cinta parat." },
@@ -2639,21 +2643,22 @@
           { n: 3, row: 3, name: "Transport", act: [{ v: "cinta" }],
             note: "Festo, passos 2 i 3: amb l'expulsor recollit, la cinta porta la peça fins al final." },
           { n: 4, row: 4, name: "Peça al final",
-            note: "Festo, pas 4: el motor s'atura. Afegit: s'espera que es retiri la peça abans de començar un cicle nou." },
+            note: "Festo, pas 4: el motor s'atura. Com al programa de PLC de Festo, s'espera que es retiri la peça abans de començar un cicle nou." },
           { n: 10, row: 1, col: 1, name: "Magatzem buit", act: [{ v: "llumBuit" }],
-            note: "Nota de Festo: si el magatzem és buit, s'encén la llum MAGATZEM BUIT. Cal carregar peces i confirmar amb START." }
+            note: "La llum MAGATZEM BUIT s'encén mentre el magatzem és buit i s'apaga sola quan es torna a carregar: no cal prémer START." }
         ],
         trans: [
           { from: 0, to: 1, c: "X23 * recollit * /inici * final * /buit", fn: "En producció, expulsor recollit, cinta lliure i magatzem amb peces",
-            note: "Condicions d'inici de Festo: expulsor recollit, cap peça a l'inici de la cinta i magatzem amb peces. Afegit: el final de la cinta també ha d'estar lliure." },
+            note: "Condicions d'inici de Festo: expulsor recollit, cap peça a l'inici de la cinta i magatzem amb peces. El final de la cinta també ha d'estar lliure." },
           { from: 0, to: 10, c: "X23 * buit", fn: "En producció i magatzem buit" },
           { from: 1, to: 2, c: "avancat", fn: "Expulsor avançat" },
           { from: 2, to: 3, c: "recollit", fn: "Expulsor recollit" },
           { from: 3, to: 4, c: "/final", fn: "Peça al final de la cinta",
             note: "El sensor G1BG3 dona 1 quan NO hi ha peça al final: la peça hi arriba quan el senyal passa a 0." },
           { from: 4, to: 0, c: "final", fn: "Peça retirada",
-            note: "Afegit: no es comença un cicle nou fins que el final de la cinta queda lliure." },
-          { from: 10, to: 0, c: "/buit * ^start", fn: "Magatzem amb peces i es prem START" }
+            note: "Com al programa de PLC de Festo, no es comença un cicle nou fins que el final de la cinta queda lliure." },
+          { from: 10, to: 0, c: "/buit", fn: "Magatzem carregat",
+            note: "Com al programa de PLC de Festo, la llum segueix el sensor C2BG3: s'apaga en carregar el magatzem, sense prémer START." }
         ]
       }
     ]
@@ -3189,7 +3194,7 @@
   }
 
   function gfAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
-  function gfTokens(c) { return c.match(/[A-Za-z_]\w*|[\/^*+()]/g) || []; }
+  function gfTokens(c) { return c.match(/\d+(?:\.\d+)?m?s\/|[A-Za-z_]\w*|[\/^*+()]/g) || []; }
   function gfIsStepVar(id) { return /^X\d+$/.test(id); }
   function gfVarsOf(c) {
     return gfTokens(c).filter(function (t) { return /^[A-Za-z_]/.test(t); });
@@ -3215,7 +3220,7 @@
       else if (t === "^") edge = "↑";
       else if (t === "*") parts.push({ t: " · " });
       else if (t === "+") parts.push({ t: " + " });
-      else if (t === "(" || t === ")") parts.push({ t: t });
+      else if (t === "(" || t === ")" || /^\d/.test(t)) parts.push({ t: t });
       else {
         if (edge) parts.push({ t: edge });
         parts.push({ t: gfIsStepVar(t) ? t : gf.vars[t][level], neg: neg });
@@ -3261,10 +3266,6 @@
     return level === "fn" ? v.fn : level === "tag" ? (v.tagAct || v.tag) : v.plc;
   }
 
-  function gfCondText(c, level) {
-    return gfCondParts(c, level).map(function (p) { return p.t; }).join("");
-  }
-
   // --- Posició de cada element ---
 
   function gfLayout(chart, level) {
@@ -3273,8 +3274,9 @@
       var acts = (s.act || []).map(function (a) {
         var txt = gfActText(a, level);
         var w = Math.ceil(gfTextWidth(txt, a.force ? 600 : 400)) + 22;
-        var cw = a.cond ? Math.ceil(gfTextWidth(gfActText({ v: a.cond }, level))) : 0;
-        return { a: a, txt: txt, w: Math.max(w, cw + 12), cond: a.cond ? gfActText({ v: a.cond }, level) : "" };
+        var cond = !a.cond ? [] : level === "fn" ? [{ t: a.condFn }] : gfCondParts(a.cond, level);
+        var cw = Math.ceil(gfTextWidth(cond.map(function (p) { return p.t; }).join("")));
+        return { a: a, txt: txt, w: Math.max(w, cw + 12), cond: cond };
       });
       var col = s.col || 0;
       var ext = acts.length
@@ -3313,14 +3315,17 @@
     }
     var rightEdge = colX[cols.length - 1] + cols[cols.length - 1];
     var top = GF.pad + 30 + 8 * Math.max(0, maxEntry - 1);
+    // Més espai entre files si alguna condició ocupa més de dues línies.
+    var maxLines = Math.max.apply(null, trans.map(function (tr) { return tr.lab.lines.length; }));
+    var rowH = GF.row + 16 * Math.max(0, maxLines - 2);
     Object.keys(steps).forEach(function (n) {
       var st = steps[n];
       st.x = colX[st.col];
-      st.top = top + st.row * GF.row;
+      st.top = top + st.row * rowH;
       st.bottom = st.top + S;
       st.cy = st.top + S / 2;
     });
-    var maxY = top + maxRow * GF.row + S;
+    var maxY = top + maxRow * rowH + S;
     trans.forEach(function (tr) {
       tr.x = colX[tr.col];
       tr.y = tr.a.bottom + 34;
@@ -3401,7 +3406,10 @@
     chart.steps.forEach(function (s) {
       var st = L.steps[s.n], x0 = st.x - S / 2;
       var vars = [];
-      (s.act || []).forEach(function (a) { if (a.v) vars.push(a.v); if (a.cond) vars.push(a.cond); });
+      (s.act || []).forEach(function (a) {
+        if (a.v) vars.push(a.v);
+        if (a.cond) vars = vars.concat(gfVarsOf(a.cond));
+      });
       var g = '<g class="gf-step" data-el="s' + s.n + '" data-vars="' + vars.join(" ") + '"' +
         (interactive ? ' tabindex="0" role="button" aria-label="' + gfAttr(gfStepLabel(s, chart, level)) + '"' : "") + ">" +
         '<rect class="box" x="' + x0 + '" y="' + st.top + '" width="' + S + '" height="' + S + '"/>' +
@@ -3416,10 +3424,12 @@
             // Ordre de forçat: requadre doble.
             g += '<rect class="box in" x="' + (x + 3) + '" y="' + (y + 3) + '" width="' + (ac.w - 6) + '" height="24"/>';
           }
-          if (ac.cond) {
+          if (ac.cond.length) {
             // Acció condicionada: la condició va a sobre, amb una línia curta.
             g += gfLine(x + ac.w / 2, y, x + ac.w / 2, y - 10) +
-              '<text class="txt" text-anchor="middle" x="' + (x + ac.w / 2) + '" y="' + (y - 14) + '">' + escapeHtml(ac.cond) + "</text>";
+              '<text class="txt" text-anchor="middle" x="' + (x + ac.w / 2) + '" y="' + (y - 14) + '">' + ac.cond.map(function (p) {
+                return p.neg ? '<tspan text-decoration="overline">' + escapeHtml(p.t) + "</tspan>" : escapeHtml(p.t);
+              }).join("") + "</text>";
           }
           g += '<text class="txt' + (ac.a.force ? " frc" : "") + '" x="' + (x + 11) + '" y="' + (st.cy + 4.5) + '">' + escapeHtml(ac.txt) + "</text>";
           x += ac.w;
@@ -3463,7 +3473,7 @@
       '<p class="gf-wide-hint">Llisca cap al costat per veure tot el grafcet.</p><div class="gf-scroll"></div></figure>' +
       '<div class="gf-side"><p class="gf-about"></p><div class="gf-info" aria-live="polite"></div><div class="gf-vars"></div></div></div>' +
       '<p class="comp-source">Font: <a href="' + data.source.url + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(data.source.label) +
-      "</a> (seqüència, taula d'assignació i esquemes). La seguretat i la conducció segueixen l'estructura GEMMA habitual.</p></div>";
+      "</a> (seqüència, taula d'assignació, esquemes i programa de PLC). La seguretat i la conducció segueixen l'estructura GEMMA habitual.</p></div>";
     return html;
   }
 
@@ -3496,7 +3506,10 @@
     var list = [];
     function add(id) { if (list.indexOf(id) < 0) list.push(id); }
     chart.steps.forEach(function (s) {
-      (s.act || []).forEach(function (a) { if (a.v) add(a.v); if (a.cond) add(a.cond); });
+      (s.act || []).forEach(function (a) {
+        if (a.v) add(a.v);
+        if (a.cond) gfVarsOf(a.cond).forEach(add);
+      });
     });
     chart.trans.forEach(function (t) { gfVarsOf(t.c).forEach(add); });
     function group(id) {
@@ -3559,8 +3572,8 @@
     var v = gf.vars[a.v];
     var html = "<li><b>" + escapeHtml(v.fn) + "</b> · " + escapeHtml(v.tagAct || v.tag) + " · " + escapeHtml(v.plc);
     if (a.cond) {
-      var cv = gf.vars[a.cond];
-      html += '<span class="gf-note">Acció condicionada: només quan ' + escapeHtml(cv.plc) + " = 1 (" + escapeHtml(cv.desc.toLowerCase()) + "), és a dir, fa pampallugues.</span>";
+      html += '<span class="gf-note">Acció condicionada: només mentre es compleix ' + gfCondHtml(a.cond, "plc") +
+        " (" + escapeHtml(a.condFn) + ").</span>";
     }
     return html + "</li>";
   }

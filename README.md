@@ -76,9 +76,11 @@ les dades de `GRAFCET_DISTRIBUTING`. Té tres grafcets parcials jerarquitzats:
 
 | Grafcet | Què fa |
 | --- | --- |
-| **GS · Seguretat** | STOP o seta d'emergència: ho atura tot i obliga a fer RESET. Força GC i GP. |
-| **GC · Conducció** | Panell de comandament: RESET, estació preparada, AUTO (cicles seguits) o MAN (un cicle). Força GP. |
-| **GP · Producció** | La seqüència de l'estació segons Festo Didactic. |
+| **GS · Seguretat** | Seta d'emergència o STOP mantingut 3 s: ho atura tot i obliga a fer RESET. Força GC i GP. |
+| **GC · Conducció** | Panell de comandament: RESET (només en MAN), estació preparada, AUTO (cicles seguits) o MAN (un cicle). Un STOP curt deixa acabar el cicle i atura l'automàtic. Força GP. |
+| **GP · Producció** | La seqüència de l'estació segons Festo Didactic. La llum de magatzem buit s'apaga sola en carregar-lo. |
+
+RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC oficial de Festo.
 
 - Es pot veure en tres nivells: **Funcional** (en paraules), **Tecnològic** (etiquetes dels esquemes)
   i **PLC** (adreces). Les adreces són les de la documentació de Festo (byte 0 = estació, byte 1 = panell).
@@ -86,6 +88,7 @@ les dades de `GRAFCET_DISTRIBUTING`. Té tres grafcets parcials jerarquitzats:
   es ressalten els senyals que fa servir. **Amplia** mostra el grafcet en gran.
 - `vars`: cada senyal amb l'adreça (`plc`), l'etiqueta (`tag`) i la descripció (`desc`).
 - Condicions de les transicions (`c`): noms de `vars`, `X12` = etapa 12 activa, `*` = I, `+` = O,
-  `/` = negat i `^` = flanc de pujada. `fn` és la mateixa condició en paraules.
-- Accions de les etapes (`act`): `{ v: "senyal" }`, amb condició `{ v: "senyal", cond: "senyal" }`,
-  o ordre de forçat `{ force: "GP", to: "0" }` (`to: ""` deixa el grafcet sense cap etapa activa).
+  `/` = negat, `^` = flanc de pujada i `3s/` = temporització (`3s//stop`: STOP premut durant 3 s).
+  `fn` és la mateixa condició en paraules.
+- Accions de les etapes (`act`): `{ v: "senyal" }`, condicionada `{ v: "senyal", cond: "condició", condFn: "en paraules" }`,
+  o ordre de forçat `{ force: "GP", to: "INIT" }` (`"INIT"` = situació inicial, `""` = cap etapa activa, `"8"` = etapa 8).
