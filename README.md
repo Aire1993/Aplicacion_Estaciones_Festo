@@ -77,8 +77,8 @@ les dades de `GRAFCET_DISTRIBUTING`. Té tres grafcets parcials jerarquitzats:
 | Grafcet | Què fa |
 | --- | --- |
 | **GS · Seguretat** | Seta d'emergència o STOP mantingut 3 s: ho atura tot i obliga a fer RESET. Força GC i GP. |
-| **GC · Conducció** | Panell de comandament: RESET (només en MAN), estació preparada, AUTO (cicles seguits) o MAN (un cicle). Un STOP curt deixa acabar el cicle i atura l'automàtic. Força GP. |
-| **GP · Producció** | La seqüència de l'estació segons Festo Didactic. La llum de magatzem buit s'apaga sola en carregar-lo. |
+| **GC · Conducció** | Panell de comandament: RESET (només en MAN), estació preparada, AUTO (cicles seguits) o MAN (un cicle). Un STOP curt deixa acabar el cicle i atura l'automàtic. La llum de magatzem buit segueix sempre el sensor. Força GP. |
+| **GP · Producció** | La seqüència de l'estació segons Festo Didactic. |
 
 RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC oficial de Festo.
 
@@ -86,7 +86,9 @@ RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC ofici
   i **PLC** (adreces). Les adreces són les de la documentació de Festo (byte 0 = estació, byte 1 = panell).
 - Passant el ratolí per sobre (o tocant) una etapa o una transició se'n veu l'explicació, i a la taula
   es ressalten els senyals que fa servir. **Amplia** mostra el grafcet en gran.
-- `vars`: cada senyal amb l'adreça (`plc`), l'etiqueta (`tag`) i la descripció (`desc`).
+- `vars`: cada senyal amb l'adreça (`plc`), l'etiqueta (`tag`) i la descripció (`desc`). Les sortides que
+  fan d'acció porten també `fn` (text de l'acció al nivell funcional) i, si cal, `tagAct` (text al nivell
+  tecnològic, p. ex. `G1MA1 endavant`).
 - Condicions de les transicions (`c`): noms de `vars`, `X12` = etapa 12 activa, `*` = I, `+` = O,
   `/` = negat, `^` = flanc de pujada i `3s/` = temporització (`3s//stop`: STOP premut durant 3 s).
   `fn` és la mateixa condició en paraules.
