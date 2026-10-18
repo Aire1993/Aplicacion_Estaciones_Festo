@@ -103,7 +103,7 @@ cablejat SysLink (borne i color del cable), terminal d'E/S, nom de la variable a
 observacions. Es pot filtrar per tipus i cercar.
 
 - Les dades es llegeixen d'un **full de càlcul de Google** (`IO_SHEET` a `index.html`; ara el full
-  [Taula_Entrades_Sortides_PLC_DCS](https://docs.google.com/spreadsheets/d/1bfW_ojUxIs_cTEsquKxMJyKHq8XLHFUZHT5bAMV0rog/edit)
+  [Taula_Entrades_Sortides_PLC](https://docs.google.com/spreadsheets/d/1bfW_ojUxIs_cTEsquKxMJyKHq8XLHFUZHT5bAMV0rog/edit)
   del compte de l'escola). Qualsevol canvi que s'hi faci es veu a la web en recarregar la pàgina, sense tocar
   el codi. El full ha d'estar compartit com a "Qualsevol persona amb l'enllaç (lector)". El botó
   **Descarrega en Excel** el baixa en format .xlsx.
