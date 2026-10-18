@@ -769,6 +769,117 @@
   .gf-table tr.is-rel { background: #e6f3fb; }
   .panel .gf-unused { margin-top: 8px; font-size: 12px; }
 
+  /* ---------- Entrades/Sortides PLC (dins del panell) ---------- */
+  .io-intro { margin-bottom: 16px; max-width: 920px; }
+  .io-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 20px;
+    margin-bottom: 12px;
+  }
+  .io-bar .comp-filters { margin-bottom: 0; }
+  .io-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .io-search input {
+    font-family: inherit;
+    font-size: 14px;
+    width: 270px;
+    max-width: 100%;
+    padding: 7px 10px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .io-search input:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 1px; border-color: var(--festo-blue); }
+  .io-check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-muted); cursor: pointer; }
+  .io-check input { width: 16px; height: 16px; accent-color: var(--festo-blue); }
+  .io-all,
+  .io-xls {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 12px;
+    background: var(--bg);
+    color: var(--festo-blue);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .io-all:hover { border-color: var(--festo-blue); }
+  .io-xls { background: var(--festo-blue); border-color: var(--festo-blue); color: #fff; }
+  .io-xls:hover { background: var(--festo-blue-dark); border-color: var(--festo-blue-dark); }
+  .io-all:focus-visible,
+  .io-xls:focus-visible,
+  .io-toggle:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+  .panel .io-status { margin: 0 0 10px; font-size: 13px; }
+  .panel .io-status:empty { margin: 0; }
+  .io-wrap { overflow-x: auto; }
+  .io-table { width: 100%; border-collapse: collapse; background: var(--bg); border: 1px solid var(--border); font-size: 14px; }
+  .io-table thead th {
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--border);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: left;
+    white-space: nowrap;
+  }
+  .io-table td,
+  .io-table tbody th { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  .io-table .io-group th {
+    padding-top: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--festo-blue-dark);
+    background: var(--bg-soft);
+  }
+  .io-table .io-addr { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .io-tag { font-weight: 600; white-space: nowrap; }
+  .io-obs { display: block; margin-top: 2px; font-size: 12px; line-height: 1.45; color: var(--text-muted); }
+  .io-row.is-free td,
+  .io-row.is-free th { color: var(--text-muted); }
+  .io-row.is-free .io-desc { font-style: italic; }
+  .io-row.is-open td,
+  .io-row.is-open th { border-bottom-color: transparent; }
+  .io-more { width: 46px; text-align: right; }
+  .io-toggle {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--festo-blue);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+  .io-toggle:hover { border-color: var(--festo-blue); }
+  .io-toggle svg { width: 16px; height: 16px; transition: transform 0.2s ease; }
+  .io-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .io-table .io-details td { padding: 4px 10px 12px; background: #f8fafb; }
+  .io-dl { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; }
+  .io-dl dt { font-size: 11px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text-muted); }
+  .io-dl dd { font-size: 14px; font-weight: 600; }
+  .io-wire {
+    display: inline-block;
+    width: 22px;
+    height: 10px;
+    margin-right: 6px;
+    border: 1px solid #9aa3ab;
+    border-radius: 5px;
+    vertical-align: middle;
+  }
+  .panel .io-empty { padding: 16px; background: var(--bg); border: 1px solid var(--border); }
+
   /* Fitxa d'un component (finestra emergent) */
   .sheet[hidden] { display: none; }
   .sheet {
@@ -1142,6 +1253,41 @@
     .sheet-body h3 { font-size: 20px; }
     .sheet-gf { padding: 14px 14px 16px; }
     .sheet-gf-head h3 { font-size: 19px; }
+    .io-search input { width: 100%; font-size: 16px; }
+    .io-search { flex: 1 1 100%; }
+    .io-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .io-table,
+    .io-table tbody,
+    .io-table tr,
+    .io-table td,
+    .io-table th { display: block; }
+    .io-table tr[hidden] { display: none; }
+    .io-table tr.io-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      column-gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .io-table tr.io-row.is-open { border-bottom-color: transparent; }
+    .io-table tr.io-row > th,
+    .io-table tr.io-row > td { padding: 0; border: 0; }
+    .io-table .io-more { grid-column: 3; grid-row: 1; width: auto; }
+    .io-desc,
+    .io-one,
+    .io-comp { grid-column: 1 / -1; margin-top: 4px; }
+    .io-one::before,
+    .io-comp::before { content: attr(data-label) ": "; font-weight: 400; color: var(--text-muted); }
+    .io-one:empty,
+    .io-comp:empty { display: none; }
+    .io-table .io-details td { padding: 0 12px 12px; border-bottom: 1px solid var(--border); }
   }
   @media (max-width: 520px) {
     .brand-sub { display: none; }
@@ -2571,6 +2717,63 @@
   // - Accions de les etapes ("act"): { v: senyal }, { v: senyal, cond: condició, condFn: en paraules }
   //   (acció condicionada) o
   //   ordre de forçat { force: "GP", to: "INIT" } ("INIT" = situació inicial, "" = cap etapa activa, "8" = etapa 8).
+  // Entrades/Sortides PLC (botó Entrades/Sortides PLC). Les dades es llegeixen del full de càlcul de Google
+  // IO_SHEET, de la pestanya que diu `tab` (MA1): qualsevol canvi que s'hi faci es veu en recarregar la pàgina.
+  // Si està buit, no es pot llegir o no té les columnes Tipus, Adreça PLC i Descripció, es fa servir la còpia
+  // guardada aquí (columns/rows). Per a MA2 i MA3 cal afegir una configuració com aquesta amb tab "MA2"/"MA3".
+  // IO_SHEET és l'ID de l'enllaç del full: docs.google.com/spreadsheets/d/ID/edit
+  var IO_SHEET = "";
+
+  var IO_DISTRIBUTING = {
+    tab: "MA1",
+    source: {
+      label: "Festo Didactic InfoPortal · Distributing Conveyor Station",
+      url: "https://ip.festo-didactic.com/InfoPortal/MPS/DistributionConveyorStation/EN/index.html"
+    },
+    docs: "esquemes 8034566, manual 8034662 i programa de PLC de Festo",
+    schematic: "8034566",
+    columns: ["Tipus", "Adreça PLC", "Bit", "Borne SysLink", "Color del fil", "Terminal E/S", "Etiqueta", "Variable Festo", "Descripció", "Quan val 1", "Component", "Mòdul", "Esquema (pàg.)", "Observacions"],
+    rows: [
+      ["Entrada", "I0.0", "I0", "13", "Gris-rosa", "G1XG1", "G1BG1", "G1BG1", "Peça a l'inici de la cinta", "Hi ha peça a l'inici", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "Per començar un cicle no hi ha d'haver cap peça a l'inici de la cinta."],
+      ["Entrada", "I0.1", "I1", "14", "Vermell-blau", "G1XG1", "G1BG2", "G1BG2", "Peça a la posició intermèdia de la cinta", "Hi ha peça al mig", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "No s'utilitza a la seqüència, però sí a la posada a zero: la cinta ha d'estar buida."],
+      ["Entrada", "I0.2", "I2", "15", "Blanc-verd", "G1XG1", "G1BG3", "G1BG3", "No hi ha peça al final de la cinta", "El final de la cinta és lliure", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "Lògica inversa: passa a 0 quan la peça arriba al final."],
+      ["Entrada", "I0.3", "I3", "16", "Marró-verd", "G1XG1", "", "", "Lliure", "", "", "Mòdul transportador (-G1)", "", "No connectada."],
+      ["Entrada", "I0.4", "I4", "17", "Blanc-groc", "C2XG1", "C2BG1", "C2BG1", "Expulsor recollit", "Expulsor recollit", "Sensor de proximitat magnètic SME-8 (contacte reed)", "Mòdul magatzem apilador (-C2)", "7, 9", "Detecta l'imant de l'èmbol del cilindre expulsor. A l'esquema pneumàtic (pàg. 9) surt com a C1BG1. Color segons l'InfoPortal; l'esquema 8034566 (pàg. 5) i el manual 8034662 hi posen blanc-verd, el mateix que I0.2: comprova-ho al cable."],
+      ["Entrada", "I0.5", "I5", "18", "Marró-groc", "C2XG1", "C2BG2", "C2BG2", "Expulsor avançat", "Expulsor avançat", "Sensor de proximitat magnètic SME-8 (contacte reed)", "Mòdul magatzem apilador (-C2)", "7, 9", "A l'esquema pneumàtic (pàg. 9) surt com a C1BG2."],
+      ["Entrada", "I0.6", "I6", "19", "Blanc-gris", "C2XG1", "C2BG3", "C2BG3", "Magatzem buit", "No hi ha peces al magatzem", "Barrera de llum de fibra òptica", "Mòdul magatzem apilador (-C2)", "7", "La llum MAGATZEM BUIT (Q1.2) segueix aquest sensor. Color segons l'esquema i l'InfoPortal (el manual 8034662 hi posa blanc-groc)."],
+      ["Entrada", "I0.7", "I7", "20", "Gris-marró", "C2XG1", "", "", "Lliure", "", "", "Mòdul magatzem apilador (-C2)", "", "No connectada."],
+      ["Sortida", "Q0.0", "Q0", "1", "Blanc", "G1XG1", "G1KF1-2", "G1BF1_A1", "Motor de la cinta endavant", "La cinta avança", "Controlador de motor G1KF1 (entrada 2: endavant), que mou el motoreductor G1MA1", "Mòdul transportador (-G1)", "6", "L'etiqueta és la del cable, que va a l'entrada 2 del controlador G1KF1."],
+      ["Sortida", "Q0.1", "Q1", "2", "Marró", "G1XG1", "G1KF1-1", "G1BF1_A2", "Motor de la cinta enrere", "La cinta va enrere", "Controlador de motor G1KF1 (entrada 1: enrere), que mou el motoreductor G1MA1", "Mòdul transportador (-G1)", "6", "No s'utilitza a la seqüència de l'estació. L'etiqueta és la del cable, que va a l'entrada 1 del controlador G1KF1."],
+      ["Sortida", "Q0.2", "Q2", "3", "Verd", "G1XG1", "G1MB1", "G1MB1", "Avançar el separador", "El separador avança", "Electroimant del separador (mòdul desviador/separador elèctric)", "Mòdul transportador (-G1)", "6", "No s'utilitza a la seqüència de l'estació."],
+      ["Sortida", "Q0.3", "Q3", "4", "Groc", "G1XG1", "", "", "Lliure", "", "", "Mòdul transportador (-G1)", "", "No connectada."],
+      ["Sortida", "Q0.4", "Q4", "5", "Gris", "C2XG1", "C2MB1", "C2MB1", "Avançar l'expulsor", "L'expulsor avança", "Bobina de l'electrovàlvula 5/2 monoestable (VUVG)", "Mòdul magatzem apilador (-C2)", "7, 9", "Sense senyal, la molla torna la vàlvula a la posició de repòs i l'expulsor es recull. A l'esquema pneumàtic (pàg. 9) i a l'etiqueta del cable (pàg. 7) surt com a C1MB1."],
+      ["Sortida", "Q0.5", "Q5", "6", "Rosa", "C2XG1", "", "", "Lliure", "", "", "Mòdul magatzem apilador (-C2)", "", "No connectada."],
+      ["Sortida", "Q0.6", "Q6", "7", "Blau", "C2XG1", "", "", "Lliure", "", "", "Mòdul magatzem apilador (-C2)", "", "No connectada."],
+      ["Sortida", "Q0.7", "Q7", "8", "Vermell", "C2XG1", "", "", "Lliure", "", "", "Mòdul magatzem apilador (-C2)", "", "No connectada."],
+      ["Entrada", "I1.0", "I0", "", "", "", "S1", "SF1", "Polsador START", "START premut", "Polsador amb llum", "Panell de comandament", "", "La seva llum és P1 (Q1.0)."],
+      ["Entrada", "I1.1", "I1", "", "", "", "S2", "SF2", "Polsador STOP", "STOP sense prémer", "Polsador normalment tancat", "Panell de comandament", "", "Si es prem un moment, atura el funcionament automàtic quan acaba el cicle. Si es manté premut 3 s, és una aturada total com la de la seta: tot torna a la situació inicial i després cal fer la posada a zero amb RESET (selector en MAN)."],
+      ["Entrada", "I1.2", "I2", "", "", "", "S3", "SF4", "Selector AUTO/MAN", "Selector en MAN (0 = AUTO)", "Selector de clau", "Panell de comandament", "", "Al programa de PLC de Festo es diu SF4."],
+      ["Entrada", "I1.3", "I3", "", "", "", "S4", "SF3", "Polsador RESET", "RESET premut", "Polsador amb llum", "Panell de comandament", "", "Només actua amb el selector en MAN. La seva llum és P2 (Q1.1). Al programa de PLC de Festo es diu SF3."],
+      ["Entrada", "I1.4", "I4", "", "", "", "", "", "Lliure", "", "", "Panell de comandament", "", "No s'utilitza."],
+      ["Entrada", "I1.5", "I5", "", "", "", "Em_Stop", "SF5", "Seta d'emergència", "Seta no premuda (desbloquejada)", "Polsador d'aturada d'emergència (seta)", "Panell de comandament", "", "Segons el manual de Festo, a totes les variants de PLC hi ha un pont de cable que porta la seta d'emergència al bit 1.5."],
+      ["Entrada", "I1.6", "I6", "", "", "", "XD6", "XD6", "Senyal de l'estació següent", "L'estació següent pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions. El programa de Festo considera que l'estació següent és lliure si XD6 o XD7 val 1 (tot i que el comentari de la variable diu «estació següent ocupada»)."],
+      ["Entrada", "I1.7", "I7", "", "", "", "XD7", "XD7", "Senyal de l'estació següent", "L'estació següent pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions. El programa de Festo considera que l'estació següent és lliure si XD6 o XD7 val 1 (tot i que el comentari de la variable diu «estació següent ocupada»)."],
+      ["Sortida", "Q1.0", "Q0", "", "", "", "P1", "PF1", "Llum del polsador START", "Llum START encesa", "Llum indicadora", "Panell de comandament", "", "S'encén quan l'estació està preparada per començar."],
+      ["Sortida", "Q1.1", "Q1", "", "", "", "P2", "PF2", "Llum del polsador RESET", "Llum RESET encesa", "Llum indicadora", "Panell de comandament", "", "Llum fixa: demana la posada a zero (amb el selector en MAN). El manual diu que fa pampallugues, però el programa de PLC de Festo l'encén fixa."],
+      ["Sortida", "Q1.2", "Q2", "", "", "", "P3", "PF3", "Llum de magatzem buit", "Llum MAGATZEM BUIT encesa", "Llum indicadora", "Panell de comandament", "", "Al panell és la llum Q1. Segueix el sensor C2BG3 (I0.6)."],
+      ["Sortida", "Q1.3", "Q3", "", "", "", "P4", "PF4", "Llum indicadora Q2 del panell", "Llum Q2 encesa", "Llum indicadora", "Panell de comandament", "", "No s'utilitza en aquesta estació."],
+      ["Sortida", "Q1.4", "Q4", "", "", "", "XD4", "XD4", "Estació lliure", "Aquesta estació pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions: avisa una altra estació que aquesta està lliure."],
+      ["Sortida", "Q1.5", "Q5", "", "", "", "", "indLightGn", "Llum verda de la torre de senyalització", "Llum verda encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Fixa: estació preparada. Intermitent: en automàtic. Segons el programa de PLC de Festo."],
+      ["Sortida", "Q1.6", "Q6", "", "", "", "", "indLightYe", "Llum groga de la torre de senyalització", "Llum groga encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Fixa: cal fer la posada a zero o el selector és en MAN. Intermitent: posada a zero en curs. Segons el programa de PLC de Festo."],
+      ["Sortida", "Q1.7", "Q7", "", "", "", "", "indLightRd", "Llum vermella de la torre de senyalització", "Llum vermella encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Seta d'emergència premuda. Segons el programa de PLC de Festo."],
+      ["Alimentació", "", "24 V A", "9+10", "Negre", "C1XG1", "", "", "24 V de les sortides", "", "", "Interfície C (-C1XG1)", "5", ""],
+      ["Alimentació", "", "24 V B", "21+22", "Blanc-rosa", "C1XG1", "", "", "24 V de les entrades", "", "", "Interfície C (-C1XG1)", "5", ""],
+      ["Alimentació", "", "GND A", "11", "Marró-rosa", "C1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-C1XG1)", "5", ""],
+      ["Alimentació", "", "GND A", "12", "Lila", "C1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-C1XG1)", "5", ""],
+      ["Alimentació", "", "GND B", "23+24", "Blanc-blau", "C1XG1", "", "", "0 V de les entrades", "", "", "Interfície C (-C1XG1)", "5", ""]
+    ]
+  };
+
   // Llum MAGATZEM BUIT: segueix el sensor a totes les etapes de la conducció.
   var GF_LLUM_BUIT = { v: "llumBuit", cond: "buit", condFn: "Magatzem buit" };
 
@@ -2650,7 +2853,7 @@
           { n: 2, row: 2, name: "Expulsor tornant",
             note: "Festo, pas 2: l'expulsor torna enrere. No cal cap acció: sense senyal, la vàlvula torna per molla." },
           { n: 3, row: 3, name: "Transport", act: [{ v: "cinta" }],
-            note: "Festo, passos 2 i 3: amb l'expulsor recollit, la cinta porta la peça fins al final." },
+            note: "Festo, pas 3: la cinta porta la peça fins al final." },
           { n: 4, row: 4, name: "Peça al final",
             note: "Festo, pas 4: el motor s'atura. Com al programa de PLC de Festo, s'espera que es retiri la peça abans de començar un cicle nou." },
         ],
@@ -2676,6 +2879,7 @@
       videoId: "17QP8BIyBUt18p9VaqKIh5JbhtJsJ-tNw",
       sections: {
         esquemes: { pdf: "18WaYvo3N18UVMBxtNH4BJvIKo8-4bGPD" },
+        "io-plc": { io: IO_DISTRIBUTING },
         grafcet: { grafcet: GRAFCET_DISTRIBUTING },
         components: { catalog: CATALOG_DISTRIBUTING }
       },
@@ -2717,7 +2921,7 @@
 
   // Botons comuns a totes les estacions. El contingut de cada botó va a STATIONS[i].sections[key]:
   // { pdf: "ID de Google Drive" } per mostrar un PDF dins la pàgina, { catalog: ... } (components),
-  // { grafcet: ... } (grafcet de l'estació) o un text HTML.
+  // { grafcet: ... } (grafcet de l'estació), { io: ... } (entrades i sortides del PLC) o un text HTML.
   var BUTTONS = [
     { key: "esquemes",   label: "Esquemes" },
     { key: "io-plc",     label: "Entrades/Sortides PLC" },
@@ -2817,6 +3021,7 @@
     panelWrap.classList.remove("open");
     catalog = null;
     gf = null;
+    io = null;
   }
 
   // Alçada del visor de documents. Dins de Google Sites "vh" és l'alçada del bloc incrustat,
@@ -2850,6 +3055,11 @@
     if (content && content.grafcet) {
       panel.innerHTML = html + renderGrafcet(content.grafcet);
       drawGrafcet();
+      return null;
+    }
+    if (content && content.io) {
+      panel.innerHTML = html + renderIo(content.io);
+      ioStart();
       return null;
     }
     panel.innerHTML = html + (content || "<p>Contingut en preparació.</p>");
@@ -3761,6 +3971,313 @@
     box.parentNode.classList.toggle("is-wide", box.scrollWidth > box.clientWidth + 2);
   }
 
+  // ---------------------------------------------------------------------------
+  // Entrades/Sortides PLC: taula llegida del full de càlcul de Google (o de la còpia guardada)
+  // ---------------------------------------------------------------------------
+
+  // Columnes que la web coneix (pel nom de la capçalera del full, sense accents ni majúscules).
+  var IO_COLUMNS = {
+    "tipus": "type", "adreca plc": "addr", "adreca": "addr", "bit": "bit", "borne syslink": "pin",
+    "color del fil": "color", "terminal e s": "term", "etiqueta": "tag", "variable festo": "var",
+    "variable al programa de festo": "var", "descripcio": "desc", "quan val 1": "one", "component": "comp",
+    "modul": "mod", "esquema pag": "page", "esquema": "page", "observacions": "obs"
+  };
+  // Columnes imprescindibles: si el full no les té, es fa servir la còpia guardada.
+  var IO_REQUIRED = { type: "Tipus", addr: "Adreça PLC", desc: "Descripció" };
+  var IO_GROUPS = { "entrada": "Entrades", "sortida": "Sortides", "alimentacio": "Alimentació" };
+  var IO_WIRE = {
+    "blanc": "#ffffff", "marro": "#8b5a2b", "verd": "#2e9d4a", "groc": "#f2c500", "gris": "#8c8c8c",
+    "rosa": "#f4a3c0", "blau": "#2f6fd6", "vermell": "#d33a2c", "negre": "#222222", "lila": "#8e5bd1"
+  };
+  var IO_LOAD_MS = 10000;
+
+  var io = null;       // taula que es mostra ara al panell
+  var ioSeq = 0;
+  var ioCache = {};    // pestanyes ja llegides del full (una sola lectura per visita)
+  var ioLiveTimer = null;
+
+  function ioNorm(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, " ").trim();
+  }
+
+  // Files { type, addr, ... , extra: [[capçalera, valor]] } a partir de capçaleres i valors (text).
+  function ioRows(columns, values) {
+    var keys = columns.map(function (c) { return IO_COLUMNS[ioNorm(c)] || ""; });
+    return values.map(function (v) {
+      var r = { extra: [] };
+      columns.forEach(function (c, i) {
+        var val = String(v[i] == null ? "" : v[i]).trim();
+        if (keys[i] && !(keys[i] in r)) r[keys[i]] = val;
+        else if (val && String(c).trim()) r.extra.push([String(c).trim(), val]);
+      });
+      Object.keys(IO_COLUMNS).forEach(function (k) { if (!(IO_COLUMNS[k] in r)) r[IO_COLUMNS[k]] = ""; });
+      return r;
+    }).filter(function (r) {
+      return r.type || r.addr || r.desc || r.tag;
+    });
+  }
+
+  function ioFree(r) { return ioNorm(r.desc) === "lliure" || (!r.desc && !r.tag); }
+  // Clau estable d'una fila (no depèn de l'ordre del full).
+  function ioKey(r) { return [r.type, r.addr || r.bit, r.pin].join("|"); }
+  // Nom curt de la fila: l'adreça o, a l'alimentació, el senyal i el borne.
+  function ioHead(r) { return r.addr || (r.bit ? r.bit + (r.pin ? " (" + r.pin + ")" : "") : r.tag || r.desc || ""); }
+
+  // Llegeix una pestanya del full de càlcul (Google Visualization, JSONP: no cal permís CORS).
+  // onData(taula) quan arriba (encara que sigui tard), onFail() si falla o si triga massa.
+  function ioLoadSheet(sheet, tab, onData, onFail) {
+    var name = "festoIO" + (++ioSeq), done = false;
+    var s = document.createElement("script");
+    var timer = setTimeout(onFail, IO_LOAD_MS);
+    function finish() {
+      done = true;
+      clearTimeout(timer);
+      // Es deixa una funció buida: si el guió arribés després, no donaria cap error.
+      window[name] = function () {};
+      if (s.parentNode) s.parentNode.removeChild(s);
+    }
+    window[name] = function (resp) {
+      if (done) return;
+      finish();
+      if (resp && resp.status === "ok" && resp.table) onData(resp.table); else onFail();
+    };
+    s.onerror = function () { if (!done) { finish(); onFail(); } };
+    s.src = "https://docs.google.com/spreadsheets/d/" + encodeURIComponent(sheet) +
+      "/gviz/tq?tqx=out:json;responseHandler:" + name + "&headers=1&sheet=" + encodeURIComponent(tab);
+    document.head.appendChild(s);
+  }
+
+  // Taula de Google Visualization -> { rows, missing: [capçaleres que falten], typed: hi ha columnes no de text }
+  function ioFromTable(table) {
+    var cols = table.cols || [];
+    var columns = cols.map(function (c) { return c.label || ""; });
+    var values = (table.rows || []).map(function (row) {
+      return (row.c || []).map(function (cell) {
+        if (!cell) return "";
+        return cell.f != null ? cell.f : cell.v == null ? "" : cell.v;
+      });
+    });
+    var have = {};
+    columns.forEach(function (c) { var k = IO_COLUMNS[ioNorm(c)]; if (k) have[k] = true; });
+    var missing = Object.keys(IO_REQUIRED).filter(function (k) { return !have[k]; })
+      .map(function (k) { return IO_REQUIRED[k]; });
+    // Google només envia un tipus per columna: si una columna és de números, les cel·les amb text arriben buides.
+    var typed = cols.some(function (c) { return c.type && c.type !== "string"; });
+    return { rows: ioRows(columns, values), missing: missing, typed: typed };
+  }
+
+  function renderIo(cfg) {
+    var cached = ioCache[cfg.tab];
+    io = { cfg: cfg, rows: cached ? cached.rows : ioRows(cfg.columns, cfg.rows), source: cached ? "sheet" : "local",
+      note: cached ? cached.note : "", filter: "all", query: "", free: true, open: {}, all: false };
+    var html = '<div class="io"><p class="io-intro">Entrades i sortides del PLC de l\'estació: adreça, etiqueta dels esquemes, ' +
+      "què vol dir que el senyal valgui 1 i el component que hi ha connectat. Obre els detalls d'una fila per veure'n el cablejat " +
+      "(borne SysLink i color del fil) i el nom de la variable al programa de PLC de Festo.</p>" +
+      '<div class="io-bar"><div class="comp-filters io-chips" role="group" aria-label="Filtra per tipus"></div>' +
+      '<div class="io-tools"><label class="io-search"><span class="sr-only">Cerca a la taula</span>' +
+      '<input type="search" placeholder="Cerca a la taula…" autocomplete="off"></label>' +
+      '<label class="io-check"><input type="checkbox" class="io-free" checked> Bits lliures</label>' +
+      '<button type="button" class="io-all">Mostra tots els detalls</button>' +
+      (IO_SHEET ? '<a class="io-xls" href="https://docs.google.com/spreadsheets/d/' + encodeURIComponent(IO_SHEET) +
+        '/export?format=xlsx" target="_blank" rel="noopener noreferrer">Descarrega en Excel <span aria-hidden="true">&#8595;</span></a>' : "") +
+      "</div></div>" +
+      '<p class="io-status" role="status"></p><p class="sr-only io-live" aria-live="polite"></p><div class="io-wrap"></div>' +
+      '<p class="comp-source">Fonts: <a href="' + gfAttr(cfg.source.url) + '" target="_blank" rel="noopener noreferrer">' +
+      escapeHtml(cfg.source.label) + "</a> (taula d'assignació i panell de comandament), " + escapeHtml(cfg.docs) +
+      ". Les adreces són les de la documentació de Festo; amb un altre PLC poden canviar.</p></div>";
+    return html;
+  }
+
+  function ioStatus(text) {
+    var el = panel.querySelector(".io-status");
+    if (el) el.textContent = text || "";
+  }
+
+  // Demana el full de càlcul. Mentrestant (o si falla) es veu la còpia guardada a la web.
+  function ioStart() {
+    var cur = io;
+    if (!IO_SHEET || cur.source === "sheet") { ioStatus(cur.note); drawIo(); return; }
+    cur.loading = true;
+    // El missatge s'escriu una mica després perquè els lectors de pantalla ja trobin la zona.
+    setTimeout(function () { if (io === cur && cur.loading) ioStatus("Carregant el full de càlcul…"); }, 100);
+    drawIo();
+    ioLoadSheet(IO_SHEET, cur.cfg.tab, function (table) {
+      cur.loading = false;
+      var data = ioFromTable(table);
+      if (data.missing.length) {
+        if (io === cur) ioStatus("Al full de càlcul hi falta la columna «" + data.missing.join("», «") + "»: es mostra la còpia guardada a la web.");
+        return;
+      }
+      if (!data.rows.length) { if (io === cur) ioStatus("El full de càlcul és buit: es mostra la còpia guardada a la web."); return; }
+      var note = data.typed ? "Alguna columna del full no està en format de text i hi poden faltar dades: " +
+        "posa tot el full en format «Text sense format» (menú Format › Número)." : "";
+      ioCache[cur.cfg.tab] = { rows: data.rows, note: note };
+      if (io !== cur) return;
+      // Es conserva el focus i les files obertes (per clau, no per posició).
+      var ae = document.activeElement, focusKey = null;
+      if (ae && panel.contains(ae)) {
+        if (ae.hasAttribute("data-io-filter")) focusKey = '[data-io-filter="' + ae.getAttribute("data-io-filter") + '"]';
+        else if (ae.hasAttribute("data-io-key")) focusKey = ae.getAttribute("data-io-key");
+      }
+      io.rows = data.rows;
+      io.source = "sheet";
+      ioStatus(note);
+      drawIo();
+      if (focusKey) {
+        var el = focusKey.charAt(0) === "[" ? panel.querySelector(focusKey) : ioToggleByKey(focusKey);
+        if (el) focusQuietly(el);
+      }
+    }, function () {
+      cur.loading = false;
+      if (io === cur && cur.source === "local") ioStatus("No s'ha pogut llegir el full de càlcul: es mostra la còpia guardada a la web.");
+    });
+  }
+
+  function ioToggleByKey(key) {
+    var list = panel.querySelectorAll("[data-io-key]");
+    for (var i = 0; i < list.length; i++) if (list[i].getAttribute("data-io-key") === key) return list[i];
+    return null;
+  }
+
+  function ioWire(name) {
+    var parts = ioNorm(name).split(" ").map(function (p) { return IO_WIRE[p]; });
+    if (!name || parts.some(function (c) { return !c; })) return escapeHtml(name || "");
+    var c1 = parts[0], c2 = parts[1] || parts[0];
+    return '<span class="io-wire" aria-hidden="true" style="background:linear-gradient(90deg,' + c1 + " 0 50%," + c2 + ' 50% 100%)"></span>' +
+      escapeHtml(name);
+  }
+
+  function ioMatch(r, q) {
+    if (!q) return true;
+    var all = [r.type, r.addr, r.bit, r.pin, r.color, r.term, r.tag, r.var, r.desc, r.one, r.comp, r.mod, r.page, r.obs]
+      .concat(r.extra.map(function (x) { return x[1]; })).join(" ");
+    return ioNorm(all).indexOf(q) >= 0;
+  }
+
+  function ioDetails(r) {
+    var page = r.page ? (/\d\D+\d/.test(r.page) ? "pàgs. " : "pàg. ") + r.page : "";
+    var items = [["Senyal (SysLink)", r.bit], ["Borne SysLink", r.pin], ["Color del fil", r.color ? ioWire(r.color) : ""],
+      ["Terminal E/S", r.term], ["Variable al programa de Festo", r.var], ["Mòdul", r.mod],
+      ["Esquema " + io.cfg.schematic, page]].concat(r.extra);
+    return '<dl class="io-dl">' + items.filter(function (x) { return x[1]; }).map(function (x) {
+      var v = x[0] === "Color del fil" ? x[1] : escapeHtml(x[1]);
+      return "<div><dt>" + escapeHtml(x[0]) + "</dt><dd>" + v + "</dd></div>";
+    }).join("") + "</dl>";
+  }
+
+  // Anuncia als lectors de pantalla quantes files queden després de filtrar o cercar.
+  function ioAnnounce(n) {
+    clearTimeout(ioLiveTimer);
+    ioLiveTimer = setTimeout(function () {
+      var el = panel.querySelector(".io-live");
+      if (el) el.textContent = n ? n + (n === 1 ? " fila" : " files") : "Cap fila coincideix amb la cerca.";
+    }, 400);
+  }
+
+  function drawIo() {
+    var wrap = panel.querySelector(".io-wrap");
+    if (!wrap) return;
+    // Filtres per tipus, amb el nombre de files de cadascun.
+    var types = [], count = {};
+    io.rows.forEach(function (r) {
+      var t = ioNorm(r.type) || "altres";
+      if (!count[t]) { count[t] = 0; types.push(t); }
+      count[t]++;
+    });
+    if (io.filter !== "all" && !count[io.filter]) io.filter = "all";
+    var chips = [{ key: "all", label: "Tot", n: io.rows.length }].concat(types.map(function (t) {
+      var r = io.rows.filter(function (x) { return (ioNorm(x.type) || "altres") === t; })[0];
+      return { key: t, label: IO_GROUPS[t] || r.type || "Altres", n: count[t] };
+    }));
+    panel.querySelector(".io-chips").innerHTML = chips.map(function (c) {
+      return '<button type="button" class="comp-chip" data-io-filter="' + gfAttr(c.key) + '" aria-pressed="' + (c.key === io.filter) + '">' +
+        escapeHtml(c.label) + '<span class="n">' + c.n + "</span></button>";
+    }).join("");
+    panel.querySelector(".io-all").textContent = io.all ? "Amaga tots els detalls" : "Mostra tots els detalls";
+
+    var q = ioNorm(io.query), groups = [], byKey = {}, shown = 0;
+    io.rows.forEach(function (r, i) {
+      var t = ioNorm(r.type) || "altres";
+      if (io.filter !== "all" && t !== io.filter) return;
+      if (!io.free && ioFree(r)) return;
+      if (!ioMatch(r, q)) return;
+      var key = t + "|" + r.mod;
+      if (!byKey[key]) {
+        byKey[key] = { title: (IO_GROUPS[t] || r.type || "Altres") + (r.mod ? " · " + r.mod : ""), rows: [] };
+        groups.push(byKey[key]);
+      }
+      byKey[key].rows.push({ r: r, i: i });
+      shown++;
+    });
+    ioAnnounce(shown);
+    if (!groups.length) {
+      wrap.innerHTML = '<p class="io-empty">Cap fila coincideix amb la cerca.</p>';
+      return;
+    }
+    var html = '<table class="io-table"><caption class="sr-only">Entrades i sortides del PLC</caption><thead><tr>' +
+      '<th scope="col">Adreça</th><th scope="col">Etiqueta</th><th scope="col">Descripció</th><th scope="col">Quan val 1</th>' +
+      '<th scope="col">Component</th><th scope="col"><span class="sr-only">Detalls</span></th></tr></thead>';
+    groups.forEach(function (g) {
+      html += '<tbody><tr class="io-group"><th colspan="6" scope="rowgroup">' + escapeHtml(g.title) + "</th></tr>";
+      g.rows.forEach(function (x) {
+        var r = x.r, id = "io-d" + x.i, key = ioKey(r);
+        var open = key in io.open ? io.open[key] : io.all;
+        var head = ioHead(r);
+        var label = (/^[aeiouàèéíòóú]/i.test(head) ? "Detalls d'" : "Detalls de ") + head;
+        html += '<tr class="io-row' + (ioFree(r) ? " is-free" : "") + (open ? " is-open" : "") + '">' +
+          '<th scope="row" class="io-addr">' + escapeHtml(head) + "</th>" +
+          '<td class="io-tag">' + escapeHtml(r.tag) + "</td>" +
+          '<td class="io-desc">' + escapeHtml(r.desc) + (r.obs ? '<span class="io-obs">' + escapeHtml(r.obs) + "</span>" : "") + "</td>" +
+          '<td class="io-one" data-label="Quan val 1">' + escapeHtml(r.one) + "</td>" +
+          '<td class="io-comp" data-label="Component">' + escapeHtml(r.comp) + "</td>" +
+          '<td class="io-more"><button type="button" class="io-toggle" data-io-key="' + gfAttr(key) + '" aria-expanded="' + !!open +
+          '" aria-controls="' + id + '" aria-label="' + gfAttr(label) + '"><svg viewBox="0 0 20 20" aria-hidden="true">' +
+          '<path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td></tr>' +
+          '<tr class="io-details" id="' + id + '"' + (open ? "" : " hidden") + '><td colspan="6">' + ioDetails(r) + "</td></tr>";
+      });
+      html += "</tbody>";
+    });
+    wrap.innerHTML = html + "</table>";
+  }
+
+  panel.addEventListener("click", function (e) {
+    if (!io || !e.target.closest) return;
+    var t = e.target.closest("[data-io-filter], [data-io-key], .io-all");
+    if (!t || !panel.contains(t)) return;
+    if (t.hasAttribute("data-io-filter")) {
+      io.filter = t.getAttribute("data-io-filter");
+      drawIo();
+      focusQuietly(panel.querySelector('[data-io-filter="' + io.filter + '"]'));
+    } else if (t.classList.contains("io-all")) {
+      io.all = !io.all;
+      io.open = {};
+      drawIo();
+      focusQuietly(panel.querySelector(".io-all"));
+    } else {
+      var open = t.getAttribute("aria-expanded") !== "true";
+      io.open[t.getAttribute("data-io-key")] = open;
+      t.setAttribute("aria-expanded", open ? "true" : "false");
+      t.closest("tr").classList.toggle("is-open", open);
+      var d = document.getElementById(t.getAttribute("aria-controls"));
+      if (d) d.hidden = !open;
+    }
+  });
+  panel.addEventListener("input", function (e) {
+    if (!io || !e.target.closest || !e.target.closest(".io-search")) return;
+    var wrap = panel.querySelector(".io-wrap");
+    // Mentre es cerca, la taula no s'encongeix: dins de Google Sites el quadre de cerca fugiria de la pantalla.
+    if (!io.query && e.target.value) wrap.style.minHeight = wrap.offsetHeight + "px";
+    if (!e.target.value) wrap.style.minHeight = "";
+    io.query = e.target.value;
+    drawIo();
+  });
+  panel.addEventListener("change", function (e) {
+    if (!io || !e.target.classList.contains("io-free")) return;
+    io.free = e.target.checked;
+    drawIo();
+  });
+
   function showStation(s) {
     pageTitle.textContent = s.title;
     breadcrumb.innerHTML = '<a href="#">Inici</a> &rsaquo; ' + escapeHtml(s.title);
@@ -3803,7 +4320,7 @@
           }
         }
         panelWrap.classList.add("open");
-        var comp = panel.querySelector(".comp, .gf");
+        var comp = panel.querySelector(".comp, .gf, .io");
         setTimeout(function () {
           if (!panelWrap.classList.contains("open")) return;
           if (doc && panel.contains(doc)) {
