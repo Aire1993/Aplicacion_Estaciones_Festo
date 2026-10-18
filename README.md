@@ -102,9 +102,11 @@ Taula d'entrades i sortides del PLC de l'estació: adreça, etiqueta, què vol d
 cablejat SysLink (borne i color del cable), terminal d'E/S, nom de la variable als programes de Festo i
 observacions. Es pot filtrar per tipus i cercar.
 
-- Les dades es llegeixen d'un **full de càlcul de Google** (`IO_SHEET` a `index.html`). Qualsevol canvi que s'hi
-  faci es veu a la web en recarregar la pàgina, sense tocar el codi. El full ha d'estar compartit com a
-  "Qualsevol persona amb l'enllaç (lector)". El botó **Descarrega en Excel** el baixa en format .xlsx.
+- Les dades es llegeixen d'un **full de càlcul de Google** (`IO_SHEET` a `index.html`; ara el full
+  [Taula_Entrades_Sortides_PLC_DCS](https://docs.google.com/spreadsheets/d/1bfW_ojUxIs_cTEsquKxMJyKHq8XLHFUZHT5bAMV0rog/edit)
+  del compte de l'escola). Qualsevol canvi que s'hi faci es veu a la web en recarregar la pàgina, sense tocar
+  el codi. El full ha d'estar compartit com a "Qualsevol persona amb l'enllaç (lector)". El botó
+  **Descarrega en Excel** el baixa en format .xlsx.
 - Cada estació llegeix la pestanya que diu el seu `tab`. Ara només hi ha la de MA1 (`IO_DISTRIBUTING`, pestanya
   `MA1`); per a MA2 i MA3 caldrà afegir-hi una vegada la seva configuració (pestanyes `MA2` i `MA3`).
 - La web reconeix les columnes pel nom de la capçalera (fila 1), sense tenir en compte accents ni majúscules:
