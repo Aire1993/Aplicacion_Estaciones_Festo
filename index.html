@@ -817,7 +817,7 @@
   .io-xls:focus-visible,
   .io-toggle:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
   .panel .io-status { margin: 0 0 10px; font-size: 13px; }
-  .io-status:empty { display: none; }
+  .panel .io-status:empty { margin: 0; }
   .io-wrap { overflow-x: auto; }
   .io-table { width: 100%; border-collapse: collapse; background: var(--bg); border: 1px solid var(--border); font-size: 14px; }
   .io-table thead th {
@@ -837,14 +837,15 @@
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    color: var(--festo-blue);
+    color: var(--festo-blue-dark);
     background: var(--bg-soft);
   }
   .io-table .io-addr { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .io-tag { font-weight: 600; white-space: nowrap; }
   .io-obs { display: block; margin-top: 2px; font-size: 12px; line-height: 1.45; color: var(--text-muted); }
   .io-row.is-free td,
-  .io-row.is-free th { color: #9aa3ab; }
+  .io-row.is-free th { color: var(--text-muted); }
+  .io-row.is-free .io-desc { font-style: italic; }
   .io-row.is-open td,
   .io-row.is-open th { border-bottom-color: transparent; }
   .io-more { width: 46px; text-align: right; }
@@ -1252,9 +1253,16 @@
     .sheet-body h3 { font-size: 20px; }
     .sheet-gf { padding: 14px 14px 16px; }
     .sheet-gf-head h3 { font-size: 19px; }
-    .io-search input { width: 100%; }
+    .io-search input { width: 100%; font-size: 16px; }
     .io-search { flex: 1 1 100%; }
-    .io-table thead { display: none; }
+    .io-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
     .io-table,
     .io-table tbody,
     .io-table tr,
@@ -2710,8 +2718,9 @@
   //   (acció condicionada) o
   //   ordre de forçat { force: "GP", to: "INIT" } ("INIT" = situació inicial, "" = cap etapa activa, "8" = etapa 8).
   // Entrades/Sortides PLC (botó Entrades/Sortides PLC). Les dades es llegeixen del full de càlcul de Google
-  // IO_SHEET (una pestanya per estació: MA1, MA2, MA3): qualsevol canvi que s'hi faci es veu en recarregar la
-  // pàgina. Si està buit o no es pot llegir, es fa servir la còpia guardada aquí (columns/rows).
+  // IO_SHEET, de la pestanya que diu `tab` (MA1): qualsevol canvi que s'hi faci es veu en recarregar la pàgina.
+  // Si està buit, no es pot llegir o no té les columnes Tipus, Adreça PLC i Descripció, es fa servir la còpia
+  // guardada aquí (columns/rows). Per a MA2 i MA3 cal afegir una configuració com aquesta amb tab "MA2"/"MA3".
   // IO_SHEET és l'ID de l'enllaç del full: docs.google.com/spreadsheets/d/ID/edit
   var IO_SHEET = "";
 
@@ -2721,6 +2730,8 @@
       label: "Festo Didactic InfoPortal · Distributing Conveyor Station",
       url: "https://ip.festo-didactic.com/InfoPortal/MPS/DistributionConveyorStation/EN/index.html"
     },
+    docs: "esquemes 8034566, manual 8034662 i programa de PLC de Festo",
+    schematic: "8034566",
     columns: ["Tipus", "Adreça PLC", "Bit", "Borne SysLink", "Color del fil", "Terminal E/S", "Etiqueta", "Variable Festo", "Descripció", "Quan val 1", "Component", "Mòdul", "Esquema (pàg.)", "Observacions"],
     rows: [
       ["Entrada", "I0.0", "I0", "13", "Gris-rosa", "G1XG1", "G1BG1", "G1BG1", "Peça a l'inici de la cinta", "Hi ha peça a l'inici", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "Per començar un cicle no hi ha d'haver cap peça a l'inici de la cinta."],
@@ -3966,10 +3977,13 @@
 
   // Columnes que la web coneix (pel nom de la capçalera del full, sense accents ni majúscules).
   var IO_COLUMNS = {
-    "tipus": "type", "adreca plc": "addr", "bit": "bit", "borne syslink": "pin", "color del fil": "color",
-    "terminal e s": "term", "etiqueta": "tag", "variable festo": "var", "descripcio": "desc",
-    "quan val 1": "one", "component": "comp", "modul": "mod", "esquema pag": "page", "observacions": "obs"
+    "tipus": "type", "adreca plc": "addr", "adreca": "addr", "bit": "bit", "borne syslink": "pin",
+    "color del fil": "color", "terminal e s": "term", "etiqueta": "tag", "variable festo": "var",
+    "variable al programa de festo": "var", "descripcio": "desc", "quan val 1": "one", "component": "comp",
+    "modul": "mod", "esquema pag": "page", "esquema": "page", "observacions": "obs"
   };
+  // Columnes imprescindibles: si el full no les té, es fa servir la còpia guardada.
+  var IO_REQUIRED = { type: "Tipus", addr: "Adreça PLC", desc: "Descripció" };
   var IO_GROUPS = { "entrada": "Entrades", "sortida": "Sortides", "alimentacio": "Alimentació" };
   var IO_WIRE = {
     "blanc": "#ffffff", "marro": "#8b5a2b", "verd": "#2e9d4a", "groc": "#f2c500", "gris": "#8c8c8c",
@@ -3977,8 +3991,10 @@
   };
   var IO_LOAD_MS = 10000;
 
-  var io = null;      // taula que es mostra ara al panell
+  var io = null;       // taula que es mostra ara al panell
   var ioSeq = 0;
+  var ioCache = {};    // pestanyes ja llegides del full (una sola lectura per visita)
+  var ioLiveTimer = null;
 
   function ioNorm(s) {
     return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -3992,9 +4008,10 @@
       var r = { extra: [] };
       columns.forEach(function (c, i) {
         var val = String(v[i] == null ? "" : v[i]).trim();
-        if (keys[i]) r[keys[i]] = val;
+        if (keys[i] && !(keys[i] in r)) r[keys[i]] = val;
         else if (val && String(c).trim()) r.extra.push([String(c).trim(), val]);
       });
+      Object.keys(IO_COLUMNS).forEach(function (k) { if (!(IO_COLUMNS[k] in r)) r[IO_COLUMNS[k]] = ""; });
       return r;
     }).filter(function (r) {
       return r.type || r.addr || r.desc || r.tag;
@@ -4002,56 +4019,73 @@
   }
 
   function ioFree(r) { return ioNorm(r.desc) === "lliure" || (!r.desc && !r.tag); }
+  // Clau estable d'una fila (no depèn de l'ordre del full).
+  function ioKey(r) { return [r.type, r.addr || r.bit, r.pin].join("|"); }
+  // Nom curt de la fila: l'adreça o, a l'alimentació, el senyal i el borne.
+  function ioHead(r) { return r.addr || (r.bit ? r.bit + (r.pin ? " (" + r.pin + ")" : "") : r.tag || r.desc || ""); }
 
   // Llegeix una pestanya del full de càlcul (Google Visualization, JSONP: no cal permís CORS).
-  function ioLoadSheet(sheet, tab, cb) {
+  // onData(taula) quan arriba (encara que sigui tard), onFail() si falla o si triga massa.
+  function ioLoadSheet(sheet, tab, onData, onFail) {
     var name = "festoIO" + (++ioSeq), done = false;
     var s = document.createElement("script");
-    var timer = setTimeout(function () { finish(null); }, IO_LOAD_MS);
-    function finish(table) {
-      if (done) return;
+    var timer = setTimeout(onFail, IO_LOAD_MS);
+    function finish() {
       done = true;
       clearTimeout(timer);
-      try { delete window[name]; } catch (e) { window[name] = undefined; }
+      // Es deixa una funció buida: si el guió arribés després, no donaria cap error.
+      window[name] = function () {};
       if (s.parentNode) s.parentNode.removeChild(s);
-      cb(table);
     }
-    window[name] = function (resp) { finish(resp && resp.status === "ok" && resp.table ? resp.table : null); };
-    s.onerror = function () { finish(null); };
+    window[name] = function (resp) {
+      if (done) return;
+      finish();
+      if (resp && resp.status === "ok" && resp.table) onData(resp.table); else onFail();
+    };
+    s.onerror = function () { if (!done) { finish(); onFail(); } };
     s.src = "https://docs.google.com/spreadsheets/d/" + encodeURIComponent(sheet) +
       "/gviz/tq?tqx=out:json;responseHandler:" + name + "&headers=1&sheet=" + encodeURIComponent(tab);
     document.head.appendChild(s);
   }
 
+  // Taula de Google Visualization -> { rows, missing: [capçaleres que falten], typed: hi ha columnes no de text }
   function ioFromTable(table) {
-    var columns = (table.cols || []).map(function (c) { return c.label || ""; });
+    var cols = table.cols || [];
+    var columns = cols.map(function (c) { return c.label || ""; });
     var values = (table.rows || []).map(function (row) {
       return (row.c || []).map(function (cell) {
         if (!cell) return "";
         return cell.f != null ? cell.f : cell.v == null ? "" : cell.v;
       });
     });
-    return ioRows(columns, values);
+    var have = {};
+    columns.forEach(function (c) { var k = IO_COLUMNS[ioNorm(c)]; if (k) have[k] = true; });
+    var missing = Object.keys(IO_REQUIRED).filter(function (k) { return !have[k]; })
+      .map(function (k) { return IO_REQUIRED[k]; });
+    // Google només envia un tipus per columna: si una columna és de números, les cel·les amb text arriben buides.
+    var typed = cols.some(function (c) { return c.type && c.type !== "string"; });
+    return { rows: ioRows(columns, values), missing: missing, typed: typed };
   }
 
   function renderIo(cfg) {
-    io = { cfg: cfg, rows: ioRows(cfg.columns, cfg.rows), source: "local", filter: "all", query: "",
-      free: true, open: {}, all: false };
+    var cached = ioCache[cfg.tab];
+    io = { cfg: cfg, rows: cached ? cached.rows : ioRows(cfg.columns, cfg.rows), source: cached ? "sheet" : "local",
+      note: cached ? cached.note : "", filter: "all", query: "", free: true, open: {}, all: false };
     var html = '<div class="io"><p class="io-intro">Entrades i sortides del PLC de l\'estació: adreça, etiqueta dels esquemes, ' +
       "què vol dir que el senyal valgui 1 i el component que hi ha connectat. Obre els detalls d'una fila per veure'n el cablejat " +
-      "(borne i color del cable SysLink) i el nom de la variable al programa de PLC de Festo.</p>" +
+      "(borne SysLink i color del fil) i el nom de la variable al programa de PLC de Festo.</p>" +
       '<div class="io-bar"><div class="comp-filters io-chips" role="group" aria-label="Filtra per tipus"></div>' +
       '<div class="io-tools"><label class="io-search"><span class="sr-only">Cerca a la taula</span>' +
-      '<input type="search" placeholder="Cerca (adreça, etiqueta, descripció…)" autocomplete="off"></label>' +
+      '<input type="search" placeholder="Cerca a la taula…" autocomplete="off"></label>' +
       '<label class="io-check"><input type="checkbox" class="io-free" checked> Bits lliures</label>' +
-      '<button type="button" class="io-all" aria-pressed="false">Mostra tots els detalls</button>' +
+      '<button type="button" class="io-all">Mostra tots els detalls</button>' +
       (IO_SHEET ? '<a class="io-xls" href="https://docs.google.com/spreadsheets/d/' + encodeURIComponent(IO_SHEET) +
         '/export?format=xlsx" target="_blank" rel="noopener noreferrer">Descarrega en Excel <span aria-hidden="true">&#8595;</span></a>' : "") +
       "</div></div>" +
-      '<p class="io-status" aria-live="polite"></p><div class="io-wrap"></div>' +
-      '<p class="comp-source">Fonts: <a href="' + cfg.source.url + '" target="_blank" rel="noopener noreferrer">' +
-      escapeHtml(cfg.source.label) + "</a> (taula d'assignació i panell de comandament), esquemes 8034566, manual 8034662 i " +
-      "programa de PLC de Festo. Les adreces són les de la documentació de Festo; amb un altre PLC poden canviar.</p></div>";
+      '<p class="io-status" role="status"></p><p class="sr-only io-live" aria-live="polite"></p><div class="io-wrap"></div>' +
+      '<p class="comp-source">Fonts: <a href="' + gfAttr(cfg.source.url) + '" target="_blank" rel="noopener noreferrer">' +
+      escapeHtml(cfg.source.label) + "</a> (taula d'assignació i panell de comandament), " + escapeHtml(cfg.docs) +
+      ". Les adreces són les de la documentació de Festo; amb un altre PLC poden canviar.</p></div>";
     return html;
   }
 
@@ -4062,22 +4096,48 @@
 
   // Demana el full de càlcul. Mentrestant (o si falla) es veu la còpia guardada a la web.
   function ioStart() {
-    if (!IO_SHEET) { drawIo(); return; }
     var cur = io;
-    ioStatus("Carregant el full de càlcul…");
+    if (!IO_SHEET || cur.source === "sheet") { ioStatus(cur.note); drawIo(); return; }
+    cur.loading = true;
+    // El missatge s'escriu una mica després perquè els lectors de pantalla ja trobin la zona.
+    setTimeout(function () { if (io === cur && cur.loading) ioStatus("Carregant el full de càlcul…"); }, 100);
     drawIo();
     ioLoadSheet(IO_SHEET, cur.cfg.tab, function (table) {
-      if (io !== cur) return;
-      var rows = table && ioFromTable(table);
-      if (rows && rows.length) {
-        io.rows = rows;
-        io.source = "sheet";
-        ioStatus("");
-        drawIo();
-      } else {
-        ioStatus("No s'ha pogut llegir el full de càlcul: es mostra la còpia guardada a la web.");
+      cur.loading = false;
+      var data = ioFromTable(table);
+      if (data.missing.length) {
+        if (io === cur) ioStatus("Al full de càlcul hi falta la columna «" + data.missing.join("», «") + "»: es mostra la còpia guardada a la web.");
+        return;
       }
+      if (!data.rows.length) { if (io === cur) ioStatus("El full de càlcul és buit: es mostra la còpia guardada a la web."); return; }
+      var note = data.typed ? "Alguna columna del full no està en format de text i hi poden faltar dades: " +
+        "posa tot el full en format «Text sense format» (menú Format › Número)." : "";
+      ioCache[cur.cfg.tab] = { rows: data.rows, note: note };
+      if (io !== cur) return;
+      // Es conserva el focus i les files obertes (per clau, no per posició).
+      var ae = document.activeElement, focusKey = null;
+      if (ae && panel.contains(ae)) {
+        if (ae.hasAttribute("data-io-filter")) focusKey = '[data-io-filter="' + ae.getAttribute("data-io-filter") + '"]';
+        else if (ae.hasAttribute("data-io-key")) focusKey = ae.getAttribute("data-io-key");
+      }
+      io.rows = data.rows;
+      io.source = "sheet";
+      ioStatus(note);
+      drawIo();
+      if (focusKey) {
+        var el = focusKey.charAt(0) === "[" ? panel.querySelector(focusKey) : ioToggleByKey(focusKey);
+        if (el) focusQuietly(el);
+      }
+    }, function () {
+      cur.loading = false;
+      if (io === cur && cur.source === "local") ioStatus("No s'ha pogut llegir el full de càlcul: es mostra la còpia guardada a la web.");
     });
+  }
+
+  function ioToggleByKey(key) {
+    var list = panel.querySelectorAll("[data-io-key]");
+    for (var i = 0; i < list.length; i++) if (list[i].getAttribute("data-io-key") === key) return list[i];
+    return null;
   }
 
   function ioWire(name) {
@@ -4096,13 +4156,23 @@
   }
 
   function ioDetails(r) {
-    var items = [["Bit de Festo", r.bit], ["Borne SysLink", r.pin], ["Color del fil", r.color ? ioWire(r.color) : ""],
-      ["Terminal E/S", r.term], ["Variable al programa de Festo", r.var], ["Mòdul", r.mod], ["Esquema 8034566", r.page ? "pàg. " + r.page : ""]]
-      .concat(r.extra);
+    var page = r.page ? (/\d\D+\d/.test(r.page) ? "pàgs. " : "pàg. ") + r.page : "";
+    var items = [["Senyal (SysLink)", r.bit], ["Borne SysLink", r.pin], ["Color del fil", r.color ? ioWire(r.color) : ""],
+      ["Terminal E/S", r.term], ["Variable al programa de Festo", r.var], ["Mòdul", r.mod],
+      ["Esquema " + io.cfg.schematic, page]].concat(r.extra);
     return '<dl class="io-dl">' + items.filter(function (x) { return x[1]; }).map(function (x) {
       var v = x[0] === "Color del fil" ? x[1] : escapeHtml(x[1]);
       return "<div><dt>" + escapeHtml(x[0]) + "</dt><dd>" + v + "</dd></div>";
     }).join("") + "</dl>";
+  }
+
+  // Anuncia als lectors de pantalla quantes files queden després de filtrar o cercar.
+  function ioAnnounce(n) {
+    clearTimeout(ioLiveTimer);
+    ioLiveTimer = setTimeout(function () {
+      var el = panel.querySelector(".io-live");
+      if (el) el.textContent = n ? n + (n === 1 ? " fila" : " files") : "Cap fila coincideix amb la cerca.";
+    }, 400);
   }
 
   function drawIo() {
@@ -4124,11 +4194,9 @@
       return '<button type="button" class="comp-chip" data-io-filter="' + gfAttr(c.key) + '" aria-pressed="' + (c.key === io.filter) + '">' +
         escapeHtml(c.label) + '<span class="n">' + c.n + "</span></button>";
     }).join("");
-    var allBtn = panel.querySelector(".io-all");
-    allBtn.setAttribute("aria-pressed", io.all ? "true" : "false");
-    allBtn.textContent = io.all ? "Amaga els detalls" : "Mostra tots els detalls";
+    panel.querySelector(".io-all").textContent = io.all ? "Amaga tots els detalls" : "Mostra tots els detalls";
 
-    var q = ioNorm(io.query), groups = [], byKey = {};
+    var q = ioNorm(io.query), groups = [], byKey = {}, shown = 0;
     io.rows.forEach(function (r, i) {
       var t = ioNorm(r.type) || "altres";
       if (io.filter !== "all" && t !== io.filter) return;
@@ -4140,7 +4208,9 @@
         groups.push(byKey[key]);
       }
       byKey[key].rows.push({ r: r, i: i });
+      shown++;
     });
+    ioAnnounce(shown);
     if (!groups.length) {
       wrap.innerHTML = '<p class="io-empty">Cap fila coincideix amb la cerca.</p>';
       return;
@@ -4151,16 +4221,18 @@
     groups.forEach(function (g) {
       html += '<tbody><tr class="io-group"><th colspan="6" scope="rowgroup">' + escapeHtml(g.title) + "</th></tr>";
       g.rows.forEach(function (x) {
-        var r = x.r, id = "io-d" + x.i, open = io.all || io.open[x.i];
-        var label = r.addr || r.bit || r.tag || r.desc;
+        var r = x.r, id = "io-d" + x.i, key = ioKey(r);
+        var open = key in io.open ? io.open[key] : io.all;
+        var head = ioHead(r);
+        var label = (/^[aeiouàèéíòóú]/i.test(head) ? "Detalls d'" : "Detalls de ") + head;
         html += '<tr class="io-row' + (ioFree(r) ? " is-free" : "") + (open ? " is-open" : "") + '">' +
-          '<th scope="row" class="io-addr">' + escapeHtml(r.addr || r.bit) + "</th>" +
+          '<th scope="row" class="io-addr">' + escapeHtml(head) + "</th>" +
           '<td class="io-tag">' + escapeHtml(r.tag) + "</td>" +
           '<td class="io-desc">' + escapeHtml(r.desc) + (r.obs ? '<span class="io-obs">' + escapeHtml(r.obs) + "</span>" : "") + "</td>" +
           '<td class="io-one" data-label="Quan val 1">' + escapeHtml(r.one) + "</td>" +
           '<td class="io-comp" data-label="Component">' + escapeHtml(r.comp) + "</td>" +
-          '<td class="io-more"><button type="button" class="io-toggle" data-io-row="' + x.i + '" aria-expanded="' + !!open +
-          '" aria-controls="' + id + '" aria-label="' + gfAttr("Detalls de " + label) + '"><svg viewBox="0 0 20 20" aria-hidden="true">' +
+          '<td class="io-more"><button type="button" class="io-toggle" data-io-key="' + gfAttr(key) + '" aria-expanded="' + !!open +
+          '" aria-controls="' + id + '" aria-label="' + gfAttr(label) + '"><svg viewBox="0 0 20 20" aria-hidden="true">' +
           '<path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td></tr>' +
           '<tr class="io-details" id="' + id + '"' + (open ? "" : " hidden") + '><td colspan="6">' + ioDetails(r) + "</td></tr>";
       });
@@ -4171,7 +4243,7 @@
 
   panel.addEventListener("click", function (e) {
     if (!io || !e.target.closest) return;
-    var t = e.target.closest("[data-io-filter], [data-io-row], .io-all");
+    var t = e.target.closest("[data-io-filter], [data-io-key], .io-all");
     if (!t || !panel.contains(t)) return;
     if (t.hasAttribute("data-io-filter")) {
       io.filter = t.getAttribute("data-io-filter");
@@ -4183,9 +4255,8 @@
       drawIo();
       focusQuietly(panel.querySelector(".io-all"));
     } else {
-      var i = +t.getAttribute("data-io-row");
       var open = t.getAttribute("aria-expanded") !== "true";
-      io.open[i] = open;
+      io.open[t.getAttribute("data-io-key")] = open;
       t.setAttribute("aria-expanded", open ? "true" : "false");
       t.closest("tr").classList.toggle("is-open", open);
       var d = document.getElementById(t.getAttribute("aria-controls"));
@@ -4194,6 +4265,10 @@
   });
   panel.addEventListener("input", function (e) {
     if (!io || !e.target.closest || !e.target.closest(".io-search")) return;
+    var wrap = panel.querySelector(".io-wrap");
+    // Mentre es cerca, la taula no s'encongeix: dins de Google Sites el quadre de cerca fugiria de la pantalla.
+    if (!io.query && e.target.value) wrap.style.minHeight = wrap.offsetHeight + "px";
+    if (!e.target.value) wrap.style.minHeight = "";
     io.query = e.target.value;
     drawIo();
   });

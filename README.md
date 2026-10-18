@@ -102,9 +102,18 @@ Taula d'entrades i sortides del PLC de l'estació: adreça, etiqueta, què vol d
 cablejat SysLink (borne i color del cable), terminal d'E/S, nom de la variable als programes de Festo i
 observacions. Es pot filtrar per tipus i cercar.
 
-- Les dades es llegeixen d'un **full de càlcul de Google** (`IO_SHEET` a `index.html`, una pestanya per
-  estació: `MA1`, `MA2`, `MA3`). Qualsevol canvi que s'hi faci es veu a la web en recarregar la pàgina, sense
-  tocar el codi. El full ha d'estar compartit com a "Qualsevol persona amb l'enllaç (lector)". El botó
-  **Descarrega en Excel** el baixa en format .xlsx.
-- La web reconeix les columnes pel nom de la capçalera (fila 1). Les columnes noves es mostren als detalls.
-- Si `IO_SHEET` és buit o el full no es pot llegir, es mostra la còpia guardada a `IO_DISTRIBUTING`.
+- Les dades es llegeixen d'un **full de càlcul de Google** (`IO_SHEET` a `index.html`). Qualsevol canvi que s'hi
+  faci es veu a la web en recarregar la pàgina, sense tocar el codi. El full ha d'estar compartit com a
+  "Qualsevol persona amb l'enllaç (lector)". El botó **Descarrega en Excel** el baixa en format .xlsx.
+- Cada estació llegeix la pestanya que diu el seu `tab`. Ara només hi ha la de MA1 (`IO_DISTRIBUTING`, pestanya
+  `MA1`); per a MA2 i MA3 caldrà afegir-hi una vegada la seva configuració (pestanyes `MA2` i `MA3`).
+- La web reconeix les columnes pel nom de la capçalera (fila 1), sense tenir en compte accents ni majúscules:
+  `Tipus`, `Adreça PLC`, `Bit`, `Borne SysLink`, `Color del fil`, `Terminal E/S`, `Etiqueta`, `Variable Festo`,
+  `Descripció`, `Quan val 1`, `Component`, `Mòdul`, `Esquema (pàg.)` i `Observacions`. `Tipus`, `Adreça PLC` i
+  `Descripció` són imprescindibles. Les columnes noves es mostren als detalls de la fila.
+- `Tipus` és `Entrada`, `Sortida` o `Alimentació` (la taula s'agrupa per tipus i mòdul). Si la descripció és
+  `Lliure`, la fila es mostra com a bit lliure.
+- Tot el full ha d'estar en format **Text sense format** (Format › Número): si una columna té números i text barrejats,
+  Google només envia un dels dos tipus i les altres cel·les arriben buides (la web n'avisa).
+- Si `IO_SHEET` és buit, el full no es pot llegir o hi falta alguna columna imprescindible, es mostra la còpia
+  guardada a `IO_DISTRIBUTING` (i un avís).
