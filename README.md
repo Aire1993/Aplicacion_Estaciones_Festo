@@ -105,8 +105,11 @@ observacions. Es pot filtrar per tipus i cercar.
 - Les dades es llegeixen d'un **full de càlcul de Google** (`IO_SHEET` a `index.html`; ara el full
   [Taula_Entrades_Sortides_PLC](https://docs.google.com/spreadsheets/d/1bfW_ojUxIs_cTEsquKxMJyKHq8XLHFUZHT5bAMV0rog/edit)
   del compte de l'escola). Qualsevol canvi que s'hi faci es veu a la web en recarregar la pàgina, sense tocar
-  el codi. El full ha d'estar compartit com a "Qualsevol persona amb l'enllaç (lector)". El botó
-  **Descarrega en Excel** el baixa en format .xlsx.
+  el codi. El full ha d'estar compartit com a "Qualsevol persona amb l'enllaç (lector)".
+- El botó **Descarrega en PDF** genera a la mateixa pàgina (sense llibreries externes) un PDF A4 apaïsat amb totes
+  les files de la taula, agrupades com a la web, encara que hi hagi filtres o una cerca. Dins de Google Sites el
+  fitxer es descarrega des d'una pestanya nova, perquè el bloc incrustat pot tenir les descàrregues bloquejades.
+  El full de càlcul es pot continuar baixant en Excel des de Google Sheets (Fitxer › Baixa).
 - Cada estació llegeix la pestanya que diu el seu `tab`. Ara només hi ha la de MA1 (`IO_DISTRIBUTING`, pestanya
   `MA1`); per a MA2 i MA3 caldrà afegir-hi una vegada la seva configuració (pestanyes `MA2` i `MA3`).
 - La web reconeix les columnes pel nom de la capçalera (fila 1), sense tenir en compte accents ni majúscules:
