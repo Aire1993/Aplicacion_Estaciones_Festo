@@ -633,7 +633,10 @@
   .gf-zoom:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
   .gf-arrow { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
   .gf-arrow span { font-size: 16px; }
+  .gf-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
   .gf-levels { display: inline-flex; background: var(--bg); border: 1px solid var(--border); }
+  .panel .gf-pdf-msg { margin: -6px 0 12px; font-size: 13px; }
+  .panel .gf-pdf-msg:empty { margin: 0; }
   .gf-level {
     font-family: inherit;
     font-size: 13px;
@@ -795,7 +798,8 @@
   .io-check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-muted); cursor: pointer; }
   .io-check input { width: 16px; height: 16px; accent-color: var(--festo-blue); }
   .io-all,
-  .io-pdf {
+  .io-pdf,
+  .gf-pdf {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -810,10 +814,13 @@
     transition: border-color 0.2s ease, background 0.2s ease;
   }
   .io-all:hover { border-color: var(--festo-blue); }
-  .io-pdf { background: var(--festo-blue); border-color: var(--festo-blue); color: #fff; }
-  .io-pdf:hover { background: var(--festo-blue-dark); border-color: var(--festo-blue-dark); }
+  .io-pdf,
+  .gf-pdf { background: var(--festo-blue); border-color: var(--festo-blue); color: #fff; }
+  .io-pdf:hover,
+  .gf-pdf:hover { background: var(--festo-blue-dark); border-color: var(--festo-blue-dark); }
   .io-all:focus-visible,
   .io-pdf:focus-visible,
+  .gf-pdf:focus-visible,
   .io-toggle:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
   .panel .io-status,
   .panel .io-pdf-msg { margin: 0 0 10px; font-size: 13px; }
@@ -3505,8 +3512,10 @@
   var gfLevel = "fn";     // nivell de descripció
   var gfPinned = "";      // element seleccionat amb un clic
   var gfCtx = null, gfFont = "";
+  var gfPdfFont = false;  // mentre es fa el PDF, els textos es mesuren amb la font del PDF (Helvetica)
 
   function gfTextWidth(s, weight, italic) {
+    if (gfPdfFont) return pdfWidth(s, weight >= 600 ? "F2" : italic ? "F3" : "F1", GF.font);
     if (!gfCtx) {
       gfCtx = document.createElement("canvas").getContext("2d");
       gfFont = getComputedStyle(document.body).fontFamily;
@@ -3808,11 +3817,12 @@
       if (i) html += '<span class="gf-arrow" aria-hidden="true">força <span>&rsaquo;</span></span>';
       html += '<button type="button" class="gf-tab" data-chart="' + i + '" aria-pressed="false"><b>' + c.key + "</b> " + escapeHtml(c.name) + "</button>";
     });
-    html += '</div><div class="gf-levels" role="group" aria-label="Nivell de descripció">';
+    html += '</div><div class="gf-tools"><div class="gf-levels" role="group" aria-label="Nivell de descripció">';
     GF_LEVELS.forEach(function (l) {
       html += '<button type="button" class="gf-level" data-level="' + l.key + '" aria-pressed="false" title="' + gfAttr(l.label + ": " + l.hint) + '">' + l.label + "</button>";
     });
-    html += "</div></div>" +
+    html += '</div><button type="button" class="gf-pdf">Descarrega en PDF <span aria-hidden="true">&#8595;</span></button></div></div>' +
+      '<p class="gf-pdf-msg" role="status"></p>' +
       '<div class="gf-main"><figure class="gf-figure"><figcaption class="gf-head"><span class="gf-title"></span>' +
       '<button type="button" class="gf-zoom" aria-label="Amplia el grafcet"><svg viewBox="0 0 20 20" aria-hidden="true">' +
       '<path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Amplia</button></figcaption>' +
@@ -3982,9 +3992,11 @@
 
   panel.addEventListener("click", function (e) {
     if (!gf || !e.target.closest) return;
-    var t = e.target.closest(".gf-tab, .gf-level, .gf-zoom, [data-el]");
+    var t = e.target.closest(".gf-tab, .gf-level, .gf-zoom, .gf-pdf, [data-el]");
     if (!t || !panel.contains(t)) return;
-    if (t.classList.contains("gf-tab")) {
+    if (t.classList.contains("gf-pdf")) {
+      gfPdf();
+    } else if (t.classList.contains("gf-tab")) {
       gfChart = +t.getAttribute("data-chart");
       gfPinned = "";
       drawGrafcet();
@@ -4450,25 +4462,37 @@
     }).join("") + ")";
   }
 
-  // Document PDF senzill: pàgines amb rectangles, línies i text (coordenades des de dalt a l'esquerra, en punts).
+  // Document PDF senzill: pàgines amb rectangles, línies, polígons i text (coordenades des de dalt a l'esquerra,
+  // en punts). Cada pàgina pot tenir la seva mida (per defecte, la del document).
   function pdfDoc(w, h) {
-    var pages = [], ops = null;
+    var pages = [], ops = null, ph = h;
     function n(v) { return String(Math.round(v * 100) / 100); }
     function rgb(c) { return n(c[0] / 255) + " " + n(c[1] / 255) + " " + n(c[2] / 255); }
     return {
       pages: pages,
-      addPage: function () { ops = []; pages.push(ops); },
-      usePage: function (i) { ops = pages[i]; },
-      rect: function (x, y, rw, rh, fill, stroke) {
-        ops.push((fill ? rgb(fill) + " rg " : "") + (stroke ? rgb(stroke) + " RG 0.5 w " : "") +
-          n(x) + " " + n(h - y - rh) + " " + n(rw) + " " + n(rh) + " re " + (fill && stroke ? "B" : fill ? "f" : "S"));
+      addPage: function (pw, pageH) {
+        var pg = { ops: [], w: pw || w, h: pageH || h };
+        pages.push(pg);
+        ops = pg.ops;
+        ph = pg.h;
+      },
+      usePage: function (i) { ops = pages[i].ops; ph = pages[i].h; },
+      rect: function (x, y, rw, rh, fill, stroke, lw) {
+        ops.push((fill ? rgb(fill) + " rg " : "") + (stroke ? rgb(stroke) + " RG " + n(lw || 0.5) + " w " : "") +
+          n(x) + " " + n(ph - y - rh) + " " + n(rw) + " " + n(rh) + " re " + (fill && stroke ? "B" : fill ? "f" : "S"));
       },
       line: function (x1, y1, x2, y2, color, lw) {
-        ops.push(rgb(color) + " RG " + n(lw) + " w " + n(x1) + " " + n(h - y1) + " m " + n(x2) + " " + n(h - y2) + " l S");
+        ops.push(rgb(color) + " RG " + n(lw) + " w " + n(x1) + " " + n(ph - y1) + " m " + n(x2) + " " + n(ph - y2) + " l S");
+      },
+      // Línia trencada [[x, y], ...]: o = { stroke, lw, fill, close }.
+      path: function (pts, o) {
+        var d = pts.map(function (p, i) { return n(p[0]) + " " + n(ph - p[1]) + (i ? " l" : " m"); }).join(" ");
+        ops.push((o.fill ? rgb(o.fill) + " rg " : "") + (o.stroke ? rgb(o.stroke) + " RG " + n(o.lw || 1) + " w " : "") +
+          d + (o.close ? " h " : " ") + (o.fill && o.stroke ? "B" : o.fill ? "f" : "S"));
       },
       // y és la línia de base del text.
       text: function (s, x, y, font, size, color) {
-        ops.push("BT /" + font + " " + n(size) + " Tf " + rgb(color) + " rg " + n(x) + " " + n(h - y) + " Td " + pdfStr(s) + " Tj ET");
+        ops.push("BT /" + font + " " + n(size) + " Tf " + rgb(color) + " rg " + n(x) + " " + n(ph - y) + " Td " + pdfStr(s) + " Tj ET");
       },
       build: function (title) {
         var objs = [], kids = [];
@@ -4484,9 +4508,9 @@
         });
         objs[6] = "<< /Title " + hex16(title) + " /CreationDate (" + date + ") >>";
         pages.forEach(function (p, i) {
-          var po = 7 + i * 2, content = p.join("\n");
+          var po = 7 + i * 2, content = p.ops.join("\n");
           kids.push(po + " 0 R");
-          objs[po] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + n(w) + " " + n(h) + "] " +
+          objs[po] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + n(p.w) + " " + n(p.h) + "] " +
             "/Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents " + (po + 1) + " 0 R >>";
           objs[po + 1] = "<< /Length " + content.length + " >>\nstream\n" + content + "\nendstream";
         });
@@ -4641,13 +4665,17 @@
     return doc.build(title + " · " + station);
   }
 
+  // Text apte per al nom d'un fitxer: sense accents i amb "_" en lloc d'espais.
+  function pdfSlug(s) {
+    return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  }
+
   function ioPdfName(station) {
-    var s = String(station).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-    return "Entrades_Sortides_PLC_" + (s || io.cfg.tab) + ".pdf";
+    return "Entrades_Sortides_PLC_" + (pdfSlug(station) || io.cfg.tab) + ".pdf";
   }
 
   // Descarrega el fitxer des de la finestra donada.
-  function ioPdfDownload(win, bytes, name) {
+  function pdfDownload(win, bytes, name) {
     var url = win.URL.createObjectURL(new win.Blob([bytes], { type: "application/pdf" }));
     var a = win.document.createElement("a");
     a.href = url;
@@ -4660,7 +4688,7 @@
 
   // Dins de Google Sites la web és en un marc que pot tenir les descàrregues bloquejades: el PDF es
   // descarrega des d'una pestanya nova, que no té aquestes restriccions.
-  function ioPdfWindow(win, bytes, name) {
+  function pdfWindow(win, bytes, name, heading) {
     var d = win.document;
     d.open();
     d.write('<!doctype html><html lang="ca"><head><meta charset="utf-8">' +
@@ -4670,7 +4698,7 @@
       "h1{margin:0 0 12px;font-size:20px;color:#0091dc}p{margin:0 0 14px;line-height:1.5}" +
       ".b{display:inline-block;margin:0 14px 8px 0;padding:9px 14px;background:#0091dc;color:#fff;font-weight:600;text-decoration:none}" +
       ".b:hover{background:#0070b0}</style></head><body><main>" +
-      "<h1>PDF de la taula d'entrades i sortides</h1>" +
+      "<h1>" + escapeHtml(heading) + "</h1>" +
       "<p>S'està descarregant el fitxer <b>" + escapeHtml(name) + "</b>.</p>" +
       '<p><a class="b" id="dl">Descarrega el PDF</a></p>' +
       "<p>Si no s'ha descarregat sol, fes clic al botó. Quan s'hagi descarregat, pots tancar aquesta pestanya.</p>" +
@@ -4688,21 +4716,303 @@
     if (el) el.textContent = text || "";
   }
 
-  function ioPdf() {
-    var station = pageTitle.textContent || "", name = ioPdfName(station), bytes;
-    ioPdfMsg("");
-    try { bytes = ioPdfBuild(station); } catch (e) { ioPdfMsg("No s'ha pogut generar el PDF."); return; }
+  // Lliura el PDF: dins d'un marc, des d'una pestanya nova; si no, directament. msg() mostra els avisos.
+  function pdfSave(bytes, name, heading, msg) {
     var inFrame = true;
     try { inFrame = window.self !== window.top; } catch (e) { /* marc d'un altre domini */ }
     if (inFrame) {
       var win = null;
       try { win = window.open("", "_blank"); } catch (e) { win = null; }
       if (win) {
-        try { ioPdfWindow(win, bytes, name); return; } catch (e) { try { win.close(); } catch (e2) { /* res */ } }
+        try { pdfWindow(win, bytes, name, heading); return; } catch (e) { try { win.close(); } catch (e2) { /* res */ } }
       }
-      ioPdfMsg("Si el PDF no s'ha descarregat, permet les finestres emergents d'aquesta pàgina i torna-ho a provar.");
+      msg("Si el PDF no s'ha descarregat, permet les finestres emergents d'aquesta pàgina i torna-ho a provar.");
     }
-    ioPdfDownload(window, bytes, name);
+    pdfDownload(window, bytes, name);
+  }
+
+  function ioPdf() {
+    var station = pageTitle.textContent || "", bytes;
+    ioPdfMsg("");
+    try { bytes = ioPdfBuild(station); } catch (e) { ioPdfMsg("No s'ha pogut generar el PDF."); return; }
+    pdfSave(bytes, ioPdfName(station), "PDF de la taula d'entrades i sortides", ioPdfMsg);
+  }
+
+  // ---------------------------------------------------------------------------
+  // PDF del grafcet: una pàgina per grafcet parcial al nivell seleccionat i, al final, la taula de senyals i
+  // les notes. El dibuix és el mateix SVG de la web, fet amb les amplades de la font del PDF.
+  // ---------------------------------------------------------------------------
+
+  var GF_INK = [31, 42, 51], GF_MUTED = [107, 118, 128];
+
+  // Escriu una línia de trossos de text: els negats porten una ratlla a sobre i "↑" (flanc de pujada) es dibuixa.
+  function pdfRichLine(doc, parts, x, y, font, size, color, anchor) {
+    parts = [].concat.apply([], parts.map(function (p) {
+      return String(p.t).split(/(↑)/).filter(Boolean).map(function (t) { return { t: t, neg: p.neg }; });
+    }));
+    if (anchor === "middle") x -= parts.reduce(function (a, p) { return a + pdfWidth(p.t, font, size); }, 0) / 2;
+    parts.forEach(function (p) {
+      var pw = pdfWidth(p.t, font, size);
+      if (p.t === "↑") {
+        var cx = x + pw / 2, top = y - size * 0.72, lw = size * 0.08;
+        doc.line(cx, y, cx, top + size * 0.1, color, lw);
+        doc.path([[cx - size * 0.18, top + size * 0.24], [cx, top], [cx + size * 0.18, top + size * 0.24]], { fill: color, close: true });
+      } else {
+        doc.text(p.t, x, y, font, size, color);
+        if (p.neg) doc.line(x, y - size * 0.82, x + pw, y - size * 0.82, color, size * 0.07);
+      }
+      x += pw;
+    });
+  }
+
+  // Parteix trossos de text en línies (els negats no es parteixen).
+  function pdfRichWrap(parts, font, size, width) {
+    var lines = [[]], w = 0;
+    parts.forEach(function (p) {
+      var bits = p.neg ? [p.t] : String(p.t).match(/\S+\s*|\s+/g) || [];
+      bits.forEach(function (b) {
+        var bw = pdfWidth(b, font, size), line = lines[lines.length - 1];
+        if (w + bw > width && line.length) {
+          b = b.replace(/^\s+/, "");
+          if (!b) return;
+          bw = pdfWidth(b, font, size);
+          lines.push(line = []);
+          w = 0;
+        }
+        line.push({ t: b, neg: p.neg });
+        w += bw;
+      });
+    });
+    return lines;
+  }
+
+  // Dibuixa l'SVG del grafcet (els elements que fa gfSvg) a escala k, amb l'origen a (ox, oy).
+  function gfPdfDraw(doc, svgHtml, k, ox, oy) {
+    var svg = new DOMParser().parseFromString(svgHtml, "image/svg+xml").documentElement;
+    function X(v) { return ox + v * k; }
+    function Y(v) { return oy + v * k; }
+    function num(el, a) { return +el.getAttribute(a); }
+    Array.prototype.forEach.call(svg.querySelectorAll("line, path, rect, text"), function (el) {
+      var cls = " " + (el.getAttribute("class") || "") + " ", tag = el.localName;
+      if (tag === "rect") {
+        if (cls.indexOf(" hit ") >= 0) return;
+        doc.rect(X(num(el, "x")), Y(num(el, "y")), num(el, "width") * k, num(el, "height") * k,
+          cls.indexOf(" in ") >= 0 ? null : [255, 255, 255], GF_INK, 1.5 * k);
+      } else if (tag === "line") {
+        doc.line(X(num(el, "x1")), Y(num(el, "y1")), X(num(el, "x2")), Y(num(el, "y2")), GF_INK, (cls.indexOf(" bar ") >= 0 ? 3.5 : 1.5) * k);
+      } else if (tag === "path") {
+        var pts = [], px = 0, py = 0;
+        (el.getAttribute("d").match(/[MLHVZ][^MLHVZ]*/g) || []).forEach(function (seg) {
+          var c = seg.charAt(0), v = seg.slice(1).trim().split(/[\s,]+/).filter(Boolean).map(Number);
+          if (c === "Z") return;
+          if (c === "H") px = v[0];
+          else if (c === "V") py = v[0];
+          else { px = v[0]; py = v[1]; }
+          pts.push([X(px), Y(py)]);
+        });
+        doc.path(pts, cls.indexOf(" arw ") >= 0 ? { fill: GF_INK, close: true } : { stroke: GF_INK, lw: 1.5 * k });
+      } else {
+        var isNum = cls.indexOf(" num ") >= 0, isCmt = cls.indexOf(" cmt ") >= 0;
+        var font = isNum || cls.indexOf(" frc ") >= 0 ? "F2" : isCmt ? "F3" : "F1";
+        var anchor = el.getAttribute("text-anchor") || (isNum ? "middle" : "start");
+        var spans = Array.prototype.filter.call(el.childNodes, function (n) { return n.nodeType === 1 && n.hasAttribute("x"); });
+        (spans.length ? spans : [el]).forEach(function (ln) {
+          var parts = Array.prototype.map.call(ln.childNodes, function (n) {
+            return { t: n.textContent, neg: n.nodeType === 1 && n.getAttribute("text-decoration") === "overline" };
+          });
+          pdfRichLine(doc, parts, X(num(ln, "x")), Y(num(ln, "y")), font, (isNum ? 15 : 13) * k, isCmt ? GF_MUTED : GF_INK, anchor);
+        });
+      }
+    });
+  }
+
+  // Accions d'una etapa al nivell donat, en trossos de text.
+  function gfPdfActParts(s, level) {
+    var parts = [];
+    (s.act || []).forEach(function (a, i) {
+      if (i) parts.push({ t: "; " });
+      if (a.force) {
+        parts.push({ t: gfActText(a, level) + ": " + gfForceText(a).replace(/\.$/, "") });
+        return;
+      }
+      parts.push({ t: gfActText(a, level) });
+      if (a.cond) {
+        parts.push({ t: " (només si " });
+        parts = parts.concat(level === "fn" ? [{ t: a.condFn }] : gfCondParts(a.cond, level));
+        parts.push({ t: ")" });
+      }
+    });
+    return parts;
+  }
+
+  function gfPdfBuild(station) {
+    var level = gfLevel, lvName = gfLevelName(level);
+    var A4W = 595.28, A4H = 841.89, M = 36, BOTTOM = 44;
+    var BLUE = [0, 145, 220], BLUE_DARK = [0, 112, 176], TEXT = [51, 51, 51], MUTED = [102, 102, 102],
+      LINE = [211, 216, 221], SOFT = [242, 244, 246], WHITE = [255, 255, 255];
+    var doc = pdfDoc(A4W, A4H), title = "Grafcet · " + station;
+    var now = new Date();
+    var when = pdfP2(now.getDate()) + "/" + pdfP2(now.getMonth() + 1) + "/" + now.getFullYear();
+    var introEl = panel.querySelector(".gf-intro");
+    var intro = introEl ? (introEl.innerText || introEl.textContent) : "";
+
+    // Dibuixos amb les amplades de Helvetica.
+    var drawings;
+    gfPdfFont = true;
+    try {
+      drawings = gf.charts.map(function (c) { return { chart: c, svg: gfSvg(c, level, false) }; });
+    } finally {
+      gfPdfFont = false;
+    }
+
+    // --- Una pàgina per grafcet parcial (vertical o apaïsada, la que el faci més gran).
+    drawings.forEach(function (d, i) {
+      function head(pw) {
+        var lines = [];
+        if (!i) lines = pdfWrap(intro, "F1", 8.5, pw - 2 * M);
+        var about = pdfWrap(d.chart.about, "F1", 8.5, pw - 2 * M);
+        return { intro: lines, about: about, h: 76 + (lines.length ? lines.length * 11 + 6 : 0) + about.length * 11 + 14 };
+      }
+      function fit(pw, ph) {
+        var hd = head(pw);
+        return { pw: pw, ph: ph, hd: hd, k: Math.min(1, (pw - 2 * M) / d.svg.w, (ph - hd.h - BOTTOM) / d.svg.h) };
+      }
+      var p = fit(A4W, A4H), l = fit(A4H, A4W);
+      var f = l.k > p.k * 1.05 ? l : p;
+      doc.addPage(f.pw, f.ph);
+      doc.text(title, M, 44, "F2", 16, BLUE);
+      doc.text(d.chart.key + " · " + d.chart.name + " · nivell " + lvName, M, 62, "F2", 11, TEXT);
+      var y = 76;
+      f.hd.intro.forEach(function (ln, j) { doc.text(ln, M, y + j * 11, "F1", 8.5, TEXT); });
+      if (f.hd.intro.length) y += f.hd.intro.length * 11 + 6;
+      f.hd.about.forEach(function (ln, j) { doc.text(ln, M, y + j * 11, "F1", 8.5, MUTED); });
+      y += f.hd.about.length * 11 + 4;
+      gfPdfDraw(doc, d.svg.html, f.k, (f.pw - d.svg.w * f.k) / 2, y);
+    });
+
+    // --- Senyals i notes (A4 vertical, tantes pàgines com calgui).
+    var W = A4W, LIMIT = A4H - BOTTOM, y = 0;
+    function notesPage(first) {
+      doc.addPage(A4W, A4H);
+      if (first) {
+        doc.text(title, M, 44, "F2", 16, BLUE);
+        doc.text("Senyals i notes · nivell " + lvName, M, 62, "F2", 11, TEXT);
+        y = 80;
+      } else {
+        doc.text(title + " · Senyals i notes (continuació)", M, 30, "F1", 7.5, MUTED);
+        y = 44;
+      }
+    }
+    function need(h) { if (y + h > LIMIT) notesPage(false); }
+    function heading(t) {
+      need(40);
+      y += 8;
+      doc.text(t, M, y + 10, "F2", 11, BLUE_DARK);
+      y += 18;
+    }
+    notesPage(true);
+
+    // Taula de senyals de tots els grafcets, agrupada com a la web.
+    heading("Senyals");
+    var all = { steps: [], trans: [] };
+    gf.charts.forEach(function (c) { all.steps = all.steps.concat(c.steps); all.trans = all.trans.concat(c.trans); });
+    var names = ["Entrades", "Sortides", "Etapes d'altres grafcets", "Altres"];
+    var cols = [{ label: "PLC", w: 52, font: "F2" }, { label: "Etiqueta", w: 92, font: "F1" }, { label: "Descripció", w: W - 2 * M - 144, font: "F1" }];
+    var FS = 8.5, LEAD = 10.5, PAD = 4;
+    function tableHead() {
+      var h = LEAD + 2 * PAD, x = M;
+      doc.rect(M, y, W - 2 * M, h, BLUE);
+      cols.forEach(function (c) { doc.text(c.label, x + PAD, y + PAD + 7.5, "F2", 7.5, WHITE); x += c.w; });
+      y += h;
+    }
+    tableHead();
+    var lastGroup = -1;
+    gfChartVars(all).forEach(function (r) {
+      var cells;
+      if (gfIsStepVar(r.id)) {
+        var fs = gfFindStep(+r.id.slice(1));
+        cells = [r.id, fs ? fs.chart.key : "", fs ? "Etapa " + fs.step.n + " de " + fs.chart.key + " activa (" + fs.step.name.toLowerCase() + ")" : ""];
+      } else {
+        var v = gf.vars[r.id];
+        cells = [v.plc, v.tag, v.desc];
+      }
+      var lines = cells.map(function (t, j) { return pdfWrap(t, cols[j].font, FS, cols[j].w - 2 * PAD); });
+      var h = Math.max.apply(null, lines.map(function (l) { return Math.max(1, l.length); })) * LEAD + 2 * PAD;
+      if (r.group !== lastGroup) {
+        if (y + 16 + h > LIMIT) { notesPage(false); tableHead(); }
+        doc.rect(M, y, W - 2 * M, 16, SOFT);
+        doc.text(names[r.group].toUpperCase(), M + PAD, y + 11, "F2", 7, BLUE_DARK);
+        y += 16;
+        lastGroup = r.group;
+      } else if (y + h > LIMIT) {
+        notesPage(false);
+        tableHead();
+      }
+      var x = M;
+      lines.forEach(function (l, j) {
+        l.forEach(function (t, m) { doc.text(t, x + PAD, y + PAD + FS + m * LEAD, cols[j].font, FS, TEXT); });
+        x += cols[j].w;
+      });
+      y += h;
+      doc.line(M, y, W - M, y, LINE, 0.5);
+    });
+    if (gf.unused) {
+      var un = pdfWrap("No s'utilitzen en aquesta seqüència: " + gf.unused + ".", "F3", 8, W - 2 * M);
+      need(un.length * 10 + 8);
+      y += 6;
+      un.forEach(function (t, j) { doc.text(t, M, y + 8 + j * 10, "F3", 8, MUTED); });
+      y += un.length * 10 + 4;
+    }
+
+    // Notes de cada etapa i de cada transició.
+    function item(head, parts, note) {
+      var w = W - 2 * M - 12;
+      var hl = pdfWrap(head, "F2", 9, w);
+      var pl = parts ? pdfRichWrap(parts, "F1", 8.5, w) : [];
+      var nl = note ? pdfWrap(note, "F1", 8.5, w) : [];
+      var h = hl.length * 11.5 + pl.length * 11.5 + nl.length * 11 + 8;
+      need(h);
+      var x = M + 12;
+      hl.forEach(function (t) { y += 11.5; doc.text(t, M, y, "F2", 9, TEXT); });
+      pl.forEach(function (ln) { y += 11.5; pdfRichLine(doc, ln, x, y, "F1", 8.5, TEXT); });
+      nl.forEach(function (t) { y += 11; doc.text(t, x, y, "F1", 8.5, MUTED); });
+      y += 8;
+    }
+    gf.charts.forEach(function (c) {
+      heading(c.key + " · " + c.name);
+      c.steps.forEach(function (st) {
+        var acts = st.act && st.act.length ? [{ t: "Accions: " }].concat(gfPdfActParts(st, level)) : [{ t: "Sense accions." }];
+        item("Etapa " + st.n + (st.init ? " (inicial)" : "") + " · " + st.name, acts, st.note);
+      });
+      c.trans.forEach(function (t) {
+        item("Transició de l'etapa " + t.from + " a la " + t.to,
+          [{ t: "Condició: " }].concat(level === "fn" ? [{ t: t.fn }] : gfCondParts(t.c, level)), t.note);
+      });
+    });
+
+    // Peu de cada pàgina: font, data i número de pàgina.
+    var count = doc.pages.length;
+    doc.pages.forEach(function (pg, i) {
+      var src = pdfWrap("Font: " + gf.source.label + " (seqüència, taula d'assignació, esquemes i programa de PLC). " +
+        "Grafcet segons la norma IEC 60848 · " + when + ".", "F1", 6.5, pg.w - 2 * M - 70);
+      var num = "Pàgina " + (i + 1) + " de " + count;
+      doc.usePage(i);
+      src.forEach(function (t, j) { doc.text(t, M, pg.h - 20 - (src.length - 1 - j) * 8, "F1", 6.5, MUTED); });
+      doc.text(num, pg.w - M - pdfWidth(num, "F1", 6.5), pg.h - 20, "F1", 6.5, MUTED);
+    });
+    return doc.build(title + " · nivell " + lvName);
+  }
+
+  function gfPdfMsg(text) {
+    var el = panel.querySelector(".gf-pdf-msg");
+    if (el) el.textContent = text || "";
+  }
+
+  function gfPdf() {
+    var station = pageTitle.textContent || "", bytes;
+    gfPdfMsg("");
+    try { bytes = gfPdfBuild(station); } catch (e) { gfPdfMsg("No s'ha pogut generar el PDF."); return; }
+    pdfSave(bytes, "Grafcet_" + pdfSlug(station) + "_" + pdfSlug(gfLevelName(gfLevel)) + ".pdf", "PDF del grafcet", gfPdfMsg);
   }
 
   panel.addEventListener("click", function (e) {

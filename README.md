@@ -87,6 +87,10 @@ RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC ofici
   i **PLC** (adreces). Les adreces són les de la documentació de Festo (byte 0 = estació, byte 1 = panell).
 - Passant el ratolí per sobre (o tocant) una etapa o una transició se'n veu l'explicació, i a la taula
   es ressalten els senyals que fa servir. **Amplia** mostra el grafcet en gran.
+- **Descarrega en PDF** genera a la mateixa pàgina (sense llibreries externes) un PDF A4 amb el nivell seleccionat:
+  una pàgina per a cada grafcet (vertical o apaïsada, la que el faci més gran) i, al final, la taula de senyals i les
+  notes de cada etapa i transició. Dins de Google Sites es descarrega des d'una pestanya nova, com el PDF de la taula
+  d'entrades i sortides.
 - `vars`: cada senyal amb l'adreça (`plc`), l'etiqueta (`tag`) i la descripció (`desc`). Les sortides que
   fan d'acció porten també `fn` (text de l'acció al nivell funcional) i, si cal, `tagAct` (text al nivell
   tecnològic, p. ex. `G1MA1 endavant`).
