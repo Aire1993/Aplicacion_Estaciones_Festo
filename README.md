@@ -54,7 +54,7 @@ de cada botó (`esquemes`, `io-plc`, `grafcet`, `components`):
   (ara: MA1B1, MA2B1 i MA3B1).
 - `{ catalog: ... }` mostra el catàleg de components (MA1B4, MA2B4, MA3B4).
 - `{ grafcet: ... }` dibuixa el grafcet de l'estació (ara: MA1B3).
-- `{ io: ... }` mostra la taula d'entrades i sortides del PLC (ara: MA1B2).
+- `{ io: ... }` mostra la taula d'entrades i sortides del PLC (MA1B2, MA2B2 i MA3B2).
 - Un text HTML per a contingut escrit.
 
 Els PDF han d'estar compartits com a "Qualsevol persona amb l'enllaç".
@@ -96,7 +96,7 @@ RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC ofici
 - Accions de les etapes (`act`): `{ v: "senyal" }`, condicionada `{ v: "senyal", cond: "condició", condFn: "en paraules" }`,
   o ordre de forçat `{ force: "GP", to: "INIT" }` (`"INIT"` = situació inicial, `""` = cap etapa activa, `"8"` = etapa 8).
 
-## Entrades/Sortides PLC (MA1B2)
+## Entrades/Sortides PLC (MA1B2, MA2B2, MA3B2)
 
 Taula d'entrades i sortides del PLC de l'estació: adreça, etiqueta, què vol dir que valgui 1, component,
 cablejat SysLink (borne i color del cable), terminal d'E/S, nom de la variable als programes de Festo i
@@ -110,8 +110,8 @@ observacions. Es pot filtrar per tipus i cercar.
   les files de la taula, agrupades com a la web, encara que hi hagi filtres o una cerca. Dins de Google Sites el
   fitxer es descarrega des d'una pestanya nova, perquè el bloc incrustat pot tenir les descàrregues bloquejades.
   El full de càlcul es pot continuar baixant en Excel des de Google Sheets (Fitxer › Baixa).
-- Cada estació llegeix la pestanya que diu el seu `tab`. Ara només hi ha la de MA1 (`IO_DISTRIBUTING`, pestanya
-  `MA1`); per a MA2 i MA3 caldrà afegir-hi una vegada la seva configuració (pestanyes `MA2` i `MA3`).
+- Cada estació llegeix la pestanya que diu el seu `tab`: `MA1` (`IO_DISTRIBUTING`), `MA2` (`IO_PICK_PLACE`) i
+  `MA3` (`IO_SORTING`). Cada configuració porta també les fonts de l'estació (esquemes, manual i programa de Festo).
 - La web reconeix les columnes pel nom de la capçalera (fila 1), sense tenir en compte accents ni majúscules:
   `Tipus`, `Adreça PLC`, `Bit`, `Borne SysLink`, `Color del fil`, `Terminal E/S`, `Etiqueta`, `Variable Festo`,
   `Descripció`, `Quan val 1`, `Component`, `Mòdul`, `Esquema (pàg.)` i `Observacions`. `Tipus`, `Adreça PLC` i
@@ -121,4 +121,4 @@ observacions. Es pot filtrar per tipus i cercar.
 - Tot el full ha d'estar en format **Text sense format** (Format › Número): si una columna té números i text barrejats,
   Google només envia un dels dos tipus i les altres cel·les arriben buides (la web n'avisa).
 - Si `IO_SHEET` és buit, el full no es pot llegir o hi falta alguna columna imprescindible, es mostra la còpia
-  guardada a `IO_DISTRIBUTING` (i un avís).
+  guardada a la configuració de l'estació (i un avís).

@@ -2719,9 +2719,9 @@
   //   (acció condicionada) o
   //   ordre de forçat { force: "GP", to: "INIT" } ("INIT" = situació inicial, "" = cap etapa activa, "8" = etapa 8).
   // Entrades/Sortides PLC (botó Entrades/Sortides PLC). Les dades es llegeixen del full de càlcul de Google
-  // IO_SHEET, de la pestanya que diu `tab` (MA1): qualsevol canvi que s'hi faci es veu en recarregar la pàgina.
-  // Si està buit, no es pot llegir o no té les columnes Tipus, Adreça PLC i Descripció, es fa servir la còpia
-  // guardada aquí (columns/rows). Per a MA2 i MA3 cal afegir una configuració com aquesta amb tab "MA2"/"MA3".
+  // IO_SHEET, de la pestanya que diu `tab` de cada estació (MA1, MA2, MA3): qualsevol canvi que s'hi faci es veu en
+  // recarregar la pàgina. Si està buit, no es pot llegir o no té les columnes Tipus, Adreça PLC i Descripció, es fa
+  // servir la còpia guardada aquí (columns/rows).
   // IO_SHEET és l'ID de l'enllaç del full: docs.google.com/spreadsheets/d/ID/edit
   var IO_SHEET = "1bfW_ojUxIs_cTEsquKxMJyKHq8XLHFUZHT5bAMV0rog";
 
@@ -2772,6 +2772,106 @@
       ["Alimentació", "", "GND A", "11", "Marró-rosa", "C1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-C1XG1)", "5", ""],
       ["Alimentació", "", "GND A", "12", "Lila", "C1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-C1XG1)", "5", ""],
       ["Alimentació", "", "GND B", "23+24", "Blanc-blau", "C1XG1", "", "", "0 V de les entrades", "", "", "Interfície C (-C1XG1)", "5", ""]
+    ]
+  };
+
+  var IO_PICK_PLACE = {
+    tab: "MA2",
+    source: {
+      label: "Festo Didactic InfoPortal · Pick and Place Station",
+      url: "https://ip.festo-didactic.com/InfoPortal/MPS/PickandPlaceStation/EN/index.html"
+    },
+    docs: "esquemes 8034567, manual 8034663 i programa de PLC de Festo",
+    schematic: "8034567",
+    columns: ["Tipus", "Adreça PLC", "Bit", "Borne SysLink", "Color del fil", "Terminal E/S", "Etiqueta", "Variable Festo", "Descripció", "Quan val 1", "Component", "Mòdul", "Esquema (pàg.)", "Observacions"],
+    rows: [
+      ["Entrada", "I0.0", "I0", "13", "Gris-rosa", "G1XG1", "G1BG1", "G1BG1", "Peça a l'inici de la cinta", "Hi ha peça a l'inici", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "En automàtic, una carcassa aquí engega el cicle. Per a la posada a zero la cinta ha d'estar buida."],
+      ["Entrada", "I0.1", "I1", "14", "Vermell-blau", "G1XG1", "G1BG2", "G1BG2", "Peça al separador (posició intermèdia de la cinta)", "Hi ha peça al separador", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "Aquí s'atura la carcassa perquè el mòdul Pick&Place hi posi la peça insert. Per a la posada a zero la cinta ha d'estar buida."],
+      ["Entrada", "I0.2", "I2", "15", "Blanc-verd", "G1XG1", "G1BG3", "G1BG3", "No hi ha peça al final de la cinta", "El final de la cinta és lliure", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "Lògica inversa: passa a 0 quan la peça arriba al final."],
+      ["Entrada", "I0.3", "I3", "16", "Marró-verd", "G1XG1", "", "", "Lliure", "", "", "Mòdul transportador (-G1)", "", "No connectada."],
+      ["Entrada", "I0.4", "I4", "17", "Blanc-groc", "G2XG1", "G2BG1", "G2BG1", "Carro horitzontal recollit", "Carro recollit", "Sensor de proximitat magnètic SME (contacte reed)", "Mòdul Pick&Place (-G2)", "7, 9", "Detecta el carro del minicarro horitzontal G2MM1. Color segons l'InfoPortal i el manual 8034663; l'esquema 8034567 (pàg. 5) hi posa blanc-verd, el mateix que I0.2: comprova-ho al cable."],
+      ["Entrada", "I0.5", "I5", "18", "Marró-groc", "G2XG1", "G2BG2", "G2BG2", "Carro horitzontal avançat", "Carro avançat", "Sensor de proximitat magnètic SME (contacte reed)", "Mòdul Pick&Place (-G2)", "7, 9", "Detecta el carro del minicarro horitzontal G2MM1."],
+      ["Entrada", "I0.6", "I6", "19", "Blanc-gris", "G2XG1", "G2BG3", "G2BG3", "Ventosa a dalt", "La ventosa és a dalt", "Sensor de proximitat magnètic SME (contacte reed)", "Mòdul Pick&Place (-G2)", "7, 9", "Detecta la posició superior del minicarro vertical G2MM2."],
+      ["Entrada", "I0.7", "I7", "20", "Gris-marró", "G2XG1", "G2BP1", "G2BP1", "Peça agafada (buit a la ventosa)", "La ventosa ha agafat una peça", "Sensor de pressió de buit SDE5", "Mòdul Pick&Place (-G2)", "7, 9", "Si no dona senyal 3 s després de baixar la ventosa, el programa de Festo encén la llum Q1 del panell (Q1.2). Al programa d'Allen-Bradley de Festo aquest bit també es diu G2BG4 (pinça tancada), per a la versió del mòdul amb pinça."],
+      ["Sortida", "Q0.0", "Q0", "1", "Blanc", "G1XG1", "G1KF1-2", "G1BF1_A1", "Motor de la cinta endavant", "La cinta avança", "Controlador de motor G1KF1 (entrada 2: endavant), que mou el motoreductor G1MA1", "Mòdul transportador (-G1)", "6", "L'etiqueta és la del cable, que va a l'entrada 2 del controlador G1KF1."],
+      ["Sortida", "Q0.1", "Q1", "2", "Marró", "G1XG1", "G1KF1-1", "G1BF1_A2", "Motor de la cinta enrere", "La cinta va enrere", "Controlador de motor G1KF1 (entrada 1: enrere), que mou el motoreductor G1MA1", "Mòdul transportador (-G1)", "6", "No s'utilitza a la seqüència de l'estació. L'etiqueta és la del cable, que va a l'entrada 1 del controlador G1KF1."],
+      ["Sortida", "Q0.2", "Q2", "3", "Verd", "G1XG1", "G1MB1", "G1MB1", "Avançar el separador", "El separador avança (reté la peça)", "Electroimant del separador (mòdul desviador/separador elèctric)", "Mòdul transportador (-G1)", "6", "Reté la carcassa al separador mentre el mòdul Pick&Place hi posa la peça insert. Després es recull i la peça continua fins al final de la cinta."],
+      ["Sortida", "Q0.3", "Q3", "4", "Groc", "G1XG1", "", "", "Lliure", "", "", "Mòdul transportador (-G1)", "", "No connectada."],
+      ["Sortida", "Q0.4", "Q4", "5", "Gris", "G2XG1", "G2MB1", "G2MB1", "Recollir el carro horitzontal", "El carro es recull", "Bobina de l'electrovàlvula 5/2 biestable G2QM1 (terminal de vàlvules)", "Mòdul Pick&Place (-G2)", "7, 9", "Vàlvula biestable: el carro es queda on és fins que s'activa l'altra bobina (Q0.5). Segons el manual 8034663, l'InfoPortal i els programes de PLC de Festo, aquesta sortida recull el carro; l'esquema 8034567 (pàg. 7) hi posa «avançar el carro»: comprova-ho a la màquina."],
+      ["Sortida", "Q0.5", "Q5", "6", "Rosa", "G2XG1", "G2MB2", "G2MB2", "Avançar el carro horitzontal", "El carro avança", "Bobina de l'electrovàlvula 5/2 biestable G2QM1 (terminal de vàlvules)", "Mòdul Pick&Place (-G2)", "7, 9", "Vàlvula biestable (vegeu Q0.4). L'esquema 8034567 (pàg. 7) hi posa «recollir el carro»."],
+      ["Sortida", "Q0.6", "Q6", "7", "Blau", "G2XG1", "G2MB3", "G2MB3", "Baixar la ventosa", "La ventosa baixa", "Bobina de l'electrovàlvula 5/2 monoestable G2QM2 (terminal de vàlvules)", "Mòdul Pick&Place (-G2)", "7, 9", "Sense senyal, la molla torna la vàlvula a la posició de repòs i la ventosa puja. La força del minicarro vertical es regula amb el regulador de pressió G2QN1."],
+      ["Sortida", "Q0.7", "Q7", "8", "Vermell", "G2XG1", "G2MB4", "G2MB4", "Activar el buit", "La ventosa xucla", "Bobina de l'electrovàlvula 5/2 monoestable G2QM3, que alimenta el generador de buit G2KH1", "Mòdul Pick&Place (-G2)", "7, 9", "Al programa de PLC de Festo es diu «Vacuum on, Open Gripper»: a la versió del mòdul amb pinça, la mateixa sortida obre la pinça."],
+      ["Entrada", "I1.0", "I0", "", "", "", "S1", "SF1", "Polsador START", "START premut", "Polsador amb llum", "Panell de comandament", "", "La seva llum és P1 (Q1.0)."],
+      ["Entrada", "I1.1", "I1", "", "", "", "S2", "SF2", "Polsador STOP", "STOP sense prémer", "Polsador normalment tancat", "Panell de comandament", "", "Si es prem un moment, atura el funcionament automàtic quan acaba el cicle. Si es manté premut 3 s, és una aturada total com la de la seta: tot torna a la situació inicial i després cal fer la posada a zero amb RESET (selector en MAN)."],
+      ["Entrada", "I1.2", "I2", "", "", "", "S3", "SF4", "Selector AUTO/MAN", "Selector en MAN (0 = AUTO)", "Selector de clau", "Panell de comandament", "", "Al programa de PLC de Festo es diu SF4."],
+      ["Entrada", "I1.3", "I3", "", "", "", "S4", "SF3", "Polsador RESET", "RESET premut", "Polsador amb llum", "Panell de comandament", "", "Només actua amb el selector en MAN. La seva llum és P2 (Q1.1). Al programa de PLC de Festo es diu SF3."],
+      ["Entrada", "I1.4", "I4", "", "", "", "", "", "Lliure", "", "", "Panell de comandament", "", "No s'utilitza."],
+      ["Entrada", "I1.5", "I5", "", "", "", "Em_Stop", "SF5", "Seta d'emergència", "Seta no premuda (desbloquejada)", "Polsador d'aturada d'emergència (seta)", "Panell de comandament", "", "Segons el manual de Festo, a totes les variants de PLC hi ha un pont de cable que porta la seta d'emergència al bit 1.5."],
+      ["Entrada", "I1.6", "I6", "", "", "", "XD6", "XD6", "Senyal de l'estació següent", "L'estació següent pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions. El programa de Festo considera que l'estació següent és lliure si XD6 o XD7 val 1 (tot i que el comentari de la variable diu «estació següent ocupada»)."],
+      ["Entrada", "I1.7", "I7", "", "", "", "XD7", "XD7", "Senyal de l'estació següent", "L'estació següent pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions. El programa de Festo considera que l'estació següent és lliure si XD6 o XD7 val 1 (tot i que el comentari de la variable diu «estació següent ocupada»)."],
+      ["Sortida", "Q1.0", "Q0", "", "", "", "P1", "PF1", "Llum del polsador START", "Llum START encesa", "Llum indicadora", "Panell de comandament", "", "S'encén quan l'estació està preparada per començar."],
+      ["Sortida", "Q1.1", "Q1", "", "", "", "P2", "PF2", "Llum del polsador RESET", "Llum RESET encesa", "Llum indicadora", "Panell de comandament", "", "Llum fixa: demana la posada a zero (amb el selector en MAN). El manual diu que fa pampallugues, però el programa de PLC de Festo l'encén fixa."],
+      ["Sortida", "Q1.2", "Q2", "", "", "", "P3", "PF3", "Llum Q1 del panell: no s'ha agafat la peça", "Llum Q1 encesa", "Llum indicadora", "Panell de comandament", "", "Segons el programa de PLC de Festo, s'encén si la ventosa no ha agafat cap peça 3 s després de baixar (per exemple, perquè la rampa de les peces insert és buida). Després cal fer la posada a zero."],
+      ["Sortida", "Q1.3", "Q3", "", "", "", "P4", "PF4", "Llum indicadora Q2 del panell", "Llum Q2 encesa", "Llum indicadora", "Panell de comandament", "", "No s'utilitza en aquesta estació."],
+      ["Sortida", "Q1.4", "Q4", "", "", "", "XD4", "XD4", "Estació lliure", "Aquesta estació pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions: avisa una altra estació que aquesta està lliure."],
+      ["Sortida", "Q1.5", "Q5", "", "", "", "", "indLightGn", "Llum verda de la torre de senyalització", "Llum verda encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Fixa: estació preparada. Intermitent: en automàtic. Segons el programa de PLC de Festo."],
+      ["Sortida", "Q1.6", "Q6", "", "", "", "", "indLightYe", "Llum groga de la torre de senyalització", "Llum groga encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Fixa: cal fer la posada a zero o el selector és en MAN. Intermitent: posada a zero en curs. Segons el programa de PLC de Festo."],
+      ["Sortida", "Q1.7", "Q7", "", "", "", "", "indLightRd", "Llum vermella de la torre de senyalització", "Llum vermella encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Seta d'emergència premuda. Segons el programa de PLC de Festo."],
+      ["Alimentació", "", "24 V A", "9+10", "Negre", "H1XG1", "", "", "24 V de les sortides", "", "", "Interfície C (-H1XG1)", "5", ""],
+      ["Alimentació", "", "24 V B", "21+22", "Blanc-rosa", "H1XG1", "", "", "24 V de les entrades", "", "", "Interfície C (-H1XG1)", "5", ""],
+      ["Alimentació", "", "GND A", "11", "Marró-rosa", "H1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-H1XG1)", "5", ""],
+      ["Alimentació", "", "GND A", "12", "Lila", "H1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-H1XG1)", "5", ""],
+      ["Alimentació", "", "GND B", "23+24", "Blanc-blau", "H1XG1", "", "", "0 V de les entrades", "", "", "Interfície C (-H1XG1)", "5", ""]
+    ]
+  };
+
+  var IO_SORTING = {
+    tab: "MA3",
+    source: {
+      label: "Festo Didactic InfoPortal · Sorting Station",
+      url: "https://ip.festo-didactic.com/InfoPortal/MPS/SortingStation/EN/index.html"
+    },
+    docs: "esquemes 8046325, manual 8046391 i programa de PLC de Festo",
+    schematic: "8046325",
+    columns: ["Tipus", "Adreça PLC", "Bit", "Borne SysLink", "Color del fil", "Terminal E/S", "Etiqueta", "Variable Festo", "Descripció", "Quan val 1", "Component", "Mòdul", "Esquema (pàg.)", "Observacions"],
+    rows: [
+      ["Entrada", "I0.0", "I0", "13", "Gris-rosa", "G1XG1", "G1BG1", "G1BG1", "Peça a l'inici de la cinta", "Hi ha peça a l'inici", "Sensor òptic amb fibra òptica", "Mòdul transportador (-G1)", "6", "En automàtic, una peça aquí engega el cicle. Per a la posada a zero no hi ha d'haver cap peça a l'inici ni cap rampa plena."],
+      ["Entrada", "I0.1", "I1", "14", "Vermell-blau", "G1XG1", "G1BG2", "G1BG2", "Desviador 1 avançat", "El desviador 1 és avançat", "Sensor de proximitat inductiu", "Mòdul transportador (-G1)", "6", "Desviador de la rampa de l'inici de la cinta, on van les peces vermelles."],
+      ["Entrada", "I0.2", "I2", "15", "Blanc-verd", "G1XG1", "G1BG3", "G1BG3", "Rampa plena", "Alguna rampa és plena", "Sensor retroreflector per a carril guia (amb reflector)", "Mòdul transportador (-G1)", "6", "Un sol sensor vigila el nivell de les tres rampes. Quan queda activat una estona, el programa de Festo encén la llum Q1 del panell (Q1.2)."],
+      ["Entrada", "I0.3", "I3", "16", "Marró-verd", "G1XG1", "G1BG4", "G1BG4", "Desviador 2 avançat", "El desviador 2 és avançat", "Sensor de proximitat inductiu", "Mòdul transportador (-G1)", "6", "Desviador de la rampa del mig de la cinta, on van les peces metàl·liques."],
+      ["Entrada", "I0.4", "I4", "17", "Blanc-groc", "B1XG1", "B1BG1", "B1BG1", "Peça davant dels sensors de detecció", "Hi ha peça al mòdul de detecció", "Barrera de llum de forquilla", "Mòdul de detecció (-B1)", "7", "Detecta totes les peces, sigui quin sigui el color o el material. Color segons l'InfoPortal; l'esquema 8046325 (pàg. 5) i el manual 8046391 hi posen blanc-verd, el mateix que I0.2: comprova-ho al cable."],
+      ["Entrada", "I0.5", "I5", "18", "Marró-groc", "B1XG1", "B1BG2", "B1BG2", "Peça que no és negra", "La peça és vermella o metàl·lica", "Sensor de reflexió difusa de fibra òptica", "Mòdul de detecció (-B1)", "7", "Les peces negres gairebé no reflecteixen la llum i no l'activen. El programa de Festo combina I0.5 i I0.6: vermella (rampa de l'inici), metàl·lica (rampa del mig) o negra (rampa del final de la cinta)."],
+      ["Entrada", "I0.6", "I6", "19", "Blanc-gris", "B1XG1", "B1BG3", "B1BG3", "Peça metàl·lica", "La peça és metàl·lica", "Sensor de proximitat inductiu", "Mòdul de detecció (-B1)", "7", "Color segons l'esquema i l'InfoPortal (el manual 8046391 hi posa blanc-groc)."],
+      ["Entrada", "I0.7", "I7", "20", "Gris-marró", "B1XG1", "", "", "Lliure", "", "", "Mòdul de detecció (-B1)", "", "No connectada."],
+      ["Sortida", "Q0.0", "Q0", "1", "Blanc", "G1XG1", "G1KF1-2", "G1BF1_A1", "Motor de la cinta endavant", "La cinta avança", "Controlador de motor G1KF1 (entrada 2: endavant), que mou el motoreductor G1MA1", "Mòdul transportador (-G1)", "6", "L'etiqueta és la del cable, que va a l'entrada 2 del controlador G1KF1. En aquesta estació la cinta només va endavant."],
+      ["Sortida", "Q0.1", "Q1", "2", "Marró", "G1XG1", "G1MB1", "G1MB1", "Avançar el desviador 1", "El desviador 1 avança", "Electroimant del desviador 1 (mòdul desviador/separador elèctric)", "Mòdul transportador (-G1)", "6", "Desvia les peces vermelles a la rampa de l'inici de la cinta."],
+      ["Sortida", "Q0.2", "Q2", "3", "Verd", "G1XG1", "G1MB2", "G1MB2", "Avançar el desviador 2", "El desviador 2 avança", "Electroimant del desviador 2 (mòdul desviador/separador elèctric)", "Mòdul transportador (-G1)", "6", "Desvia les peces metàl·liques a la rampa del mig de la cinta."],
+      ["Sortida", "Q0.3", "Q3", "4", "Groc", "G1XG1", "G1MB3", "G1MB3", "Recollir el topall", "El topall es recull (deixa passar la peça)", "Bobina de l'electrovàlvula 3/2 del topall pneumàtic", "Mòdul transportador (-G1)", "6, 9", "Sense senyal, el topall surt i atura la peça davant dels sensors del mòdul de detecció. A l'esquema pneumàtic (pàg. 9) surt com a MB3 (vàlvula QM1)."],
+      ["Sortida", "Q0.4", "Q4", "5", "Gris", "B1XG1", "", "", "Lliure", "", "", "Mòdul de detecció (-B1)", "", "No connectada."],
+      ["Sortida", "Q0.5", "Q5", "6", "Rosa", "B1XG1", "", "", "Lliure", "", "", "Mòdul de detecció (-B1)", "", "No connectada."],
+      ["Sortida", "Q0.6", "Q6", "7", "Blau", "B1XG1", "", "", "Lliure", "", "", "Mòdul de detecció (-B1)", "", "No connectada."],
+      ["Sortida", "Q0.7", "Q7", "8", "Vermell", "B1XG1", "", "", "Lliure", "", "", "Mòdul de detecció (-B1)", "", "No connectada."],
+      ["Entrada", "I1.0", "I0", "", "", "", "S1", "SF1", "Polsador START", "START premut", "Polsador amb llum", "Panell de comandament", "", "La seva llum és P1 (Q1.0)."],
+      ["Entrada", "I1.1", "I1", "", "", "", "S2", "SF2", "Polsador STOP", "STOP sense prémer", "Polsador normalment tancat", "Panell de comandament", "", "Si es prem un moment, atura el funcionament automàtic quan acaba el cicle. Si es manté premut 3 s, és una aturada total com la de la seta: tot torna a la situació inicial i després cal fer la posada a zero amb RESET (selector en MAN)."],
+      ["Entrada", "I1.2", "I2", "", "", "", "S3", "SF4", "Selector AUTO/MAN", "Selector en MAN (0 = AUTO)", "Selector de clau", "Panell de comandament", "", "Al programa de PLC de Festo es diu SF4."],
+      ["Entrada", "I1.3", "I3", "", "", "", "S4", "SF3", "Polsador RESET", "RESET premut", "Polsador amb llum", "Panell de comandament", "", "Només actua amb el selector en MAN. La seva llum és P2 (Q1.1). Al programa de PLC de Festo es diu SF3."],
+      ["Entrada", "I1.4", "I4", "", "", "", "", "", "Lliure", "", "", "Panell de comandament", "", "No s'utilitza."],
+      ["Entrada", "I1.5", "I5", "", "", "", "Em_Stop", "SF5", "Seta d'emergència", "Seta no premuda (desbloquejada)", "Polsador d'aturada d'emergència (seta)", "Panell de comandament", "", "Segons el manual de Festo, a totes les variants de PLC hi ha un pont de cable que porta la seta d'emergència al bit 1.5."],
+      ["Entrada", "I1.6", "I6", "", "", "", "XD6", "XD6", "Senyal de l'estació següent", "L'estació següent pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions. El programa de Festo en calcula «estació següent lliure» (XD6 o XD7 = 1), però la seqüència d'aquesta estació no el fa servir."],
+      ["Entrada", "I1.7", "I7", "", "", "", "XD7", "XD7", "Senyal de l'estació següent", "L'estació següent pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions. El programa de Festo en calcula «estació següent lliure» (XD6 o XD7 = 1), però la seqüència d'aquesta estació no el fa servir."],
+      ["Sortida", "Q1.0", "Q0", "", "", "", "P1", "PF1", "Llum del polsador START", "Llum START encesa", "Llum indicadora", "Panell de comandament", "", "S'encén quan l'estació està preparada per començar."],
+      ["Sortida", "Q1.1", "Q1", "", "", "", "P2", "PF2", "Llum del polsador RESET", "Llum RESET encesa", "Llum indicadora", "Panell de comandament", "", "Llum fixa: demana la posada a zero (amb el selector en MAN). El manual diu que fa pampallugues, però el programa de PLC de Festo l'encén fixa."],
+      ["Sortida", "Q1.2", "Q2", "", "", "", "P3", "PF3", "Llum de rampa plena", "Llum RAMPA PLENA encesa", "Llum indicadora", "Panell de comandament", "", "Al panell és la llum Q1. Segons el programa de PLC de Festo, s'encén quan el sensor G1BG3 (I0.2) queda activat una estona. Segons el manual 8046391, s'encén quan hi ha 6 peces en una rampa: cal treure-les i confirmar-ho amb START."],
+      ["Sortida", "Q1.3", "Q3", "", "", "", "P4", "PF4", "Llum indicadora Q2 del panell", "Llum Q2 encesa", "Llum indicadora", "Panell de comandament", "", "No s'utilitza en aquesta estació."],
+      ["Sortida", "Q1.4", "Q4", "", "", "", "XD4", "XD4", "Estació lliure", "Aquesta estació pot rebre peça", "Endoll de laboratori del panell", "Panell de comandament", "", "Només s'utilitza quan es combinen estacions: avisa una altra estació que aquesta està lliure."],
+      ["Sortida", "Q1.5", "Q5", "", "", "", "", "indLightGn", "Llum verda de la torre de senyalització", "Llum verda encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Fixa: estació preparada. Intermitent: en automàtic. Segons el programa de PLC de Festo."],
+      ["Sortida", "Q1.6", "Q6", "", "", "", "", "indLightYe", "Llum groga de la torre de senyalització", "Llum groga encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Fixa: cal fer la posada a zero o el selector és en MAN. Intermitent: posada a zero en curs. Segons el programa de PLC de Festo."],
+      ["Sortida", "Q1.7", "Q7", "", "", "", "", "indLightRd", "Llum vermella de la torre de senyalització", "Llum vermella encesa", "Endoll de laboratori del panell (torre de senyalització)", "Panell de comandament", "", "Seta d'emergència premuda. Segons el programa de PLC de Festo."],
+      ["Alimentació", "", "24 V A", "9+10", "Negre", "V1XG1", "", "", "24 V de les sortides", "", "", "Interfície C (-V1XG1)", "5", ""],
+      ["Alimentació", "", "24 V B", "21+22", "Blanc-rosa", "V1XG1", "", "", "24 V de les entrades", "", "", "Interfície C (-V1XG1)", "5", ""],
+      ["Alimentació", "", "GND A", "11", "Marró-rosa", "V1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-V1XG1)", "5", ""],
+      ["Alimentació", "", "GND A", "12", "Lila", "V1XG1", "", "", "0 V de les sortides", "", "", "Interfície C (-V1XG1)", "5", ""],
+      ["Alimentació", "", "GND B", "23+24", "Blanc-blau", "V1XG1", "", "", "0 V de les entrades", "", "", "Interfície C (-V1XG1)", "5", ""]
     ]
   };
 
@@ -2896,6 +2996,7 @@
       videoId: "1dqghcQuXWaoBHcUy1dHYOPJmsc0D5PqC",
       sections: {
         esquemes: { pdf: "104ACTv_B9T1ZvIctjMwS3SsvQrxuXcDy" },
+        "io-plc": { io: IO_PICK_PLACE },
         components: { catalog: CATALOG_PICK_PLACE }
       },
       description: [
@@ -2910,6 +3011,7 @@
       videoId: "1miOvlUw2UlK6ogMasl6DututKDaS3LBJ",
       sections: {
         esquemes: { pdf: "11fx7idZUYUNGkPIn4b3Kom96FsnmWbbk" },
+        "io-plc": { io: IO_SORTING },
         components: { catalog: CATALOG_SORTING }
       },
       description: [
