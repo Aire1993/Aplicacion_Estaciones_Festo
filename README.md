@@ -14,14 +14,14 @@ Aplicació web (un sol fitxer `index.html`) per publicar a Google Sites.
 
 | Nom | On és |
 | --- | --- |
-| **Barra superior** | Franja blanca de dalt de tot: logo de FESTO (esquerra) i logo de l'Escola del Treball (dreta). |
-| **Banda del títol** | Franja grisa amb la ruta de navegació ("Inici › …") i el títol gran. |
+| **Barra superior** | Franja blanca de dalt de tot: logo de FESTO, el text «Estacions didàctiques» (enllaç per tornar a la pàgina inicial) i el logo de l'Escola del Treball (dreta). |
+| **Banda del títol** | Franja grisa amb el títol gran. |
 | **Targetes** | Els tres requadres de la pantalla inicial (foto + nom de l'estació). |
 | **Fitxa de l'estació** | Pantalla de cada estació: imatge a l'esquerra i descripció a la dreta. |
 | **Botons** | "Esquemes", "Entrades/Sortides PLC", "Grafcet" i "Components". |
 | **Panell de contingut** | Requadre gris que s'obre sota els botons. |
 | **Reproductor ampliat** | Vídeo en gran que apareix després de passar el ratolí per la imatge. |
-| **Peu de pàgina** | Franja de baix de tot (ara buida, pendent de contingut). |
+| **Peu de pàgina** | Franja de baix de tot (provisional): descripció de la web, enllaços a les estacions, InfoPortal de Festo i Escola del Treball, avís de web no oficial i «Torna a dalt». |
 
 ## Vídeos
 
