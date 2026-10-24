@@ -1058,6 +1058,20 @@
   }
   .footer-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
   .footer-about p:not(.footer-name) { max-width: 420px; }
+  .footer-author { margin-top: 10px; }
+  .footer-author b { color: var(--text); font-weight: 600; }
+  .footer-license p + p { margin-top: 8px; font-size: 12px; line-height: 1.5; }
+  .site-footer a.cc-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--text);
+    border: 1.5px solid var(--text);
+    border-radius: 3px;
+  }
+  .site-footer a.cc-badge:hover { color: var(--festo-blue); border-color: var(--festo-blue); text-decoration: none; }
   .footer-h {
     font-size: 12px;
     font-weight: 600;
@@ -1423,11 +1437,9 @@
       <div class="footer-about">
         <p class="footer-name">Estacions didàctiques de Festo</p>
         <p>Documentació de les estacions MPS de Festo Didactic: esquemes, entrades i sortides del PLC, grafcet i components.</p>
+        <p class="footer-author">Web feta per <b>Alberto Pérez Castillo</b>, estudiant de Mecatrònica Industrial
+          de l'Institut Escola del Treball de Barcelona (promoció 2025-2027).</p>
       </div>
-      <nav class="footer-nav" aria-label="Estacions">
-        <h2 class="footer-h">Estacions</h2>
-        <ul id="footer-stations"></ul>
-      </nav>
       <nav class="footer-nav" aria-label="Enllaços">
         <h2 class="footer-h">Enllaços</h2>
         <ul>
@@ -1435,6 +1447,12 @@
           <li><a href="https://escoladeltreball.org/ca/" target="_blank" rel="noopener noreferrer">Institut Escola del Treball de Barcelona</a></li>
         </ul>
       </nav>
+      <div class="footer-license">
+        <h2 class="footer-h">Llicència</h2>
+        <p><a class="cc-badge" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ca" target="_blank" rel="license noopener noreferrer">CC BY-NC-SA 4.0</a></p>
+        <p>Els textos, les taules i els grafcets d'aquesta web es poden compartir i adaptar citant-ne l'autor, sense ús comercial
+          i amb la mateixa llicència. Les imatges, els esquemes i els documents de Festo són dels seus titulars i no hi estan inclosos.</p>
+      </div>
     </div>
     <div class="footer-bottom">
       <p>Web educativa no oficial. FESTO i MPS són marques dels seus titulars; les dades tècniques són de la documentació de Festo Didactic.</p>
@@ -3179,13 +3197,7 @@
     home.appendChild(a);
   });
 
-  // Peu de pàgina: enllaços a les estacions i "Torna a dalt".
-  var footerStations = $("footer-stations");
-  STATIONS.forEach(function (s) {
-    var li = document.createElement("li");
-    li.innerHTML = '<a href="#' + s.slug + '">' + escapeHtml(s.title) + "</a>";
-    footerStations.appendChild(li);
-  });
+  // Peu de pàgina: "Torna a dalt".
   $("footer-top").addEventListener("click", function () {
     scrollToEl(document.querySelector(".topbar"), "start");
     focusQuietly(homeLink);

@@ -21,7 +21,7 @@ Aplicació web (un sol fitxer `index.html`) per publicar a Google Sites.
 | **Botons** | "Esquemes", "Entrades/Sortides PLC", "Grafcet" i "Components". |
 | **Panell de contingut** | Requadre gris que s'obre sota els botons. |
 | **Reproductor ampliat** | Vídeo en gran que apareix després de passar el ratolí per la imatge. |
-| **Peu de pàgina** | Franja de baix de tot (provisional): descripció de la web, enllaços a les estacions, InfoPortal de Festo i Escola del Treball, avís de web no oficial i «Torna a dalt». |
+| **Peu de pàgina** | Franja de baix de tot: descripció i autoria de la web, enllaços a l'InfoPortal de Festo i a l'Escola del Treball, llicència (CC BY-NC-SA 4.0), avís de web no oficial i «Torna a dalt». |
 
 ## Vídeos
 
