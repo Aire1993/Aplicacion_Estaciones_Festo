@@ -3801,7 +3801,8 @@
     gfPinned = "";
     var html = '<div class="gf"><p class="gf-intro">Grafcet de l\'estació segons la norma IEC 60848, dividit en tres grafcets ' +
       "jerarquitzats: <b>Seguretat</b> mana sobre els altres dos, <b>Conducció</b> gestiona el panell i els modes de marxa, " +
-      "i <b>Producció</b> fa la seqüència de l'estació. Els superiors manen sobre els inferiors amb ordres de forçat (requadre doble, p. ex. GP{INIT}).</p>" +
+      "i <b>Producció</b> fa la seqüència de l'estació.<br>" +
+      "Un grafcet superior pot obligar un d'inferior a anar a una situació concreta (ordre de forçat, requadre doble).</p>" +
       '<div class="gf-bar"><div class="gf-tabs" role="group" aria-label="Grafcets parcials">';
     data.charts.forEach(function (c, i) {
       if (i) html += '<span class="gf-arrow" aria-hidden="true">força <span>&rsaquo;</span></span>';
