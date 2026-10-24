@@ -53,7 +53,7 @@ de cada botó (`esquemes`, `io-plc`, `grafcet`, `components`):
 - `{ pdf: "ID de Google Drive" }` mostra el PDF dins de la pàgina amb el visor de Drive
   (ara: MA1B1, MA2B1 i MA3B1).
 - `{ catalog: ... }` mostra el catàleg de components (MA1B4, MA2B4, MA3B4).
-- `{ grafcet: ... }` dibuixa el grafcet de l'estació (ara: MA1B3).
+- `{ grafcet: ... }` dibuixa el grafcet de l'estació (MA1B3, MA2B3 i MA3B3).
 - `{ io: ... }` mostra la taula d'entrades i sortides del PLC (MA1B2, MA2B2 i MA3B2).
 - Un text HTML per a contingut escrit.
 
@@ -70,18 +70,28 @@ peces repetides comparteixen les mateixes dades.
   Les que no hi són, o que fallen, es carreguen des de la web de Festo.
 - `FESTO_DRIVE_PDFS`: fitxes tècniques pujades a Google Drive. Les que no hi són s'obren des de Festo.
 
-## Grafcet (MA1B3)
+## Grafcet (MA1B3, MA2B3, MA3B3)
 
-Grafcet de l'estació segons la norma IEC 60848, dibuixat a la mateixa pàgina (SVG) a partir de
-les dades de `GRAFCET_DISTRIBUTING`. Té tres grafcets parcials jerarquitzats:
+Grafcet de cada estació segons la norma IEC 60848, dibuixat a la mateixa pàgina (SVG) a partir de
+les dades de `GRAFCET_DISTRIBUTING`, `GRAFCET_PICK_PLACE` i `GRAFCET_SORTING`. Cada estació té tres
+grafcets parcials jerarquitzats:
 
 | Grafcet | Què fa |
 | --- | --- |
-| **GS · Seguretat** | Seta d'emergència o STOP mantingut 3 s: ho atura tot i obliga a fer RESET. Força GC i GP. |
-| **GC · Conducció** | Panell de comandament: RESET (només en MAN), estació preparada, AUTO (cicles seguits) o MAN (un cicle). Un STOP curt deixa acabar el cicle i atura l'automàtic. La llum de magatzem buit segueix sempre el sensor. Força GP. |
+| **GS · Seguretat** | Seta d'emergència o STOP mantingut 3 s: ho atura tot i obliga a fer RESET. Força GC i GP. Igual a les tres estacions (`gfSafety`). |
+| **GC · Conducció** | Panell de comandament: RESET (només en MAN), estació preparada, AUTO (cicles seguits) o MAN (un cicle). Un STOP curt deixa acabar el cicle i atura l'automàtic. Força GP. |
 | **GP · Producció** | La seqüència de l'estació segons Festo Didactic. |
 
-RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC oficial de Festo.
+Cada estació segueix el seu programa de PLC oficial de Festo:
+
+| Estació | Particularitats |
+| --- | --- |
+| **Distributing** (MA1B3) | La llum MAGATZEM BUIT segueix sempre el sensor; si el magatzem és buit, la producció espera a l'etapa 0. |
+| **Pick and Place** (MA2B3) | La ventosa agafa la peça insert (mínim 1,2 s); si al cap de 3 s no l'ha agafada, la producció va a l'etapa 10 (llum ERROR) i la conducció torna a l'etapa 20: cal fer RESET. A la posada a zero, primer puja la ventosa i després es recull el carro. |
+| **Sorting** (MA3B3) | Divergència en O de tres branques (vermella, metàl·lica, negra) que tornen a ajuntar-se (convergència en O). La llum RAMPA PLENA s'encén quan el sensor de les rampes fa 1 s que està actiu; si passa amb la producció en repòs, cal buidar la rampa i fer RESET. |
+
+Els senyals del panell (`GF_PANEL_VARS`), el grafcet de seguretat (`gfSafety`) i les transicions de
+RESET i START de la conducció (`GF_GC_TRANS`) són comuns a les tres estacions.
 
 - Es pot veure en tres nivells: **Funcional** (en paraules), **Tecnològic** (etiquetes dels esquemes)
   i **PLC** (adreces). Les adreces són les de la documentació de Festo (byte 0 = estació, byte 1 = panell).
@@ -99,6 +109,11 @@ RESET, STOP i la llum de magatzem buit es comporten com al programa de PLC ofici
   `fn` és la mateixa condició en paraules.
 - Accions de les etapes (`act`): `{ v: "senyal" }`, condicionada `{ v: "senyal", cond: "condició", condFn: "en paraules" }`,
   o ordre de forçat `{ force: "GP", to: "INIT" }` (`"INIT"` = situació inicial, `""` = cap etapa activa, `"8"` = etapa 8).
+- Posició: cada etapa té una fila (`row`) i, si no és a la primera, una columna (`col`). Les branques d'una divergència
+  en O van a columnes diferents i, si tornen a una etapa d'una altra columna, s'hi ajunten amb una convergència en O.
+  Una transició pot portar `col` per triar-ne la columna (p. ex. dues transicions que surten de la mateixa etapa i
+  tornen enrere: les de la primera columna tornen per l'esquerra i les altres per la dreta).
+- Temporitzacions: `3s/`, `500ms/`, `1200ms/X2` (l'etapa 2 fa 1,2 s que és activa).
 
 ## Entrades/Sortides PLC (MA1B2, MA2B2, MA3B2)
 

@@ -2964,6 +2964,52 @@
     ]
   };
 
+  // Senyals del panell, iguals a totes les estacions.
+  var GF_PANEL_VARS = {
+    start:     { plc: "I1.0", tag: "S1", desc: "Polsador START" },
+    stop:      { plc: "I1.1", tag: "S2", desc: "Polsador STOP (normalment tancat: 1 = no premut)" },
+    man:       { plc: "I1.2", tag: "S3", desc: "Selector AUTO/MAN (0 = AUTO, 1 = MAN)" },
+    reset:     { plc: "I1.3", tag: "S4", desc: "Polsador RESET" },
+    seta:      { plc: "I1.5", tag: "Em_Stop", desc: "Seta d'emergència (1 = no premuda)" },
+    llumStart: { plc: "Q1.0", tag: "P1", fn: "Llum START", desc: "Llum del polsador START" },
+    llumReset: { plc: "Q1.1", tag: "P2", fn: "Llum RESET", desc: "Llum del polsador RESET" }
+  };
+  function gfVars(own) {
+    var v = {};
+    Object.keys(GF_PANEL_VARS).forEach(function (k) { v[k] = GF_PANEL_VARS[k]; });
+    Object.keys(own).forEach(function (k) { v[k] = own[k]; });
+    return v;
+  }
+
+  // Grafcet de seguretat, igual a totes les estacions; només canvia què passa amb els actuadors.
+  function gfSafety(stopNote) {
+    return {
+      key: "GS", name: "Seguretat",
+      about: "Té la prioritat més alta. Si es prem la seta d'emergència o es manté STOP premut 3 s, ho atura tot: la producció es queda sense cap etapa activa i la conducció torna a l'etapa 20. Després cal tornar a fer RESET.",
+      steps: [
+        { n: 100, init: true, row: 0, name: "Funcionament normal",
+          note: "Situació inicial. Una pulsació curta de STOP no actua aquí: la gestiona el grafcet de conducció." },
+        { n: 101, row: 1, name: "Aturada total", act: [{ force: "GP", to: "" }, { force: "GC", to: "INIT" }],
+          note: "Com al programa de PLC de Festo, s'atura tot i cal tornar a fer RESET. La producció es queda sense cap etapa activa (GP{}): " + stopNote +
+            " La conducció torna a la situació inicial (etapa 20), i la producció no torna a l'etapa 0 fins a la posada a zero (GP{INIT} a l'etapa 21)." }
+      ],
+      trans: [
+        { from: 100, to: 101, c: "/seta + 3s//stop", fn: "Seta premuda o STOP premut durant 3 s",
+          note: "La seta dona 1 quan no està premuda i STOP és un contacte normalment tancat: per això es comproven negats. «3s/» és una temporització: la condició es compleix quan STOP fa 3 s que està premut." },
+        { from: 101, to: 100, c: "stop * seta", fn: "STOP i seta alliberats",
+          note: "Torna al funcionament normal, però la conducció és a l'etapa 20: cal fer RESET amb el selector en MAN." }
+      ]
+    };
+  }
+
+  var GF_GC_ABOUT = "Grafcet de conducció o de modes de marxa. Gestiona el panell de comandament: posada a zero amb RESET (només amb el selector en MAN), estació preparada i producció en AUTO (cicles seguits) o MAN (un sol cicle). Una pulsació curta de STOP deixa acabar el cicle en curs i atura l'automàtic.";
+  var GF_GC_TRANS = {
+    reset: { from: 20, to: 21, c: "^reset * man", fn: "Es prem RESET amb el selector en MAN",
+      note: "Com al programa de PLC de Festo, RESET només funciona amb el selector en MAN (I1.2 = 1)." },
+    start: { from: 22, to: 23, c: "^start * X0 * stop", fn: "Es prem START amb la producció en repòs i STOP sense prémer",
+      note: "Si s'ha aturat amb STOP, START no actua fins que acaba el cicle en curs (la producció torna a l'etapa 0). Com al programa de PLC de Festo, STOP té prioritat sobre START." }
+  };
+
   // Llum MAGATZEM BUIT: segueix el sensor a totes les etapes de la conducció.
   var GF_LLUM_BUIT = { v: "llumBuit", cond: "buit", condFn: "Magatzem buit" };
 
@@ -2972,45 +3018,23 @@
       label: "Festo Didactic InfoPortal · Distributing Conveyor Station",
       url: "https://ip.festo-didactic.com/InfoPortal/MPS/DistributionConveyorStation/EN/index.html"
     },
-    vars: {
+    vars: gfVars({
       inici:     { plc: "I0.0", tag: "G1BG1", desc: "Peça a l'inici de la cinta" },
       mig:       { plc: "I0.1", tag: "G1BG2", desc: "Peça a la posició intermèdia de la cinta" },
       final:     { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)" },
       recollit:  { plc: "I0.4", tag: "C2BG1", desc: "Expulsor recollit" },
       avancat:   { plc: "I0.5", tag: "C2BG2", desc: "Expulsor avançat" },
       buit:      { plc: "I0.6", tag: "C2BG3", desc: "Magatzem buit" },
-      start:     { plc: "I1.0", tag: "S1", desc: "Polsador START" },
-      stop:      { plc: "I1.1", tag: "S2", desc: "Polsador STOP (normalment tancat: 1 = no premut)" },
-      man:       { plc: "I1.2", tag: "S3", desc: "Selector AUTO/MAN (0 = AUTO, 1 = MAN)" },
-      reset:     { plc: "I1.3", tag: "S4", desc: "Polsador RESET" },
-      seta:      { plc: "I1.5", tag: "Em_Stop", desc: "Seta d'emergència (1 = no premuda)" },
       cinta:     { plc: "Q0.0", tag: "G1MA1", tagAct: "G1MA1 endavant", fn: "Cinta endavant", desc: "Motor de la cinta endavant (controlador G1KF1)" },
       expulsor:  { plc: "Q0.4", tag: "C2MB1", fn: "Avançar l'expulsor", desc: "Avançar l'expulsor (electrovàlvula 5/2 que torna per molla)" },
-      llumStart: { plc: "Q1.0", tag: "P1", fn: "Llum START", desc: "Llum del polsador START" },
-      llumReset: { plc: "Q1.1", tag: "P2", fn: "Llum RESET", desc: "Llum del polsador RESET" },
       llumBuit:  { plc: "Q1.2", tag: "P3", fn: "Llum MAGATZEM BUIT", desc: "Llum de magatzem buit" }
-    },
+    }),
     unused: "Q0.1 (cinta enrere) i Q0.2 (G1MB1, separador)",
     charts: [
-      {
-        key: "GS", name: "Seguretat",
-        about: "Té la prioritat més alta. Si es prem la seta d'emergència o es manté STOP premut 3 s, ho atura tot: la producció es queda sense cap etapa activa i la conducció torna a l'etapa 20. Després cal tornar a fer RESET.",
-        steps: [
-          { n: 100, init: true, row: 0, name: "Funcionament normal",
-            note: "Situació inicial. Una pulsació curta de STOP no actua aquí: la gestiona el grafcet de conducció." },
-          { n: 101, row: 1, name: "Aturada total", act: [{ force: "GP", to: "" }, { force: "GC", to: "INIT" }],
-            note: "Com al programa de PLC de Festo, s'atura tot i cal tornar a fer RESET. La producció es queda sense cap etapa activa (GP{}): el motor s'atura i l'expulsor torna enrere per la molla de la vàlvula. La conducció torna a la situació inicial (etapa 20), i la producció no torna a l'etapa 0 fins a la posada a zero (GP{INIT} a l'etapa 21)." }
-        ],
-        trans: [
-          { from: 100, to: 101, c: "/seta + 3s//stop", fn: "Seta premuda o STOP premut durant 3 s",
-            note: "La seta dona 1 quan no està premuda i STOP és un contacte normalment tancat: per això es comproven negats. «3s/» és una temporització: la condició es compleix quan STOP fa 3 s que està premut." },
-          { from: 101, to: 100, c: "stop * seta", fn: "STOP i seta alliberats",
-            note: "Torna al funcionament normal, però la conducció és a l'etapa 20: cal fer RESET amb el selector en MAN." }
-        ]
-      },
+      gfSafety("el motor s'atura i l'expulsor torna enrere per la molla de la vàlvula."),
       {
         key: "GC", name: "Conducció",
-        about: "Grafcet de conducció o de modes de marxa. Gestiona el panell de comandament: posada a zero amb RESET (només amb el selector en MAN), estació preparada i producció en AUTO (cicles seguits) o MAN (un sol cicle). Una pulsació curta de STOP deixa acabar el cicle en curs i atura l'automàtic. La llum MAGATZEM BUIT segueix sempre el sensor.",
+        about: GF_GC_ABOUT + " La llum MAGATZEM BUIT segueix sempre el sensor.",
         steps: [
           { n: 20, init: true, row: 0, name: "No inicialitzada", act: [{ v: "llumReset", cond: "man", condFn: "MAN" }, GF_LLUM_BUIT],
             note: "Situació inicial i després d'una aturada total. Amb el selector en MAN, la llum RESET s'encén fixa per demanar la posada a zero. La llum MAGATZEM BUIT és a totes les etapes de la conducció (sempre n'hi ha una d'activa), així que segueix sempre el sensor, com al programa de PLC de Festo." },
@@ -3022,12 +3046,10 @@
             note: "La producció pot fer cicles. En AUTO en fa de seguits; en MAN només un." }
         ],
         trans: [
-          { from: 20, to: 21, c: "^reset * man", fn: "Es prem RESET amb el selector en MAN",
-            note: "Com al programa de PLC de Festo, RESET només funciona amb el selector en MAN (I1.2 = 1)." },
+          GF_GC_TRANS.reset,
           { from: 21, to: 22, c: "X0 * recollit * /inici * /mig * final * /buit", fn: "Producció a l'etapa 0, expulsor recollit, cinta buida i magatzem amb peces",
             note: "Com al programa de PLC de Festo, la posada a zero acaba quan l'expulsor és recollit, no hi ha cap peça a la cinta (ni a l'inici, ni al mig, ni al final) i el magatzem té peces. Comprovar X0 assegura que el forçat s'ha fet." },
-          { from: 22, to: 23, c: "^start * X0 * stop", fn: "Es prem START amb la producció en repòs i STOP sense prémer",
-            note: "Si s'ha aturat amb STOP, START no actua fins que acaba el cicle en curs (la producció torna a l'etapa 0). Com al programa de PLC de Festo, STOP té prioritat sobre START." },
+          GF_GC_TRANS.start,
           { from: 23, to: 22, c: "/stop + X4 * final * man", fn: "STOP premut, o MAN i fi de cicle (etapa 4 i peça retirada)",
             note: "Com al programa de PLC de Festo, una pulsació curta de STOP atura l'automàtic: el cicle en curs acaba i l'estació queda preparada, sense haver de fer RESET. En MAN, torna a preparada quan acaba el cicle." }
         ]
@@ -3061,6 +3083,200 @@
     ]
   };
 
+  var GRAFCET_PICK_PLACE = {
+    source: {
+      label: "Festo Didactic InfoPortal · Pick and Place Station",
+      url: "https://ip.festo-didactic.com/InfoPortal/MPS/PickandPlaceStation/EN/index.html"
+    },
+    vars: gfVars({
+      inici:         { plc: "I0.0", tag: "G1BG1", desc: "Peça a l'inici de la cinta" },
+      mig:           { plc: "I0.1", tag: "G1BG2", desc: "Peça al separador (posició intermèdia de la cinta)" },
+      final:         { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)" },
+      carroRecollit: { plc: "I0.4", tag: "G2BG1", desc: "Carro horitzontal recollit (ventosa sobre la rampa de les peces insert)" },
+      carroAvancat:  { plc: "I0.5", tag: "G2BG2", desc: "Carro horitzontal avançat (ventosa sobre la cinta)" },
+      ventosaDalt:   { plc: "I0.6", tag: "G2BG3", desc: "Ventosa a dalt" },
+      agafada:       { plc: "I0.7", tag: "G2BP1", desc: "Peça agafada (hi ha buit a la ventosa)" },
+      cinta:         { plc: "Q0.0", tag: "G1MA1", tagAct: "G1MA1 endavant", fn: "Cinta endavant", desc: "Motor de la cinta endavant (controlador G1KF1)" },
+      separador:     { plc: "Q0.2", tag: "G1MB1", fn: "Avançar el separador", desc: "Avançar el separador, que reté la peça (electroimant: sense senyal es recull)" },
+      recollirCarro: { plc: "Q0.4", tag: "G2MB1", fn: "Recollir el carro", desc: "Recollir el carro horitzontal (electrovàlvula 5/2 biestable)" },
+      avancarCarro:  { plc: "Q0.5", tag: "G2MB2", fn: "Avançar el carro", desc: "Avançar el carro horitzontal (electrovàlvula 5/2 biestable)" },
+      baixarVentosa: { plc: "Q0.6", tag: "G2MB3", fn: "Baixar la ventosa", desc: "Baixar la ventosa (electrovàlvula 5/2 monoestable: sense senyal puja)" },
+      buit:          { plc: "Q0.7", tag: "G2MB4", fn: "Activar el buit", desc: "Activar el buit de la ventosa (generador de buit G2KH1)" },
+      llumError:     { plc: "Q1.2", tag: "P3", fn: "Llum ERROR", desc: "Llum Q1 del panell: no s'ha agafat la peça insert" }
+    }),
+    unused: "Q0.1 (cinta enrere)",
+    charts: [
+      gfSafety("la cinta i el buit s'aturen, el separador es recull i la ventosa puja (vàlvula monoestable); si duia una peça insert, la deixa anar. El carro es queda on és perquè la seva vàlvula és biestable."),
+      {
+        key: "GC", name: "Conducció",
+        about: GF_GC_ABOUT + " Si la ventosa no agafa la peça insert, l'estació deixa de produir i cal tornar a fer RESET.",
+        steps: [
+          { n: 20, init: true, row: 0, name: "No inicialitzada", act: [{ v: "llumReset", cond: "man", condFn: "MAN" }],
+            note: "Situació inicial, després d'una aturada total o d'un error en agafar la peça insert. Amb el selector en MAN, la llum RESET s'encén fixa per demanar la posada a zero." },
+          { n: 21, row: 1, name: "Posada a zero", act: [{ force: "GP", to: "INIT" }, { v: "llumReset", cond: "man", condFn: "MAN" }, { v: "recollirCarro", cond: "ventosaDalt", condFn: "Ventosa a dalt" }],
+            note: "Posa la producció a la situació inicial (etapa 0): cinta parada, separador recollit, buit desactivat i ventosa a dalt. Com al programa de PLC de Festo, primer puja la ventosa i després es recull el carro (acció condicionada). La llum RESET continua encesa fins que acaba." },
+          { n: 22, row: 2, name: "Preparada", act: [{ v: "llumStart", cond: "X0", condFn: "GP en repòs" }],
+            note: "La llum START s'encén quan es pot començar: l'estació està preparada i la producció és en repòs (etapa 0)." },
+          { n: 23, row: 3, name: "En producció",
+            note: "La producció pot fer cicles. En AUTO en fa de seguits; en MAN només un." }
+        ],
+        trans: [
+          GF_GC_TRANS.reset,
+          { from: 21, to: 22, c: "X0 * ventosaDalt * carroRecollit * /inici * /mig * final", fn: "Producció a l'etapa 0, ventosa a dalt, carro recollit i cinta buida",
+            note: "Com al programa de PLC de Festo, la posada a zero acaba quan la ventosa és a dalt, el carro és recollit i no hi ha cap peça a la cinta (ni a l'inici, ni al separador, ni al final). Comprovar X0 assegura que el forçat s'ha fet." },
+          GF_GC_TRANS.start,
+          { from: 23, to: 22, c: "/stop + X9 * final * man", fn: "STOP premut, o MAN i fi de cicle (etapa 9 i peça retirada)",
+            note: "Com al programa de PLC de Festo, una pulsació curta de STOP atura l'automàtic: el cicle en curs acaba i l'estació queda preparada, sense haver de fer RESET. En MAN, torna a preparada quan acaba el cicle." },
+          { from: 22, to: 20, col: 1, c: "X10", fn: "Peça insert no agafada (etapa 10)",
+            note: "Si s'ha premut STOP, el cicle en curs continua amb la conducció a l'etapa 22 i també pot fallar. Per això aquesta transició també surt de l'etapa 22." },
+          { from: 23, to: 20, col: 1, c: "X10", fn: "Peça insert no agafada (etapa 10)",
+            note: "Com al programa de PLC de Festo, si la ventosa no agafa la peça insert, l'estació deixa de produir: l'automàtic s'atura i cal fer la posada a zero amb RESET (selector en MAN). La producció es queda a l'etapa 10, amb la llum ERROR encesa, fins a la posada a zero." }
+        ]
+      },
+      {
+        key: "GP", name: "Producció",
+        about: "La seqüència de l'estació segons Festo Didactic: la cinta porta la carcassa fins al separador, el mòdul Pick&Place agafa una peça insert de la rampa i la hi posa, i la cinta porta la peça completa fins al final. Si la ventosa no agafa cap peça insert, la producció va a l'etapa 10 i s'hi queda.",
+        steps: [
+          { n: 0, init: true, row: 0, name: "Repòs",
+            note: "Posició inicial: cinta parada, separador recollit, ventosa a dalt, carro recollit i buit desactivat. L'InfoPortal diu que el separador és avançat a la posició inicial, però el programa de PLC de Festo el deixa recollit i no l'avança fins que arriba una carcassa." },
+          { n: 1, row: 1, name: "Transport al separador", act: [{ v: "cinta" }, { v: "separador" }],
+            note: "Festo, pas 1: la cinta porta la carcassa fins al separador, que avança per retenir-la." },
+          { n: 2, row: 2, name: "Agafar la peça insert", act: [{ v: "separador" }, { v: "baixarVentosa" }, { v: "buit" }],
+            note: "Festo, passos 2 i 3: la cinta s'atura amb la carcassa retinguda al separador. La ventosa baixa sobre la rampa i xucla una peça insert." },
+          { n: 3, row: 3, name: "Pujar la ventosa", act: [{ v: "separador" }, { v: "buit" }],
+            note: "La ventosa puja amb la peça insert. El buit continua actiu perquè no caigui." },
+          { n: 4, row: 4, name: "Avançar el carro", act: [{ v: "separador" }, { v: "buit" }, { v: "avancarCarro" }],
+            note: "El carro porta la peça insert a sobre de la carcassa. Com que la vàlvula del carro és biestable, n'hi ha prou amb el senyal fins que el carro arriba." },
+          { n: 5, row: 5, name: "Baixar la peça insert", act: [{ v: "separador" }, { v: "buit" }, { v: "baixarVentosa" }],
+            note: "La ventosa baixa i posa la peça insert a la carcassa." },
+          { n: 6, row: 6, name: "Deixar la peça insert", act: [{ v: "separador" }],
+            note: "Es desactiva el buit per deixar anar la peça insert i la ventosa torna a pujar (sense senyal, la vàlvula torna per molla)." },
+          { n: 7, row: 7, name: "Recollir el carro", act: [{ v: "separador" }, { v: "recollirCarro" }],
+            note: "El carro torna a sobre de la rampa de les peces insert." },
+          { n: 8, row: 8, name: "Transport al final", act: [{ v: "cinta" }],
+            note: "Festo, passos 4 i 5: el separador es recull (sense senyal) i la cinta porta la peça completa fins al final." },
+          { n: 9, row: 9, name: "Peça al final",
+            note: "Festo, pas 6: la cinta s'atura. Com al programa de PLC de Festo, s'espera que es retiri la peça abans de començar un cicle nou." },
+          { n: 10, row: 3, col: 1, name: "Error: peça insert no agafada", act: [{ v: "baixarVentosa" }, { v: "llumError" }],
+            note: "La ventosa no ha agafat cap peça insert (per exemple, perquè la rampa és buida). Com al programa de PLC de Festo, s'encén la llum ERROR, s'aturen la cinta i el buit i el separador es recull, però la ventosa es queda a baix. Aquesta etapa no té cap transició de sortida: la conducció torna a l'etapa 20 i la producció només en surt amb la posada a zero (GP{INIT}). Abans de fer RESET cal treure la carcassa de la cinta i omplir la rampa." }
+        ],
+        trans: [
+          { from: 0, to: 1, c: "X23 * inici", fn: "En producció i carcassa a l'inici de la cinta",
+            note: "Condició d'inici de Festo: hi ha una carcassa a l'inici de la cinta i l'estació és en producció (AUTO o MAN)." },
+          { from: 1, to: 2, c: "500ms/mig", fn: "Fa 0,5 s que la carcassa és al separador",
+            note: "Com al programa de PLC de Festo, quan el sensor G1BG2 detecta la carcassa, la cinta continua 0,5 s perquè quedi ben recolzada contra el separador. «500ms/» és una temporització: la condició es compleix quan el sensor fa 0,5 s que està actiu." },
+          { from: 2, to: 3, c: "1200ms/X2 * agafada", fn: "Peça insert agafada (com a mínim 1,2 s a baix)",
+            note: "Com al programa de PLC de Festo, la ventosa es queda a baix com a mínim 1,2 s i després comprova que el sensor de buit G2BP1 detecta la peça. X2 és la variable de l'etapa 2: «1200ms/X2» es compleix quan l'etapa fa 1,2 s que és activa." },
+          { from: 2, to: 10, c: "3s/X2 * /agafada", fn: "Al cap de 3 s no s'ha agafat cap peça insert",
+            note: "Com al programa de PLC de Festo, si al cap de 3 s el sensor de buit no detecta cap peça, hi ha un error. Les dues transicions que surten de l'etapa 2 són excloents (peça agafada o no), com demana la norma en una divergència en O." },
+          { from: 3, to: 4, c: "ventosaDalt", fn: "Ventosa a dalt" },
+          { from: 4, to: 5, c: "carroAvancat", fn: "Carro avançat" },
+          { from: 5, to: 6, c: "1s/X5 * /ventosaDalt", fn: "Fa 1 s que baixa i ja no és a dalt",
+            note: "Com al programa de PLC de Festo: com que no hi ha cap sensor de ventosa a baix, s'espera 1 s des que comença a baixar i es comprova que el sensor G2BG3 (ventosa a dalt) està desactivat." },
+          { from: 6, to: 7, c: "ventosaDalt", fn: "Ventosa a dalt" },
+          { from: 7, to: 8, c: "carroRecollit", fn: "Carro recollit",
+            note: "El mòdul Pick&Place ha acabat: com al programa de PLC de Festo, el separador deixa passar la carcassa amb la peça insert posada." },
+          { from: 8, to: 9, c: "/final", fn: "Peça al final de la cinta",
+            note: "El sensor G1BG3 dona 1 quan NO hi ha peça al final: la peça hi arriba quan el senyal passa a 0." },
+          { from: 9, to: 0, c: "final", fn: "Peça retirada",
+            note: "Com al programa de PLC de Festo, no es comença un cicle nou fins que el final de la cinta queda lliure. Quan es combinen estacions, el programa també pot passar la peça a l'estació següent si és lliure (I1.6 o I1.7); aquest grafcet no ho inclou." }
+        ]
+      }
+    ]
+  };
+
+  // Llum RAMPA PLENA: a totes les etapes de la conducció, quan el sensor de les rampes fa 1 s que està actiu.
+  var GF_LLUM_PLENA = { v: "llumPlena", cond: "1s/rampa", condFn: "Rampa ocupada 1 s" };
+
+  var GRAFCET_SORTING = {
+    source: {
+      label: "Festo Didactic InfoPortal · Sorting Station",
+      url: "https://ip.festo-didactic.com/InfoPortal/MPS/SortingStation/EN/index.html"
+    },
+    vars: gfVars({
+      inici:      { plc: "I0.0", tag: "G1BG1", desc: "Peça a l'inici de la cinta" },
+      desv1:      { plc: "I0.1", tag: "G1BG2", desc: "Desviador 1 avançat" },
+      rampa:      { plc: "I0.2", tag: "G1BG3", desc: "Peça davant del sensor de les rampes (n'hi cau una o alguna rampa és plena)" },
+      desv2:      { plc: "I0.3", tag: "G1BG4", desc: "Desviador 2 avançat" },
+      peca:       { plc: "I0.4", tag: "B1BG1", desc: "Peça al mòdul de detecció (barrera de llum de forquilla)" },
+      noNegra:    { plc: "I0.5", tag: "B1BG2", desc: "La peça no és negra (sensor de reflexió difusa)" },
+      metall:     { plc: "I0.6", tag: "B1BG3", desc: "La peça és metàl·lica (sensor inductiu)" },
+      cinta:      { plc: "Q0.0", tag: "G1MA1", tagAct: "G1MA1 endavant", fn: "Cinta endavant", desc: "Motor de la cinta endavant (controlador G1KF1)" },
+      desviador1: { plc: "Q0.1", tag: "G1MB1", fn: "Avançar el desviador 1", desc: "Avançar el desviador 1, que porta les peces vermelles a la rampa de l'inici (electroimant)" },
+      desviador2: { plc: "Q0.2", tag: "G1MB2", fn: "Avançar el desviador 2", desc: "Avançar el desviador 2, que porta les peces metàl·liques a la rampa del mig (electroimant)" },
+      topall:     { plc: "Q0.3", tag: "G1MB3", fn: "Recollir el topall", desc: "Recollir el topall i deixar passar la peça (sense senyal surt i l'atura)" },
+      llumPlena:  { plc: "Q1.2", tag: "P3", fn: "Llum RAMPA PLENA", desc: "Llum de rampa plena (llum Q1 del panell)" }
+    }),
+    charts: [
+      gfSafety("la cinta s'atura, els desviadors es recullen i el topall surt."),
+      {
+        key: "GC", name: "Conducció",
+        about: GF_GC_ABOUT + " La llum RAMPA PLENA segueix el sensor de les rampes. Si una rampa és plena quan l'estació espera una peça nova, cal buidar-la i tornar a fer RESET.",
+        steps: [
+          { n: 20, init: true, row: 0, name: "No inicialitzada", act: [{ v: "llumReset", cond: "man", condFn: "MAN" }, GF_LLUM_PLENA],
+            note: "Situació inicial, després d'una aturada total o quan s'omple una rampa. Amb el selector en MAN, la llum RESET s'encén fixa per demanar la posada a zero. La llum RAMPA PLENA és a totes les etapes de la conducció (sempre n'hi ha una d'activa): com al programa de PLC de Festo, s'encén quan el sensor de les rampes fa una estona que detecta una peça i s'apaga sola quan es buida la rampa. El programa no en documenta el temps: aquí s'ha pres 1 s, el mateix que espera la producció a l'etapa 6. El manual diu que s'encén amb 6 peces en una rampa i que es confirma amb START, però el programa de PLC de Festo demana RESET." },
+          { n: 21, row: 1, name: "Posada a zero", act: [{ force: "GP", to: "INIT" }, { v: "llumReset", cond: "man", condFn: "MAN" }, GF_LLUM_PLENA],
+            note: "Posa la producció a la situació inicial (etapa 0): cinta parada, desviadors recollits i topall a fora. La llum RESET continua encesa fins que acaba." },
+          { n: 22, row: 2, name: "Preparada", act: [{ v: "llumStart", cond: "X0", condFn: "GP en repòs" }, GF_LLUM_PLENA],
+            note: "La llum START s'encén quan es pot començar: l'estació està preparada i la producció és en repòs (etapa 0)." },
+          { n: 23, row: 3, name: "En producció", act: [GF_LLUM_PLENA],
+            note: "La producció pot fer cicles. En AUTO en fa de seguits; en MAN només un." }
+        ],
+        trans: [
+          GF_GC_TRANS.reset,
+          { from: 21, to: 22, c: "X0 * /inici * /rampa", fn: "Producció a l'etapa 0, cap peça a l'inici i rampes lliures",
+            note: "Com al programa de PLC de Festo, la posada a zero acaba quan no hi ha cap peça a l'inici de la cinta ni davant del sensor de les rampes. Comprovar X0 assegura que el forçat s'ha fet." },
+          GF_GC_TRANS.start,
+          { from: 23, to: 22, c: "/stop + X6 * man", fn: "STOP premut, o MAN i peça classificada (etapa 6)",
+            note: "Com al programa de PLC de Festo, una pulsació curta de STOP atura l'automàtic: el cicle en curs acaba i l'estació queda preparada, sense haver de fer RESET. En MAN, torna a preparada quan la peça ja és a la rampa." },
+          { from: 22, to: 20, col: 1, c: "X0 * 1s/rampa", fn: "Rampa ocupada 1 s amb la producció en repòs",
+            note: "La rampa també es pot omplir quan l'estació és preparada (per exemple, si s'hi posen peces a mà). Per això aquesta transició també surt de l'etapa 22." },
+          { from: 23, to: 20, col: 1, c: "X0 * 1s/rampa", fn: "Rampa ocupada 1 s amb la producció en repòs",
+            note: "Com al programa de PLC de Festo, si el sensor de les rampes continua detectant una peça quan la producció espera la peça següent (etapa 0), una rampa és plena: l'estació deixa de produir. Cal buidar la rampa i fer la posada a zero amb RESET (selector en MAN)." }
+        ]
+      },
+      {
+        key: "GP", name: "Producció",
+        about: "La seqüència de l'estació segons Festo Didactic: la cinta porta la peça fins al topall, el mòdul de detecció en mira el color i el material, i un desviador l'envia a la rampa que li toca: les vermelles a la de l'inici, les metàl·liques a la del mig i les negres a la del final de la cinta.",
+        steps: [
+          { n: 0, init: true, row: 0, name: "Repòs",
+            note: "Posició inicial: cinta parada, topall a fora i desviadors recollits." },
+          { n: 1, row: 1, name: "Transport fins al topall", act: [{ v: "cinta" }],
+            note: "Festo, passos 1 i 2: hi ha una peça a l'inici de la cinta i el motor s'engega. El topall (a fora, sense senyal) atura la peça davant dels sensors del mòdul de detecció." },
+          { n: 2, row: 2, name: "Detecció del color i el material", act: [{ v: "cinta" }],
+            note: "Festo, pas 3: la peça és aturada pel topall davant dels sensors i la cinta continua en marxa. Al programa de PLC de Festo, el mòdul de detecció decideix que la peça és negra si el sensor de reflexió B1BG2 no s'activa en 0,5 s; si s'activa, és metàl·lica si el sensor inductiu B1BG3 també s'activa, i vermella si 0,1 s després no s'ha activat. Aquí es llegeixen els sensors al cap de 0,5 s, amb la peça quieta." },
+          { n: 3, row: 3, name: "Peça vermella", act: [{ v: "cinta" }, { v: "topall" }, { v: "desviador1" }],
+            note: "Festo, passos 4 a 6 (peça vermella): el desviador 1 avança, el topall es recull i la cinta porta la peça fins a la rampa de l'inici." },
+          { n: 4, row: 3, col: 1, name: "Peça metàl·lica", act: [{ v: "cinta" }, { v: "topall" }, { v: "desviador2" }],
+            note: "Festo, passos 4 a 6 (peça metàl·lica): el desviador 2 avança, el topall es recull i la cinta porta la peça fins a la rampa del mig." },
+          { n: 5, row: 3, col: 2, name: "Peça negra", act: [{ v: "cinta" }, { v: "topall" }],
+            note: "Festo, passos 4 i 5 (peça negra): el topall es recull i la cinta porta la peça fins a la rampa del final, sense cap desviador." },
+          { n: 6, row: 4, name: "Peça classificada",
+            note: "Festo, passos 7 a 9: la peça ja és a la rampa. La cinta s'atura, el desviador es recull i el topall torna a sortir. No cal cap acció: sense senyal, tots tornen a la posició de repòs." }
+        ],
+        trans: [
+          { from: 0, to: 1, c: "X23 * inici", fn: "En producció i peça a l'inici de la cinta",
+            note: "Condició d'inici de Festo: hi ha una peça a l'inici de la cinta i l'estació és en producció (AUTO o MAN)." },
+          { from: 1, to: 2, c: "peca", fn: "Peça davant dels sensors de detecció",
+            note: "La barrera de llum de forquilla B1BG1 detecta totes les peces, siguin del color o del material que siguin." },
+          { from: 2, to: 3, c: "500ms/X2 * noNegra * /metall", fn: "Al cap de 0,5 s, no és negra ni metàl·lica: vermella",
+            note: "X2 és la variable de l'etapa 2: «500ms/X2» es compleix quan l'etapa fa 0,5 s que és activa. Les tres transicions que surten de l'etapa 2 són excloents, com demana la norma en una divergència en O." },
+          { from: 2, to: 4, c: "500ms/X2 * noNegra * metall", fn: "Al cap de 0,5 s, metàl·lica",
+            note: "Les peces metàl·liques activen el sensor inductiu B1BG3 i també el de reflexió B1BG2." },
+          { from: 2, to: 5, c: "500ms/X2 * /noNegra", fn: "Al cap de 0,5 s, negra",
+            note: "Les peces negres gairebé no reflecteixen la llum i no activen el sensor de reflexió B1BG2." },
+          { from: 3, to: 6, c: "desv1 * rampa", fn: "Desviador 1 avançat i peça a la rampa",
+            note: "Com al programa de PLC de Festo, s'espera que el desviador sigui avançat i que la peça passi per davant del sensor de les rampes G1BG3 (n'hi ha un de sol per a les tres rampes)." },
+          { from: 4, to: 6, c: "desv2 * rampa", fn: "Desviador 2 avançat i peça a la rampa",
+            note: "Les tres branques s'ajunten a l'etapa 6 (convergència en O)." },
+          { from: 5, to: 6, c: "rampa", fn: "Peça a la rampa" },
+          { from: 6, to: 0, c: "/rampa + 1s/X6", fn: "Sensor de les rampes lliure, o ha passat 1 s",
+            note: "Com al programa de PLC de Festo, s'espera que la peça acabi de caure (el sensor torna a 0). Si al cap d'1 s encara hi ha una peça davant del sensor, la rampa és plena: la producció torna igualment a l'etapa 0 i la conducció atura l'estació (transicions 22 → 20 i 23 → 20)." }
+        ]
+      }
+    ]
+  };
+
   var STATIONS = [
     {
       slug: "distributing-conveyor",
@@ -3086,6 +3302,7 @@
       sections: {
         esquemes: { pdf: "104ACTv_B9T1ZvIctjMwS3SsvQrxuXcDy" },
         "io-plc": { io: IO_PICK_PLACE },
+        grafcet: { grafcet: GRAFCET_PICK_PLACE },
         components: { catalog: CATALOG_PICK_PLACE }
       },
       description: [
@@ -3101,6 +3318,7 @@
       sections: {
         esquemes: { pdf: "11fx7idZUYUNGkPIn4b3Kom96FsnmWbbk" },
         "io-plc": { io: IO_SORTING },
+        grafcet: { grafcet: GRAFCET_SORTING },
         components: { catalog: CATALOG_SORTING }
       },
       description: [
@@ -3705,21 +3923,26 @@
       out[s.n] = [];
       maxRow = Math.max(maxRow, s.row);
     });
+    var outN = {};
+    chart.trans.forEach(function (t) { outN[t.from] = (outN[t.from] || 0) + 1; });
     var trans = chart.trans.map(function (t, i) {
       var a = steps[t.from], b = steps[t.to];
       var loop = b.row <= a.row;
+      // Convergència en O: la transició es queda a la columna de la branca i s'ajunta sobre l'etapa.
+      var conv = !loop && a.col !== b.col && outN[t.from] === 1;
       var lab = gfWrap(gfLabelParts(t, level), level === "fn" ? GF.labelW : 320);
-      var col = loop ? a.col : b.col;
+      // t.col: columna triada a mà (p. ex. dues transicions que surten de la mateixa etapa i tornen enrere).
+      var col = t.col !== undefined ? t.col : loop || conv ? a.col : b.col;
       cols[col] = Math.max(cols[col] || 0, 19 + lab.w);
-      var tr = { t: t, i: i, a: a, b: b, loop: loop, col: col, lab: lab };
+      var tr = { t: t, i: i, a: a, b: b, loop: loop, conv: conv, col: col, lab: lab };
       out[t.from].push(tr);
       return tr;
     });
-    // Retorns cap amunt: per l'esquerra si surten de la primera columna, si no per la dreta.
+    // Retorns cap amunt: per l'esquerra si la transició és a la primera columna, si no per la dreta.
     var left = 0, right = 0, entries = {};
     trans.forEach(function (tr) {
       if (!tr.loop) return;
-      tr.side = tr.a.col === 0 ? "left" : "right";
+      tr.side = tr.col === 0 ? "left" : "right";
       tr.lane = tr.side === "left" ? left++ : right++;
       tr.entry = entries[tr.t.to] = (entries[tr.t.to] || 0) + 1;
     });
@@ -3755,7 +3978,8 @@
         tr.laneX = tr.side === "left"
           ? colX[0] - S / 2 - 18 - tr.lane * GF.lane
           : rightEdge + 18 + tr.lane * GF.lane;
-        tr.yIn = tr.b.top - 14 - 8 * (tr.entry - 1);
+        // Per la dreta s'entra més amunt, per sobre de les condicions de les accions de l'etapa.
+        tr.yIn = tr.b.top - (tr.side === "left" ? 14 : 28) - 8 * (tr.entry - 1);
         maxY = Math.max(maxY, tr.yLoop);
       }
     });
@@ -3822,9 +4046,16 @@
         o.push(gfLine(a.x, a.bottom, a.x, list[0].y));
       }
     });
+    var convs = {};
     L.trans.forEach(function (tr) {
       var b = tr.b;
-      if (!tr.loop) {
+      if (tr.conv) {
+        // Convergència en O: totes les branques s'ajunten en una línia horitzontal sobre l'etapa.
+        var yConv = b.top - 12;
+        o.push(gfLine(tr.x, tr.y, tr.x, yConv));
+        if (!convs[tr.t.to]) convs[tr.t.to] = { b: b, y: yConv, xs: [b.x] };
+        convs[tr.t.to].xs.push(tr.x);
+      } else if (!tr.loop) {
         o.push(gfLine(tr.x, tr.y, tr.x, b.top));
       } else {
         // Retorn cap amunt, amb fletxa a la línia que puja.
@@ -3832,6 +4063,11 @@
         var ym = Math.round((tr.yLoop + tr.yIn) / 2);
         o.push(gfPath("M" + (tr.laneX - 4.5) + " " + (ym + 4) + "L" + tr.laneX + " " + (ym - 5) + "L" + (tr.laneX + 4.5) + " " + (ym + 4) + "Z", "arw"));
       }
+    });
+    Object.keys(convs).forEach(function (n) {
+      var c = convs[n];
+      o.push(gfLine(Math.min.apply(null, c.xs), c.y, Math.max.apply(null, c.xs), c.y));
+      o.push(gfLine(c.b.x, c.y, c.b.x, c.b.top));
     });
     // Etapes i transicions en l'ordre de lectura (també és l'ordre del tabulador).
     var trG = L.trans.map(function (tr) {
@@ -3969,11 +4205,16 @@
   }
 
   function gfVarsTable(chart) {
-    var names = ["Entrades", "Sortides", "Etapes d'altres grafcets", "Altres"];
+    var rows = gfChartVars(chart);
+    // Les variables d'etapa solen ser d'altres grafcets, però una temporització (p. ex. 500ms/X2) pot fer servir les pròpies.
+    var ownSteps = rows.some(function (r) {
+      return r.group === 2 && chart.steps.some(function (s) { return "X" + s.n === r.id; });
+    });
+    var names = ["Entrades", "Sortides", ownSteps ? "Etapes" : "Etapes d'altres grafcets", "Altres"];
     var html = '<table class="gf-table lv-' + gfLevel + '"><caption>Senyals d\'aquest grafcet</caption>' +
       '<thead><tr><th scope="col" class="c-plc">PLC</th><th scope="col" class="c-tag">Etiqueta</th><th scope="col" class="c-fn">Descripció</th></tr></thead>';
     var last = -1;
-    gfChartVars(chart).forEach(function (r) {
+    rows.forEach(function (r) {
       if (r.group !== last) {
         html += (last < 0 ? "" : "</tbody>") + '<tbody><tr class="gf-group"><th colspan="3" scope="rowgroup">' + names[r.group] + "</th></tr>";
         last = r.group;
@@ -5003,7 +5244,7 @@
     heading("Senyals");
     var all = { steps: [], trans: [] };
     gf.charts.forEach(function (c) { all.steps = all.steps.concat(c.steps); all.trans = all.trans.concat(c.trans); });
-    var names = ["Entrades", "Sortides", "Etapes d'altres grafcets", "Altres"];
+    var names = ["Entrades", "Sortides", "Etapes", "Altres"];
     var cols = [{ label: "PLC", w: 52, font: "F2" }, { label: "Etiqueta", w: 92, font: "F1" }, { label: "Descripció", w: W - 2 * M - 144, font: "F1" }];
     var FS = 8.5, LEAD = 10.5, PAD = 4;
     function tableHead() {
