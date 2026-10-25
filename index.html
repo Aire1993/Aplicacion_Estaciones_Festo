@@ -769,6 +769,179 @@
   .gf-table tr.is-rel { background: #e6f3fb; }
   .panel .gf-unused { margin-top: 8px; font-size: 12px; }
 
+  /* Simulació */
+  .gf-simbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 12px;
+    background: var(--bg);
+    color: var(--festo-blue);
+    border: 1px solid var(--festo-blue);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .gf-simbtn:hover { background: #e6f3fb; }
+  .gf.is-sim .gf-simbtn { background: var(--text); border-color: var(--text); color: #fff; }
+  .gf-simbtn:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+  .gf.is-sim .gf-about,
+  .gf.is-sim .gf-info,
+  .gf.is-sim .gf-vars,
+  .gf-sim:empty { display: none; }
+  @media (min-width: 1001px) {
+    /* Els comandaments es queden a la vista mentre es baixa pel dibuix. */
+    .gf.is-sim .gf-side { position: sticky; top: 12px; }
+    .gf.is-sim .gf-sim { max-height: calc(100vh - 24px); overflow-y: auto; overscroll-behavior: contain; }
+  }
+  .gf-svg .tok { display: none; fill: var(--festo-blue-dark); }
+  .gf-svg .gf-step.sim-on > .box:not(.in) { fill: #cfe8f8; stroke: var(--festo-blue-dark); stroke-width: 2.5; }
+  .gf-svg .gf-step.sim-on .tok { display: inline; }
+  .gf-svg .gf-a.sim-on .box.act { fill: #d9f2dd; stroke: #2e8540; stroke-width: 2; }
+  .gf-svg .gf-a.sim-on .box.in { fill: none; }
+  .gf-svg .gf-tr.sim-wait .bar { stroke: #e08a00; }
+  .gf-sim {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--text);
+    font-size: 14px;
+  }
+  .gf-sim-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .panel .gf-sim-title { margin: 0; font-size: 17px; font-weight: 600; color: var(--text); }
+  .gf-sim-restart,
+  .gf-simgo {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    background: var(--bg);
+    color: var(--festo-blue);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .gf-sim-restart:hover,
+  .gf-simgo:hover { border-color: var(--festo-blue); }
+  .gf-simgo.is-cur { border-color: var(--festo-blue); background: #e6f3fb; }
+  .gf-simgo b { font-weight: 700; }
+  .panel .gf-sim-help,
+  .panel .gf-sim-state { margin: 0; }
+  .gf-sim-state { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .panel .gf-sim-sub { margin: 0 0 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .gf-sim-wait { list-style: none; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .gf-sim-wait li { line-height: 1.4; }
+  .gf-sim-c { display: block; font-size: 12px; color: var(--text-muted); }
+  .gf-sim-time { display: inline-block; padding: 0 6px; font-size: 12px; font-weight: 600; color: #8a5300; background: #fdf0d9; }
+  .gf-sim-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .gf-pb,
+  .gf-key button,
+  .gf-estop {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+  .gf-pb {
+    min-width: 64px;
+    padding: 9px 10px;
+    background: #fff;
+    border: 2px solid #1f2a33;
+    border-radius: 6px;
+    box-shadow: 0 2px 0 #1f2a33;
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  }
+  .gf-pb.is-stop { border-color: #c4161c; box-shadow: 0 2px 0 #c4161c; color: #c4161c; }
+  .gf-pb.lamp-on { background: #fff4c2; box-shadow: 0 2px 0 #1f2a33, 0 0 0 3px #ffd84d; }
+  .gf-pb.is-down { transform: translateY(2px); box-shadow: none; }
+  .gf-key { display: inline-flex; border: 2px solid #1f2a33; border-radius: 6px; overflow: hidden; }
+  .gf-key button { padding: 8px 9px; background: #fff; border: 0; }
+  .gf-key button + button { border-left: 1px solid var(--border); }
+  .gf-key button[aria-pressed="true"] { background: #1f2a33; color: #fff; }
+  .gf-estop {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 5px 5px;
+    background: #fff;
+    border: 2px solid #c4161c;
+    border-radius: 999px;
+  }
+  .gf-estop-cap { width: 22px; height: 22px; border-radius: 50%; background: #e3262d; box-shadow: inset 0 -3px 0 #a10f15; }
+  .gf-estop[aria-pressed="true"] { background: #fde5e6; }
+  .gf-estop[aria-pressed="true"] .gf-estop-cap { box-shadow: inset 0 3px 0 #a10f15; }
+  .gf-pb:focus-visible,
+  .gf-key button:focus-visible,
+  .gf-estop:focus-visible,
+  .gf-sw:focus-visible,
+  .gf-sim-restart:focus-visible,
+  .gf-simgo:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+  .gf-sim-auto { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+  .gf-sim-auto input { width: 16px; height: 16px; accent-color: var(--festo-blue); }
+  .gf-sim .gf-note { margin: 4px 0 8px; font-size: 12px; }
+  .gf-sws { display: flex; flex-direction: column; gap: 4px; }
+  .gf-sw {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    text-align: left;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .gf-sw:hover { border-color: var(--festo-blue); }
+  .gf-sw-v {
+    flex-shrink: 0;
+    width: 26px;
+    padding: 2px 0;
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+  }
+  .gf-sw[aria-pressed="true"] { background: #e6f3fb; border-color: var(--festo-blue); }
+  .gf-sw[aria-pressed="true"] .gf-sw-v { color: #fff; background: var(--festo-blue); border-color: var(--festo-blue); }
+  .gf-sw-t { flex: 1; min-width: 0; }
+  .gf-sw-t b { display: block; font-weight: 600; color: var(--text); }
+  .gf-sw-auto { display: none; flex-shrink: 0; padding: 1px 6px; font-size: 11px; font-weight: 600; color: #2e8540; border: 1px solid #2e8540; }
+  .gf-sim.is-auto .gf-sw-auto { display: inline-block; }
+  .gf-outs { list-style: none; margin: 0; display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--text-muted); }
+  .gf-outs li { display: flex; align-items: baseline; gap: 6px; }
+  .gf-outs b { font-weight: 600; color: var(--text); }
+  .gf-led {
+    flex-shrink: 0;
+    align-self: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #d3d8dd;
+    border: 1px solid #b0b7bf;
+  }
+  .gf-outs li.is-on { color: var(--text); }
+  .gf-outs li.is-on .gf-led { background: #36b14a; border-color: #2e8540; box-shadow: 0 0 0 3px #d9f2dd; }
+  .panel .gf-sim-legend { margin: 0; font-size: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+  .gf-sim-legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .gf-sim-legend i { display: inline-block; width: 14px; height: 10px; border: 2px solid; }
+  .gf-sim-legend .lg-step { background: #cfe8f8; border-color: var(--festo-blue-dark); }
+  .gf-sim-legend .lg-act { background: #d9f2dd; border-color: #2e8540; }
+  .gf-sim-legend .lg-wait { height: 0; border-width: 2px 0 0; border-color: #e08a00; border-top-width: 4px; }
+
   /* ---------- Entrades/Sortides PLC (dins del panell) ---------- */
   .io-intro { margin-bottom: 16px; max-width: 920px; }
   .io-bar {
@@ -2964,13 +3137,14 @@
     ]
   };
 
-  // Senyals del panell, iguals a totes les estacions.
+  // Senyals del panell, iguals a totes les estacions. "rest": valor de l'entrada en repòs (si no, 0),
+  // que és amb el qual comença la simulació.
   var GF_PANEL_VARS = {
     start:     { plc: "I1.0", tag: "S1", desc: "Polsador START" },
-    stop:      { plc: "I1.1", tag: "S2", desc: "Polsador STOP (normalment tancat: 1 = no premut)" },
-    man:       { plc: "I1.2", tag: "S3", desc: "Selector AUTO/MAN (0 = AUTO, 1 = MAN)" },
+    stop:      { plc: "I1.1", tag: "S2", desc: "Polsador STOP (normalment tancat: 1 = no premut)", rest: 1 },
+    man:       { plc: "I1.2", tag: "S3", desc: "Selector AUTO/MAN (0 = AUTO, 1 = MAN)", rest: 1 },
     reset:     { plc: "I1.3", tag: "S4", desc: "Polsador RESET" },
-    seta:      { plc: "I1.5", tag: "Em_Stop", desc: "Seta d'emergència (1 = no premuda)" },
+    seta:      { plc: "I1.5", tag: "Em_Stop", desc: "Seta d'emergència (1 = no premuda)", rest: 1 },
     llumStart: { plc: "Q1.0", tag: "P1", fn: "Llum START", desc: "Llum del polsador START" },
     llumReset: { plc: "Q1.1", tag: "P2", fn: "Llum RESET", desc: "Llum del polsador RESET" }
   };
@@ -3021,8 +3195,8 @@
     vars: gfVars({
       inici:     { plc: "I0.0", tag: "G1BG1", desc: "Peça a l'inici de la cinta" },
       mig:       { plc: "I0.1", tag: "G1BG2", desc: "Peça a la posició intermèdia de la cinta" },
-      final:     { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)" },
-      recollit:  { plc: "I0.4", tag: "C2BG1", desc: "Expulsor recollit" },
+      final:     { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)", rest: 1 },
+      recollit:  { plc: "I0.4", tag: "C2BG1", desc: "Expulsor recollit", rest: 1 },
       avancat:   { plc: "I0.5", tag: "C2BG2", desc: "Expulsor avançat" },
       buit:      { plc: "I0.6", tag: "C2BG3", desc: "Magatzem buit" },
       cinta:     { plc: "Q0.0", tag: "G1MA1", tagAct: "G1MA1 endavant", fn: "Cinta endavant", desc: "Motor de la cinta endavant (controlador G1KF1)" },
@@ -3030,6 +3204,12 @@
       llumBuit:  { plc: "Q1.2", tag: "P3", fn: "Llum MAGATZEM BUIT", desc: "Llum de magatzem buit" }
     }),
     unused: "Q0.1 (cinta enrere) i Q0.2 (G1MB1, separador)",
+    // Simulació: com es mouen els actuadors (el sensor "start" canvia de seguida, el "end" al cap de "time" s).
+    simHint: "El magatzem té peces (C2BG3 a 0) i l'expulsor es mou sol. Tu fas de peça al final de la cinta: quan hi arribi, posa G1BG3 a 0 (dona 1 quan el final és lliure) i, quan la retiris, torna'l a 1.",
+    motions: [
+      { out: "expulsor", val: 1, start: { recollit: 0 }, time: 0.6, end: { avancat: 1 } },
+      { out: "expulsor", val: 0, start: { avancat: 0 }, time: 0.6, end: { recollit: 1 } }
+    ],
     charts: [
       gfSafety("el motor s'atura i l'expulsor torna enrere per la molla de la vàlvula."),
       {
@@ -3091,10 +3271,10 @@
     vars: gfVars({
       inici:         { plc: "I0.0", tag: "G1BG1", desc: "Peça a l'inici de la cinta" },
       mig:           { plc: "I0.1", tag: "G1BG2", desc: "Peça al separador (posició intermèdia de la cinta)" },
-      final:         { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)" },
-      carroRecollit: { plc: "I0.4", tag: "G2BG1", desc: "Carro horitzontal recollit (ventosa sobre la rampa de les peces insert)" },
+      final:         { plc: "I0.2", tag: "G1BG3", desc: "No hi ha peça al final de la cinta (1 = lliure)", rest: 1 },
+      carroRecollit: { plc: "I0.4", tag: "G2BG1", desc: "Carro horitzontal recollit (ventosa sobre la rampa de les peces insert)", rest: 1 },
       carroAvancat:  { plc: "I0.5", tag: "G2BG2", desc: "Carro horitzontal avançat (ventosa sobre la cinta)" },
-      ventosaDalt:   { plc: "I0.6", tag: "G2BG3", desc: "Ventosa a dalt" },
+      ventosaDalt:   { plc: "I0.6", tag: "G2BG3", desc: "Ventosa a dalt", rest: 1 },
       agafada:       { plc: "I0.7", tag: "G2BP1", desc: "Peça agafada (hi ha buit a la ventosa)" },
       cinta:         { plc: "Q0.0", tag: "G1MA1", tagAct: "G1MA1 endavant", fn: "Cinta endavant", desc: "Motor de la cinta endavant (controlador G1KF1)" },
       separador:     { plc: "Q0.2", tag: "G1MB1", fn: "Avançar el separador", desc: "Avançar el separador, que reté la peça (electroimant: sense senyal es recull)" },
@@ -3105,6 +3285,14 @@
       llumError:     { plc: "Q1.2", tag: "P3", fn: "Llum ERROR", desc: "Llum Q1 del panell: no s'ha agafat la peça insert" }
     }),
     unused: "Q0.1 (cinta enrere)",
+    simHint: "Tu fas de peça: posa la carcassa a l'inici (G1BG1) i després al separador (G1BG2). Quan la ventosa baixi, activa G2BP1 per dir que ha agafat la peça insert; si no ho fas en 3 s, veuràs l'error de l'etapa 10. Al final de la cinta, posa G1BG3 a 0 i després a 1.",
+    motions: [
+      { out: "baixarVentosa", val: 1, start: { ventosaDalt: 0 } },
+      { out: "baixarVentosa", val: 0, time: 0.5, end: { ventosaDalt: 1 } },
+      { out: "avancarCarro", val: 1, start: { carroRecollit: 0 }, time: 0.8, end: { carroAvancat: 1 } },
+      { out: "recollirCarro", val: 1, start: { carroAvancat: 0 }, time: 0.8, end: { carroRecollit: 1 } },
+      { out: "buit", val: 0, start: { agafada: 0 } }
+    ],
     charts: [
       gfSafety("la cinta i el buit s'aturen, el separador es recull i la ventosa puja (vàlvula monoestable); si duia una peça insert, la deixa anar. El carro es queda on és perquè la seva vàlvula és biestable."),
       {
@@ -3207,6 +3395,13 @@
       topall:     { plc: "Q0.3", tag: "G1MB3", fn: "Recollir el topall", desc: "Recollir el topall i deixar passar la peça (sense senyal surt i l'atura)" },
       llumPlena:  { plc: "Q1.2", tag: "P3", fn: "Llum RAMPA PLENA", desc: "Llum de rampa plena (llum Q1 del panell)" }
     }),
+    simHint: "Tu fas de peça: activa G1BG1 (inici) i B1BG1 (peça al topall) i tria el color amb B1BG2 i B1BG3 (cap dels dos: negra). Quan la peça caigui a la rampa, activa i desactiva G1BG3. Si el deixes activat més d'1 s, la rampa és plena.",
+    motions: [
+      { out: "desviador1", val: 1, time: 0.3, end: { desv1: 1 } },
+      { out: "desviador1", val: 0, time: 0.3, end: { desv1: 0 } },
+      { out: "desviador2", val: 1, time: 0.3, end: { desv2: 1 } },
+      { out: "desviador2", val: 0, time: 0.3, end: { desv2: 0 } }
+    ],
     charts: [
       gfSafety("la cinta s'atura, els desviadors es recullen i el topall surt."),
       {
@@ -4091,12 +4286,14 @@
         (interactive ? ' tabindex="0" role="button" aria-pressed="false" aria-label="' + gfAttr(gfStepLabel(s, chart, level)) + '"' : "") + ">" +
         '<rect class="box" x="' + x0 + '" y="' + st.top + '" width="' + S + '" height="' + S + '"/>' +
         (s.init ? '<rect class="box in" x="' + (x0 + 4) + '" y="' + (st.top + 4) + '" width="' + (S - 8) + '" height="' + (S - 8) + '"/>' : "") +
-        '<text class="num" x="' + st.x + '" y="' + (st.cy + 5) + '">' + s.n + "</text>";
+        '<text class="num" x="' + st.x + '" y="' + (st.cy + 5) + '">' + s.n + "</text>" +
+        // Marca d'etapa activa: només es veu a la simulació.
+        '<circle class="tok" cx="' + st.x + '" cy="' + (st.top + S - 9) + '" r="3.5"/>';
       if (st.acts.length) {
         var x = st.x + S / 2 + 22, y = st.cy - 15;
         g += gfLine(st.x + S / 2, st.cy, x, st.cy);
-        st.acts.forEach(function (ac) {
-          g += '<rect class="box act" x="' + x + '" y="' + y + '" width="' + ac.w + '" height="30"/>';
+        st.acts.forEach(function (ac, k) {
+          g += '<g class="gf-a" data-a="' + k + '"><rect class="box act" x="' + x + '" y="' + y + '" width="' + ac.w + '" height="30"/>';
           if (ac.a.force) {
             // Ordre de forçat: requadre doble.
             g += '<rect class="box in" x="' + (x + 3) + '" y="' + (y + 3) + '" width="' + (ac.w - 6) + '" height="24"/>';
@@ -4108,7 +4305,7 @@
                 return p.neg ? '<tspan text-decoration="overline">' + escapeHtml(p.t) + "</tspan>" : escapeHtml(p.t);
               }).join("") + "</text>";
           }
-          g += '<text class="txt' + (ac.a.force ? " frc" : "") + '" x="' + (x + 11) + '" y="' + (st.cy + 4.5) + '">' + escapeHtml(ac.txt) + "</text>";
+          g += '<text class="txt' + (ac.a.force ? " frc" : "") + '" x="' + (x + 11) + '" y="' + (st.cy + 4.5) + '">' + escapeHtml(ac.txt) + "</text></g>";
           x += ac.w;
         });
       } else {
@@ -4131,6 +4328,8 @@
   function renderGrafcet(data) {
     gf = data;
     gfPinned = "";
+    clearInterval(gfSimClock);
+    gfSim = gfSimHeld = null;
     var html = '<div class="gf"><p class="gf-intro">Grafcet de l\'estació segons la norma IEC 60848, dividit en tres grafcets ' +
       "jerarquitzats: <b>Seguretat</b> mana sobre els altres dos, <b>Conducció</b> gestiona el panell i els modes de marxa, " +
       "i <b>Producció</b> fa la seqüència de l'estació.<br>" +
@@ -4144,13 +4343,15 @@
     GF_LEVELS.forEach(function (l) {
       html += '<button type="button" class="gf-level" data-level="' + l.key + '" aria-pressed="false" title="' + gfAttr(l.label + ": " + l.hint) + '">' + l.label + "</button>";
     });
-    html += '</div><button type="button" class="gf-pdf">Descarrega en PDF <span aria-hidden="true">&#8595;</span></button></div></div>' +
+    html += '</div><button type="button" class="gf-simbtn"><span aria-hidden="true">&#9654;</span> Simula</button>' +
+      '<button type="button" class="gf-pdf">Descarrega en PDF <span aria-hidden="true">&#8595;</span></button></div></div>' +
       '<p class="gf-pdf-msg" role="status"></p>' +
       '<div class="gf-main"><figure class="gf-figure"><figcaption class="gf-head"><span class="gf-title"></span>' +
       '<button type="button" class="gf-zoom" aria-label="Amplia el grafcet"><svg viewBox="0 0 20 20" aria-hidden="true">' +
       '<path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Amplia</button></figcaption>' +
       '<p class="gf-wide-hint">Llisca cap al costat per veure tot el grafcet.</p><div class="gf-scroll"></div></figure>' +
-      '<div class="gf-side"><p class="gf-about"></p><div class="gf-info" aria-live="polite"></div><div class="gf-vars"></div></div></div>' +
+      '<div class="gf-side"><p class="gf-about"></p><div class="gf-info" aria-live="polite"></div><div class="gf-vars"></div>' +
+      '<div class="gf-sim" role="region" aria-label="Simulació del grafcet"></div></div></div>' +
       '<p class="comp-source">Font: <a href="' + data.source.url + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(data.source.label) +
       "</a> (seqüència, taula d'assignació, esquemes i programa de PLC). La seguretat i la conducció segueixen l'estructura GEMMA habitual.</p></div>";
     return html;
@@ -4171,6 +4372,7 @@
     panel.querySelector(".gf-about").textContent = chart.about;
     panel.querySelector(".gf-vars").innerHTML = gfVarsTable(chart);
     gfSetPinned(gfPinned);
+    gfSimPaint();
   }
 
   // Si el grafcet no hi cap d'amplada (mòbils), s'avisa que es pot lliscar.
@@ -4346,7 +4548,7 @@
   });
   // En una sola columna (mòbils) l'explicació queda sota el dibuix: si no es veu, s'hi porta.
   function gfRevealInfo() {
-    var box = panel.querySelector(".gf-info");
+    var box = panel.querySelector(".gf:not(.is-sim) .gf-info");
     if (!box || !window.matchMedia || !window.matchMedia("(max-width: 1000px)").matches) return;
     measureVisible(function (vis) {
       var r = box.getBoundingClientRect();
@@ -4390,7 +4592,7 @@
 
   function gfSheetHtml(i) {
     var chart = gf.charts[i];
-    return '<div class="sheet-gf"><div class="sheet-gf-head"><span class="comp-kicker">Grafcet · nivell ' +
+    return '<div class="sheet-gf" data-chart="' + i + '"><div class="sheet-gf-head"><span class="comp-kicker">Grafcet · nivell ' +
       gfLevelName(gfLevel) + '</span><h3 id="sheet-title">' + chart.key + " · " + escapeHtml(chart.name) + "</h3></div>" +
       '<p class="gf-wide-hint">Llisca cap al costat per veure tot el grafcet.</p>' +
       '<div class="sheet-gf-chart" tabindex="0" role="region" aria-label="' + gfAttr("Grafcet " + chart.key + " ampliat") + '">' +
@@ -4414,6 +4616,453 @@
     var box = svg.parentNode;
     box.parentNode.classList.toggle("is-wide", box.scrollWidth > box.clientWidth + 2);
   }
+
+  // ---------------------------------------------------------------------------
+  // Grafcet: simulació
+  // ---------------------------------------------------------------------------
+
+  // --- Simulació: motor (no toca la pàgina; les proves del repositori el fan servir tal qual) ---
+
+  // Condició → arbre: "or"/"and" (a: llista), "not"/"time" (a: operand), "edge"/"var" (id).
+  function gfSimParse(c) {
+    var tk = gfTokens(c), i = 0;
+    function any() {
+      var a = [all()];
+      while (tk[i] === "+") { i++; a.push(all()); }
+      return a.length > 1 ? { k: "or", a: a } : a[0];
+    }
+    function all() {
+      var a = [one()];
+      while (tk[i] === "*") { i++; a.push(one()); }
+      return a.length > 1 ? { k: "and", a: a } : a[0];
+    }
+    function one() {
+      var t = tk[i++];
+      if (t === "/") return { k: "not", a: one() };
+      if (t === "^") return { k: "edge", id: tk[i++] };
+      if (t === "(") { var e = any(); i++; return e; }
+      // Temporització "3s/x": es compleix quan x fa 3 s que és cert.
+      if (/^\d/.test(t)) return { k: "time", s: parseFloat(t) / (/ms\/$/.test(t) ? 1000 : 1), a: one(), since: null };
+      return { k: "var", id: t };
+    }
+    return any();
+  }
+
+  // Simula els grafcets d'una estació (GS, GC i GP alhora) segons la norma IEC 60848: es franquegen alhora
+  // totes les transicions franquejables, s'evoluciona fins que no en queda cap (evolució fugaç) i els
+  // forçats s'apliquen per ordre de jerarquia. Si "auto" no és fals, "motions" mou els sensors dels actuadors.
+  // Entrades: set({ senyal: 0 o 1 }); temps: tick(segons).
+  function gfSimCreate(data, auto) {
+    var charts = data.charts, motions = data.motions || [];
+    var tree = {}, timers = [], prev = {}, edges = false, moving = [];
+    var sim = { now: 0, inp: {}, sit: {}, auto: auto !== false, autoInputs: {} };
+
+    function cond(c) {
+      if (!tree[c]) {
+        tree[c] = gfSimParse(c);
+        (function walk(n) {
+          if (n.k === "time") timers.push(n);
+          if (n.a) [].concat(n.a).forEach(walk);
+        })(tree[c]);
+      }
+      return tree[c];
+    }
+    function val(n) {
+      switch (n.k) {
+        case "or": return n.a.some(val);
+        case "and": return n.a.every(val);
+        case "not": return !val(n.a);
+        case "edge": return edges && !!sim.inp[n.id] && !prev[n.id];
+        case "time": return n.since !== null && sim.now - n.since >= n.s - 1e-9;
+        default: return gfIsStepVar(n.id) ? sim.isActive(+n.id.slice(1)) : !!sim.inp[n.id];
+      }
+    }
+    // Les temporitzacions segueixen el seu operand encara que la transició no estigui validada.
+    function runTimers() {
+      timers.forEach(function (n) { n.since = val(n.a) ? (n.since === null ? sim.now : n.since) : null; });
+    }
+    function initial(ch) {
+      return ch.steps.filter(function (s) { return s.init; }).map(function (s) { return s.n; });
+    }
+    // Grafcets forçats per les etapes actives dels superiors. Amb "apply" s'hi aplica el forçat.
+    function forcing(apply) {
+      var forced = {};
+      charts.forEach(function (ch) {
+        if (forced[ch.key] && apply) sim.sit[ch.key] = forced[ch.key].slice();
+        ch.steps.forEach(function (s) {
+          if (sim.sit[ch.key].indexOf(s.n) < 0) return;
+          (s.act || []).forEach(function (a) {
+            if (!a.force) return;
+            var target = charts.filter(function (c) { return c.key === a.force; })[0];
+            forced[a.force] = a.to === "INIT" ? initial(target) : a.to ? a.to.split(",").map(Number) : [];
+          });
+        });
+      });
+      return forced;
+    }
+    function evolve() {
+      runTimers();
+      var forced = forcing(true), fire = [];
+      charts.forEach(function (ch) {
+        if (forced[ch.key]) return;
+        ch.trans.forEach(function (t) {
+          if (sim.sit[ch.key].indexOf(t.from) >= 0 && val(cond(t.c))) fire.push([ch.key, t]);
+        });
+      });
+      // Primer es desactiven les etapes anteriors i després s'activen les posteriors.
+      fire.forEach(function (f) { sim.sit[f[0]] = sim.sit[f[0]].filter(function (n) { return n !== f[1].from; }); });
+      fire.forEach(function (f) { if (sim.sit[f[0]].indexOf(f[1].to) < 0) sim.sit[f[0]].push(f[1].to); });
+      forcing(true);
+      return fire.length;
+    }
+    function keep() {
+      prev = {};
+      Object.keys(sim.inp).forEach(function (k) { prev[k] = sim.inp[k]; });
+    }
+    function settle() {
+      // Els flancs només valen a la primera evolució després del canvi d'entrades.
+      for (var n = 0; n < 50 && evolve(); n++) edges = false;
+      edges = false;
+      runTimers();
+      keep();
+    }
+    function change(changes) {
+      keep();
+      Object.keys(changes).forEach(function (k) { sim.inp[k] = changes[k] ? 1 : 0; });
+      edges = true;
+      settle();
+    }
+    // Actuadors: quan la sortida "out" val "val", els sensors "start" canvien de seguida i els "end" al cap de "time" s.
+    function same(o) {
+      return !o || Object.keys(o).every(function (k) { return !!sim.inp[k] === !!o[k]; });
+    }
+    function move() {
+      for (var round = 0; round < 10 && sim.auto; round++) {
+        var outs = sim.outputs(), changes = {}, any = false;
+        motions.forEach(function (m, i) {
+          if (!!outs[m.out] !== !!m.val) { moving[i] = null; return; }
+          if (moving[i] == null && !(same(m.start) && same(m.end))) {
+            Object.keys(m.start || {}).forEach(function (k) {
+              if (!!sim.inp[k] !== !!m.start[k]) { changes[k] = m.start[k]; any = true; }
+            });
+            moving[i] = sim.now + (m.time || 0);
+          }
+          if (moving[i] != null && sim.now >= moving[i] - 1e-9) {
+            Object.keys(m.end || {}).forEach(function (k) {
+              if (!!sim.inp[k] !== !!m.end[k]) { changes[k] = m.end[k]; any = true; }
+            });
+            moving[i] = null;
+          }
+        });
+        if (!any) return;
+        change(changes);
+      }
+    }
+
+    sim.isActive = function (n) {
+      return charts.some(function (ch) { return sim.sit[ch.key].indexOf(n) >= 0; });
+    };
+    // Una acció de l'etapa (si l'etapa és activa): les condicionades, només si es compleix la condició.
+    sim.actOn = function (a) { return !a.cond || val(cond(a.cond)); };
+    sim.outputs = function () {
+      var o = {};
+      charts.forEach(function (ch) {
+        ch.steps.forEach(function (s) {
+          if (sim.sit[ch.key].indexOf(s.n) < 0) return;
+          (s.act || []).forEach(function (a) { if (a.v && sim.actOn(a)) o[a.v] = true; });
+        });
+      });
+      return o;
+    };
+    sim.set = function (changes) { change(changes); move(); };
+    sim.tick = function (dt) { sim.now += dt; settle(); move(); };
+    // Transicions validades (amb les etapes anteriors actives i el grafcet sense forçar): les que s'esperen.
+    sim.waiting = function () {
+      var forced = forcing(false), list = [];
+      charts.forEach(function (ch, ci) {
+        if (forced[ch.key]) return;
+        ch.trans.forEach(function (t, ti) {
+          if (sim.sit[ch.key].indexOf(t.from) >= 0) list.push({ chart: ci, i: ti, t: t });
+        });
+      });
+      return list;
+    };
+    // Temporitzacions en marxa d'una condició: [{ s: durada, t: temps que porta }].
+    sim.timing = function (c) {
+      var out = [];
+      (function walk(n) {
+        if (n.k === "time" && n.since !== null && sim.now - n.since < n.s - 1e-9) out.push({ s: n.s, t: sim.now - n.since });
+        if (n.a) [].concat(n.a).forEach(walk);
+      })(cond(c));
+      return out;
+    };
+
+    // Sensors que els actuadors mouen en tots dos sentits (els altres els canvia qui simula).
+    var moved = {};
+    motions.forEach(function (m) {
+      [m.start, m.end].forEach(function (o) {
+        Object.keys(o || {}).forEach(function (k) { (moved[k] = moved[k] || {})[o[k] ? 1 : 0] = true; });
+      });
+    });
+    Object.keys(moved).forEach(function (k) { if (moved[k][0] && moved[k][1]) sim.autoInputs[k] = true; });
+    Object.keys(data.vars).forEach(function (k) {
+      if (/^I/.test(data.vars[k].plc)) sim.inp[k] = data.vars[k].rest ? 1 : 0;
+    });
+    charts.forEach(function (ch) {
+      sim.sit[ch.key] = initial(ch);
+      ch.trans.forEach(function (t) { cond(t.c); });
+      ch.steps.forEach(function (s) { (s.act || []).forEach(function (a) { if (a.cond) cond(a.cond); }); });
+    });
+    keep();
+    settle();
+    move();
+    return sim;
+  }
+
+  // --- Simulació: panell ---
+
+  var gfSim = null;          // simulació en marxa (o null)
+  var gfSimClock = 0, gfSimLast = 0;
+  var gfSimHeld = null;      // polsador que es manté premut
+  // Polsadors del panell: STOP és normalment tancat (premut = 0). Alguns porten llum.
+  var GF_SIM_PUSH = {
+    start: { label: "START", nc: false, lamp: "llumStart" },
+    stop: { label: "STOP", nc: true },
+    reset: { label: "RESET", nc: false, lamp: "llumReset" }
+  };
+
+  function gfSimByPlc(a, b) {
+    var pa = gf.vars[a].plc, pb = gf.vars[b].plc;
+    return pa < pb ? -1 : pa > pb ? 1 : 0;
+  }
+  function gfSimNum(x) { return (Math.round(x * 10) / 10).toString().replace(".", ","); }
+
+  function gfSimHtml() {
+    var v = gf.vars;
+    var sensors = Object.keys(v).filter(function (k) { return /^I/.test(v[k].plc) && !GF_PANEL_VARS[k]; }).sort(gfSimByPlc);
+    var outputs = Object.keys(v).filter(function (k) { return /^Q/.test(v[k].plc); }).sort(gfSimByPlc);
+    var hasAuto = sensors.some(function (k) { return gfSim.autoInputs[k]; });
+    return '<div class="gf-sim-head"><p class="gf-sim-title">Simulació</p>' +
+      '<button type="button" class="gf-sim-restart">Torna a començar</button></div>' +
+      '<p class="gf-sim-help">Fes de màquina: prem els polsadors i activa els sensors. Els temps són reals.' +
+      (gf.simHint ? " " + escapeHtml(gf.simHint) : "") + "</p>" +
+      '<p class="gf-sim-state"></p><p class="sr-only gf-sim-live" aria-live="polite"></p>' +
+      '<div class="gf-sim-sec"><p class="gf-sim-sub">S\'espera</p><ul class="gf-sim-wait"></ul></div>' +
+      '<div class="gf-sim-sec"><p class="gf-sim-sub">Panell de comandament</p><div class="gf-sim-panel">' +
+      Object.keys(GF_SIM_PUSH).map(function (k) {
+        return '<button type="button" class="gf-pb' + (GF_SIM_PUSH[k].nc ? " is-stop" : "") + '" data-push="' + k + '" title="' +
+          gfAttr(v[k].plc + " · " + v[k].desc) + '">' + GF_SIM_PUSH[k].label + "</button>";
+      }).join("") +
+      '<div class="gf-key" role="group" aria-label="Selector AUTO/MAN"><button type="button" data-man="0">AUTO</button>' +
+      '<button type="button" data-man="1">MAN</button></div>' +
+      '<button type="button" class="gf-estop" aria-pressed="false" title="' + gfAttr(v.seta.plc + " · " + v.seta.desc) + '">' +
+      '<span class="gf-estop-cap" aria-hidden="true"></span>Seta</button></div>' +
+      '<p class="gf-note">Mantén STOP premut 3 s per fer una aturada total. La seta es queda premuda fins que la tornes a prémer.</p></div>' +
+      '<div class="gf-sim-sec"><p class="gf-sim-sub">Sensors</p>' +
+      (hasAuto ? '<label class="gf-sim-auto"><input type="checkbox" checked> Els actuadors es mouen sols</label>' +
+        '<p class="gf-note">Els sensors marcats amb «auto» canvien sols quan es mouen els actuadors. Els altres els has d\'activar tu.</p>' : "") +
+      '<div class="gf-sws">' + sensors.map(function (k) {
+        return '<button type="button" class="gf-sw" data-in="' + k + '" aria-pressed="false"><span class="gf-sw-v" aria-hidden="true">0</span>' +
+          '<span class="gf-sw-t"><b>' + escapeHtml(v[k].plc + " · " + v[k].tag) + "</b>" + escapeHtml(v[k].desc) + "</span>" +
+          (gfSim.autoInputs[k] ? '<span class="gf-sw-auto">auto</span>' : "") + "</button>";
+      }).join("") + "</div></div>" +
+      '<div class="gf-sim-sec"><p class="gf-sim-sub">Sortides</p><ul class="gf-outs">' + outputs.map(function (k) {
+        return '<li data-out="' + k + '"><span class="gf-led" aria-hidden="true"></span><b>' + escapeHtml(v[k].plc) + "</b> " +
+          escapeHtml(v[k].fn || v[k].desc) + '<span class="sr-only gf-out-st"></span></li>';
+      }).join("") + "</ul></div>" +
+      '<p class="gf-sim-legend"><span><i class="lg-step"></i>Etapa activa</span><span><i class="lg-act"></i>Acció activa</span>' +
+      '<span><i class="lg-wait"></i>Transició que s\'espera</span></p>';
+  }
+
+  function gfSimSetHtml(el, html) {
+    if (el && el.gfHtml !== html) { el.gfHtml = html; el.innerHTML = html; }
+  }
+
+  // Marca al dibuix les etapes actives, les accions actives i les transicions que s'esperen.
+  function gfSimPaintSvg(svg, chart) {
+    if (!svg || !chart) return;
+    var wait = {};
+    gfSim.waiting().forEach(function (w) { if (gf.charts[w.chart] === chart) wait[w.i] = true; });
+    chart.steps.forEach(function (s) {
+      var g = svg.querySelector('[data-el="s' + s.n + '"]');
+      if (!g) return;
+      var on = gfSim.isActive(s.n);
+      g.classList.toggle("sim-on", on);
+      Array.prototype.forEach.call(g.querySelectorAll(".gf-a"), function (ga) {
+        ga.classList.toggle("sim-on", on && gfSim.actOn(s.act[+ga.getAttribute("data-a")]));
+      });
+    });
+    chart.trans.forEach(function (t, i) {
+      var g = svg.querySelector('[data-el="t' + i + '"]');
+      if (g) g.classList.toggle("sim-wait", !!wait[i]);
+    });
+  }
+
+  function gfSimPaint() {
+    var root = gfSim && gf && panel.querySelector(".gf.is-sim .gf-sim");
+    if (!root) return;
+    var inp = gfSim.inp, outs = gfSim.outputs();
+    gfSimPaintSvg(panel.querySelector(".gf-scroll svg"), gf.charts[gfChart]);
+    var sh = !sheet.hidden && sheetContent.querySelector(".sheet-gf");
+    if (sh) gfSimPaintSvg(sh.querySelector("svg"), gf.charts[+sh.getAttribute("data-chart")]);
+    var steps = gf.charts.map(function (c) {
+      var act = gfSim.sit[c.key].slice().sort(function (a, b) { return a - b; });
+      return { key: c.key, txt: act.length ? act.join(", ") : "cap" };
+    });
+    gfSimSetHtml(root.querySelector(".gf-sim-state"), "Etapes actives: " + steps.map(function (s, i) {
+      return '<button type="button" class="gf-simgo' + (i === gfChart ? " is-cur" : "") + '" data-chart="' + i + '"><b>' + s.key + "</b> " + s.txt + "</button>";
+    }).join(" "));
+    // Només s'anuncia quan canvien les etapes actives.
+    var live = root.querySelector(".gf-sim-live"), said = steps.map(function (s) { return s.key + " " + s.txt; }).join(", ");
+    if (live.textContent !== "Etapes actives: " + said) live.textContent = "Etapes actives: " + said;
+    gfSimSetHtml(root.querySelector(".gf-sim-wait"), gfSim.waiting().map(function (w) {
+      var t = w.t, c = gf.charts[w.chart];
+      var time = gfSim.timing(t.c).map(function (x) { return gfSimNum(x.t) + " / " + gfSimNum(x.s) + " s"; }).join(", ");
+      return '<li><button type="button" class="gf-simgo" data-chart="' + w.chart + '"><b>' + c.key + "</b> " + t.from + " → " + t.to + "</button> " +
+        escapeHtml(t.fn) + (gfLevel !== "fn" ? ' <span class="gf-sim-c">' + gfCondHtml(t.c, gfLevel) + "</span>" : "") +
+        (time ? ' <span class="gf-sim-time">' + time + "</span>" : "") + "</li>";
+    }).join("") || "<li>Res: cap grafcet no té cap transició validada.</li>");
+    Object.keys(GF_SIM_PUSH).forEach(function (k) {
+      var b = root.querySelector('.gf-pb[data-push="' + k + '"]'), p = GF_SIM_PUSH[k];
+      b.classList.toggle("is-down", !!inp[k] !== !p.nc);
+      b.classList.toggle("lamp-on", !!(p.lamp && outs[p.lamp]));
+    });
+    Array.prototype.forEach.call(root.querySelectorAll("[data-man]"), function (b) {
+      b.setAttribute("aria-pressed", +b.getAttribute("data-man") === inp.man ? "true" : "false");
+    });
+    root.querySelector(".gf-estop").setAttribute("aria-pressed", inp.seta ? "false" : "true");
+    Array.prototype.forEach.call(root.querySelectorAll(".gf-sw"), function (b) {
+      var on = !!inp[b.getAttribute("data-in")];
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.querySelector(".gf-sw-v").textContent = on ? "1" : "0";
+    });
+    Array.prototype.forEach.call(root.querySelectorAll(".gf-outs li"), function (li) {
+      var on = !!outs[li.getAttribute("data-out")];
+      li.classList.toggle("is-on", on);
+      li.querySelector(".gf-out-st").textContent = on ? ": activada" : ": desactivada";
+    });
+    root.classList.toggle("is-auto", gfSim.auto);
+  }
+
+  function gfSimTick() {
+    if (!gfSim || !gf || !panel.querySelector(".gf.is-sim")) { gfSimStop(); return; }
+    var t = Date.now(), dt = Math.min(0.5, (t - gfSimLast) / 1000);
+    gfSimLast = t;
+    gfSim.tick(dt);
+    gfSimPaint();
+  }
+
+  function gfSimStart() {
+    var root = panel.querySelector(".gf");
+    gfSim = gfSimCreate(gf);
+    root.classList.add("is-sim");
+    panel.querySelector(".gf-sim").innerHTML = gfSimHtml();
+    var btn = panel.querySelector(".gf-simbtn");
+    btn.innerHTML = '<span aria-hidden="true">&#9632;</span> Para la simulació';
+    clearInterval(gfSimClock);
+    gfSimLast = Date.now();
+    gfSimClock = setInterval(gfSimTick, 100);
+    gfSimPaint();
+  }
+
+  function gfSimStop() {
+    clearInterval(gfSimClock);
+    gfSimClock = 0;
+    gfSim = null;
+    gfSimHeld = null;
+    var root = gf && panel.querySelector(".gf.is-sim");
+    if (!root) return;
+    root.classList.remove("is-sim");
+    panel.querySelector(".gf-sim").innerHTML = "";
+    panel.querySelector(".gf-simbtn").innerHTML = '<span aria-hidden="true">&#9654;</span> Simula';
+    drawGrafcet();
+  }
+
+  function gfSimPress(b, down) {
+    if (!gfSim) return;
+    var k = b.getAttribute("data-push"), ch = {};
+    ch[k] = down !== GF_SIM_PUSH[k].nc ? 1 : 0;
+    gfSim.set(ch);
+    gfSimPaint();
+  }
+  function gfSimRelease(fromKey) {
+    var b = gfSimHeld;
+    gfSimHeld = null;
+    if (!b) return;
+    gfSimPress(b, false);
+    // Si el teclat no acaba fent clic, el clic següent (p. ex. d'un lector de pantalla) torna a comptar.
+    if (fromKey === true) setTimeout(function () { b.gfUsed = false; }, 0);
+  }
+
+  panel.addEventListener("click", function (e) {
+    if (!gf || !e.target.closest) return;
+    var t = e.target.closest(".gf-simbtn, .gf-sim-restart, .gf-simgo, .gf-pb, [data-man], .gf-estop, .gf-sw");
+    if (!t || !panel.contains(t)) return;
+    if (t.classList.contains("gf-simbtn")) {
+      if (gfSim) gfSimStop(); else gfSimStart();
+      return;
+    }
+    if (!gfSim) return;
+    if (t.classList.contains("gf-sim-restart")) {
+      gfSim = gfSimCreate(gf, gfSim.auto);
+      gfSimLast = Date.now();
+    } else if (t.classList.contains("gf-simgo")) {
+      gfChart = +t.getAttribute("data-chart");
+      gfPinned = "";
+      drawGrafcet();
+    } else if (t.classList.contains("gf-pb")) {
+      // Clic sense prémer abans (p. ex. un lector de pantalla): una pulsació curta.
+      if (t.gfUsed) { t.gfUsed = false; return; }
+      gfSimPress(t, true);
+      gfSimPress(t, false);
+    } else if (t.hasAttribute("data-man")) {
+      gfSim.set({ man: +t.getAttribute("data-man") });
+    } else if (t.classList.contains("gf-estop")) {
+      gfSim.set({ seta: gfSim.inp.seta ? 0 : 1 });
+    } else {
+      var k = t.getAttribute("data-in"), ch = {};
+      ch[k] = gfSim.inp[k] ? 0 : 1;
+      gfSim.set(ch);
+    }
+    gfSimPaint();
+  });
+  panel.addEventListener("change", function (e) {
+    if (!gfSim || !e.target.closest(".gf-sim-auto")) return;
+    gfSim.auto = e.target.checked;
+    gfSim.tick(0);
+    gfSimPaint();
+  });
+  // Els polsadors funcionen mentre es mantenen premuts (ratolí, dit o teclat).
+  panel.addEventListener("pointerdown", function (e) {
+    var b = gfSim && e.target.closest && e.target.closest(".gf-pb");
+    if (!b || e.button > 0) return;
+    gfSimRelease();
+    gfSimHeld = b;
+    b.gfUsed = true;
+    if (b.setPointerCapture) { try { b.setPointerCapture(e.pointerId); } catch (err) {} }
+    gfSimPress(b, true);
+  });
+  panel.addEventListener("pointerup", gfSimRelease);
+  panel.addEventListener("pointercancel", gfSimRelease);
+  panel.addEventListener("contextmenu", function (e) {
+    if (e.target.closest && e.target.closest(".gf-pb")) e.preventDefault();
+  });
+  panel.addEventListener("keydown", function (e) {
+    var b = gfSim && (e.key === " " || e.key === "Enter") && e.target.closest && e.target.closest(".gf-pb");
+    if (!b) return;
+    e.preventDefault();
+    if (e.repeat || gfSimHeld === b) return;
+    gfSimRelease();
+    gfSimHeld = b;
+    b.gfUsed = true;
+    gfSimPress(b, true);
+  });
+  panel.addEventListener("keyup", function (e) {
+    if (gfSimHeld && (e.key === " " || e.key === "Enter")) gfSimRelease(true);
+  });
+  panel.addEventListener("focusout", function (e) {
+    if (gfSimHeld && e.target === gfSimHeld) gfSimRelease();
+  });
 
   // ---------------------------------------------------------------------------
   // Entrades/Sortides PLC: taula llegida del full de càlcul de Google (o de la còpia guardada)

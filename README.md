@@ -115,6 +115,30 @@ RESET i START de la conducció (`GF_GC_TRANS`) són comuns a les tres estacions.
   tornen enrere: les de la primera columna tornen per l'esquerra i les altres per la dreta).
 - Temporitzacions: `3s/`, `500ms/`, `1200ms/X2` (l'etapa 2 fa 1,2 s que és activa).
 
+### Simulació
+
+El botó **Simula** posa en marxa els tres grafcets de l'estació alhora, segons la norma IEC 60848
+(transicions franquejades alhora, evolució fugaç, temporitzacions en temps real i forçats per ordre de
+jerarquia). L'alumne fa de màquina:
+
+- **Panell de comandament**: START i RESET (amb la llum quan s'encén), STOP (normalment tancat: es pot
+  mantenir premut 3 s), el selector AUTO/MAN i la seta, que es queda premuda.
+- **Sensors**: cada entrada es pot posar a 0 o a 1. Amb *Els actuadors es mouen sols*, els sensors de posició
+  dels cilindres (marcats amb «auto») canvien sols quan s'activen les sortides; els de les peces els canvia l'alumne.
+- **Sortides**: llums que mostren quines sortides estan activades.
+- Al dibuix es marquen les etapes actives (amb la marca de la norma), les accions actives i les transicions
+  que s'esperen; a la llista *S'espera* hi ha aquestes transicions i el temps de les temporitzacions en marxa.
+
+Dades de cada estació per a la simulació:
+
+- `rest: 1` en una entrada de `vars`: val 1 en repòs (p. ex. STOP, que és normalment tancat, o G1BG3,
+  que dona 1 quan el final de la cinta és lliure). Les altres comencen a 0.
+- `motions`: com es mouen els actuadors. `{ out: "expulsor", val: 1, start: { recollit: 0 }, time: 0.6, end: { avancat: 1 } }`
+  vol dir que, quan la sortida `expulsor` val 1, `recollit` passa a 0 de seguida i `avancat` a 1 al cap de 0,6 s.
+- `simHint`: el text que explica què ha d'activar l'alumne.
+
+El motor de la simulació (`gfSimCreate`) no toca la pàgina: les proves el fan servir directament.
+
 ## Entrades/Sortides PLC (MA1B2, MA2B2, MA3B2)
 
 Taula d'entrades i sortides del PLC de l'estació: adreça, etiqueta, què vol dir que valgui 1, component,
@@ -141,3 +165,36 @@ observacions. Es pot filtrar per tipus i cercar.
   Google només envia un dels dos tipus i les altres cel·les arriben buides (la web n'avisa).
 - Si `IO_SHEET` és buit, el full no es pot llegir o hi falta alguna columna imprescindible, es mostra la còpia
   guardada a la configuració de l'estació (i un avís).
+
+## Proves
+
+A la carpeta `tests` hi ha proves automàtiques per comprovar la web abans de publicar un canvi:
+
+| Fitxer | Què comprova |
+| --- | --- |
+| `grafcet-data.js` | Les dades dels tres grafcets: senyals, etapes, transicions, accions, forçats i moviments. |
+| `sim-distributing.js`, `sim-pick-place.js`, `sim-sorting.js` | Situacions de cada grafcet (cicle, RESET, STOP curt i de 3 s, seta, errors, rampa plena…) amb el motor de simulació de la pàgina. |
+| `sim-motions.js` | La simulació amb els actuadors que es mouen sols. |
+| `web-smoke.js` | Tota la web: inici, les tres estacions i els quatre botons, a l'ordinador, al mòbil i incrustada com a Google Sites, sense errors. |
+| `web-grafcet.js` | Els dibuixos dels grafcets (cap text a sobre d'un altre o d'una línia), les explicacions, la finestra ampliada i el mòbil. |
+| `web-simulator.js` | El simulador a la pàgina: polsadors (també mantenint-los premuts i amb el teclat), sensors, dibuix, mòbil i Google Sites. |
+| `web-pdf.js` | Els PDF del grafcet i de la taula d'entrades i sortides, també dins de Google Sites. |
+
+Cal tenir [Node.js](https://nodejs.org/). La primera vegada:
+
+```
+npm install
+npx playwright install chromium
+```
+
+I després:
+
+```
+npm test            # totes les proves (un parell de minuts)
+npm run test:sim    # només les dels grafcets, sense navegador (un segon)
+node tests/run.js -v   # totes, amb el detall de cada comprovació
+```
+
+Les proves amb navegador no surten a Internet: Google Drive i el full de càlcul es substitueixen per
+respostes locals (la taula d'entrades i sortides fa servir la còpia guardada a la pàgina). Les captures i els
+PDF que generen queden a `tests/out` (no es pugen al repositori).
