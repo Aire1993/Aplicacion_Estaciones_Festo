@@ -120,6 +120,35 @@ const badPlaces = t => t.evaluate(() => [...document.querySelectorAll('.gl-term'
     ok('no errors', !errors.length, errors);
     await browser.close();
 
+    title('Footer option: no underlined words');
+    ({ browser, page, errors } = await B.launch());
+    const count = () => page.$$eval('.gl-term', e => e.length);
+    await B.openSection(page, 'pick-and-place', 1);
+    await page.waitForSelector('.io-row');
+    const before = await count();
+    ok('option on by default', await page.isChecked('#gl-marks') && before > 10, before);
+    await page.uncheck('#gl-marks');
+    await page.waitForTimeout(150);
+    r = await page.evaluate(() => ({ n: document.querySelectorAll('.gl-term').length, text: /Sensor de proximitat magnètic/.test(document.querySelector('.io-wrap').textContent) }));
+    ok('unchecked: no underlined words, the text stays', r.n === 0 && r.text, r);
+    await B.openSection(page, 'sorting', 2);
+    ok('other pages without underlined words either', (await count()) === 0);
+    await page.reload();
+    await page.waitForSelector('#station-desc p');
+    ok('remembered after reloading', !(await page.isChecked('#gl-marks')) && (await count()) === 0);
+    await B.openSection(page, 'pick-and-place', 1);
+    await page.waitForSelector('.io-row');
+    await page.check('#gl-marks');
+    await page.waitForTimeout(150);
+    ok('checked again: the words come back in what is on screen', (await count()) === before, await count());
+    await page.uncheck('#gl-marks');
+    await page.goto(B.APP + '#glossari');
+    await page.waitForTimeout(500);
+    r = await page.evaluate(() => ({ entries: document.querySelectorAll('.gl-entry').length, terms: document.querySelectorAll('.gl-term').length }));
+    ok('the glossary page still works, without underlined words', r.entries === N && r.terms === 0, r);
+    ok('no errors', !errors.length, errors);
+    await browser.close();
+
     title('Phone');
     ({ browser, page, errors } = await B.launch({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }));
     await page.goto(B.APP + '#sorting');

@@ -21,7 +21,7 @@ Aplicació web (un sol fitxer `index.html`) per publicar a Google Sites.
 | **Botons** | "Esquemes", "Entrades/Sortides PLC", "Grafcet" i "Components". |
 | **Panell de contingut** | Requadre gris que s'obre sota els botons. |
 | **Reproductor ampliat** | Vídeo en gran que apareix després de passar el ratolí per la imatge. |
-| **Peu de pàgina** | Franja de baix de tot: descripció i autoria de la web, enllaç al glossari, enllaços a l'InfoPortal de Festo i a l'Escola del Treball, llicència (CC BY-NC-SA 4.0), avís de web no oficial i «Torna a dalt». |
+| **Peu de pàgina** | Franja de baix de tot: descripció i autoria de la web, enllaç al glossari i opció per no subratllar-ne les paraules, enllaços a l'InfoPortal de Festo i a l'Escola del Treball, llicència (CC BY-NC-SA 4.0), avís de web no oficial i «Torna a dalt». |
 | **Glossari** | Pàgina amb les paraules tècniques de la web (s'hi arriba des del peu de pàgina). |
 | **Definició** | Finestreta que s'obre en tocar una paraula subratllada amb punts. |
 
@@ -151,6 +151,8 @@ Paraules tècniques de la web explicades en català (`GLOSSARY` a `index.html`),
 - **Als textos** (descripció de l'estació, grafcet, taula d'entrades i sortides, components i el mateix glossari),
   les paraules del glossari surten subratllades amb punts la primera vegada que apareixen en cada text (a la taula
   d'entrades i sortides, un sol cop a tota la taula). En tocar-les s'obre la definició, amb un enllaç al glossari.
+- **Opció del peu de pàgina** «Subratlla les paraules del glossari als textos»: si es desmarca, les paraules
+  tornen a ser text normal (sense subratllat ni definició) a tota la web. Cada navegador recorda l'opció triada.
 - Cada paraula: `{ id, cat, term, def }` i, si cal, `words` (com pot sortir als textos, p. ex. en plural),
   `also` (altres noms, que també es mostren) i `mark: false` (no es marca als textos perquè surt a tot arreu,
   com «etapa» o «PLC»).
@@ -195,7 +197,7 @@ A la carpeta `tests` hi ha proves automàtiques per comprovar la web abans de pu
 | `web-smoke.js` | Tota la web: inici, les tres estacions i els quatre botons, a l'ordinador, al mòbil i incrustada com a Google Sites, sense errors. |
 | `web-grafcet.js` | Els dibuixos dels grafcets (cap text a sobre d'un altre o d'una línia), les explicacions, la finestra ampliada i el mòbil. |
 | `web-simulator.js` | El simulador a la pàgina: polsadors (també mantenint-los premuts i amb el teclat), sensors, dibuix, mòbil i Google Sites. |
-| `web-glossary.js` | El glossari: enllaç del peu, cercador, temes, enllaç a una paraula i les definicions als textos (també dins de les fitxes, al mòbil i a Google Sites). |
+| `web-glossary.js` | El glossari: enllaç del peu, cercador, temes, enllaç a una paraula, les definicions als textos (també dins de les fitxes, al mòbil i a Google Sites) i l'opció per no subratllar-les. |
 | `web-pdf.js` | Els PDF del grafcet i de la taula d'entrades i sortides, també dins de Google Sites. |
 
 Cal tenir [Node.js](https://nodejs.org/). La primera vegada:

@@ -1307,6 +1307,9 @@
     gap: 20px 40px;
   }
   .footer-glossary p + p { margin-top: 8px; }
+  .footer-check { display: inline-flex; align-items: flex-start; gap: 7px; cursor: pointer; }
+  .footer-check input { flex-shrink: 0; width: 16px; height: 16px; margin-top: 1px; accent-color: var(--festo-blue); cursor: pointer; }
+  .footer-check input:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
   .site-footer a.footer-gl { font-weight: 600; }
   .footer-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
   .footer-about p:not(.footer-name) { max-width: 420px; }
@@ -1701,6 +1704,7 @@
         <h2 class="footer-h">Glossari</h2>
         <p>Les paraules tècniques de la web explicades: grafcet, sensors, vàlvules, PLC…</p>
         <p><a class="footer-gl" href="#glossari">Obre el glossari <span aria-hidden="true">&rarr;</span></a></p>
+        <p><label class="footer-check"><input type="checkbox" id="gl-marks" checked> Subratlla les paraules del glossari als textos</label></p>
       </div>
       <nav class="footer-nav" aria-label="Enllaços">
         <h2 class="footer-h">Enllaços</h2>
@@ -6393,7 +6397,7 @@
   // està marcat no es repeteix.
   var GL_SKIP = /^(A|BUTTON|B|STRONG|H1|H2|H3|H4|H5|H6|LABEL|INPUT|TEXTAREA|SELECT|SUMMARY|SVG|SCRIPT|STYLE)$/;
   function glossLink(root, except, only) {
-    if (!root) return;
+    if (!root || !glOn) return;
     var re = glRegex(), used = {}, nodes = [];
     if (except) used[except] = true;
     Array.prototype.forEach.call(root.querySelectorAll(".gl-term"), function (t) { used[t.getAttribute("data-gl")] = true; });
@@ -6435,6 +6439,36 @@
         n.parentNode.replaceChild(frag, n);
       }
     });
+  }
+
+  // Opció del peu de pàgina: subratllar o no les paraules als textos. Es recorda en aquest navegador.
+  var glOn = true;
+  try { glOn = localStorage.getItem("gl-marks") !== "off"; } catch (e) {}
+  var glMarks = $("gl-marks");
+  glMarks.checked = glOn;
+  glMarks.addEventListener("change", function () {
+    glOn = glMarks.checked;
+    try { localStorage.setItem("gl-marks", glOn ? "on" : "off"); } catch (e) {}
+    if (glOn) glRemark();
+    else {
+      // Les paraules tornen a ser text normal (sense subratllat ni definició).
+      glClose();
+      Array.prototype.forEach.call(document.querySelectorAll(".gl-term"), function (t) {
+        var p = t.parentNode;
+        p.replaceChild(document.createTextNode(t.textContent), t);
+        p.normalize();
+      });
+    }
+  });
+  // Torna a marcar els textos que es veuen ara (els mateixos llocs que quan es dibuixen).
+  function glRemark() {
+    glossLink(stationDesc);
+    Array.prototype.forEach.call(panel.querySelectorAll(".gf-intro, .gf-about, .gf-info, .comp-intro, .comp-module-body"), function (el) {
+      glossLink(el);
+    });
+    glossLink(panel.querySelector(".io-wrap"), null, ".io-comp, .io-obs");
+    glossLink(sheetContent.querySelector(".sheet-text"));
+    Array.prototype.forEach.call(glossary.querySelectorAll(".gl-def"), function (p) { glossLink(p, p.parentNode.id.slice(3)); });
   }
 
   // --- Definició al costat de la paraula ---
@@ -6528,7 +6562,8 @@
   function renderGlossary() {
     glossary.innerHTML = '<div class="gl-page">' +
       '<p class="gl-intro">Les paraules tècniques que surten a la web, explicades de manera curta. Als textos de les estacions, ' +
-      'les paraules <span class="gl-sample">subratllades amb punts</span> són d\'aquest glossari: toca-les per veure\'n la definició.</p>' +
+      'les paraules <span class="gl-sample">subratllades amb punts</span> són d\'aquest glossari: toca-les per veure\'n la definició. ' +
+      'Si no les vols veure subratllades, ho pots desactivar al peu de pàgina.</p>' +
       '<div class="gl-tools"><div class="comp-filters gl-chips" role="group" aria-label="Filtra per tema"></div>' +
       '<label class="io-search gl-search"><span class="sr-only">Cerca al glossari</span>' +
       '<input type="search" placeholder="Cerca una paraula…" autocomplete="off"></label></div>' +
