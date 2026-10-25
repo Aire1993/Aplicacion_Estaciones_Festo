@@ -56,6 +56,9 @@ Configuració del lloc de Google Sites:
 
 - **Nom del lloc** (a la capçalera, «Introdueix el nom del lloc»): Estacions didàctiques Festo MPS · Escola del Treball
 - **Favicon**: `icona/icona-512.png` (vegeu [Icona](#icona-favicon)).
+- **Estadístiques de visites**: Google Analytics (GA4), a **Configuració → Analytics** amb l'ID de mesura
+  (`G-…`). No hi ha cap codi a `index.html`: es compten les visites al lloc de Google Sites, no el que es fa dins
+  del bloc incrustat ni les visites a GitHub Pages.
 
 Google Sites no permet escriure una descripció només per als cercadors (la «meta descripció»): Google la treu
 del text visible del lloc, i no llegeix el que hi ha dins del bloc incrustat. S'ha decidit no afegir-hi cap text
