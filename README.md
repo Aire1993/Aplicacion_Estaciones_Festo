@@ -21,7 +21,9 @@ Aplicació web (un sol fitxer `index.html`) per publicar a Google Sites.
 | **Botons** | "Esquemes", "Entrades/Sortides PLC", "Grafcet" i "Components". |
 | **Panell de contingut** | Requadre gris que s'obre sota els botons. |
 | **Reproductor ampliat** | Vídeo en gran que apareix després de passar el ratolí per la imatge. |
-| **Peu de pàgina** | Franja de baix de tot: descripció i autoria de la web, enllaços a l'InfoPortal de Festo i a l'Escola del Treball, llicència (CC BY-NC-SA 4.0), avís de web no oficial i «Torna a dalt». |
+| **Peu de pàgina** | Franja de baix de tot: descripció i autoria de la web, enllaç al glossari, enllaços a l'InfoPortal de Festo i a l'Escola del Treball, llicència (CC BY-NC-SA 4.0), avís de web no oficial i «Torna a dalt». |
+| **Glossari** | Pàgina amb les paraules tècniques de la web (s'hi arriba des del peu de pàgina). |
+| **Definició** | Finestreta que s'obre en tocar una paraula subratllada amb punts. |
 
 ## Vídeos
 
@@ -139,6 +141,20 @@ Dades de cada estació per a la simulació:
 
 El motor de la simulació (`gfSimCreate`) no toca la pàgina: les proves el fan servir directament.
 
+## Glossari
+
+Paraules tècniques de la web explicades en català (`GLOSSARY` a `index.html`), agrupades per temes
+(`GLOSSARY_CATS`): grafcet i modes de marxa, PLC i senyals, sensors, pneumàtica i actuadors, i les estacions.
+
+- **Pàgina** `#glossari`, des de la columna «Glossari» del peu de pàgina: cercador i filtre per tema.
+  `#glossari/biestable` obre la pàgina amb aquesta paraula marcada.
+- **Als textos** (descripció de l'estació, grafcet, taula d'entrades i sortides, components i el mateix glossari),
+  les paraules del glossari surten subratllades amb punts la primera vegada que apareixen en cada text (a la taula
+  d'entrades i sortides, un sol cop a tota la taula). En tocar-les s'obre la definició, amb un enllaç al glossari.
+- Cada paraula: `{ id, cat, term, def }` i, si cal, `words` (com pot sortir als textos, p. ex. en plural),
+  `also` (altres noms, que també es mostren) i `mark: false` (no es marca als textos perquè surt a tot arreu,
+  com «etapa» o «PLC»).
+
 ## Entrades/Sortides PLC (MA1B2, MA2B2, MA3B2)
 
 Taula d'entrades i sortides del PLC de l'estació: adreça, etiqueta, què vol dir que valgui 1, component,
@@ -173,11 +189,13 @@ A la carpeta `tests` hi ha proves automàtiques per comprovar la web abans de pu
 | Fitxer | Què comprova |
 | --- | --- |
 | `grafcet-data.js` | Les dades dels tres grafcets: senyals, etapes, transicions, accions, forçats i moviments. |
+| `glossary-data.js` | Les dades del glossari: noms únics, temes i definicions completes. |
 | `sim-distributing.js`, `sim-pick-place.js`, `sim-sorting.js` | Situacions de cada grafcet (cicle, RESET, STOP curt i de 3 s, seta, errors, rampa plena…) amb el motor de simulació de la pàgina. |
 | `sim-motions.js` | La simulació amb els actuadors que es mouen sols. |
 | `web-smoke.js` | Tota la web: inici, les tres estacions i els quatre botons, a l'ordinador, al mòbil i incrustada com a Google Sites, sense errors. |
 | `web-grafcet.js` | Els dibuixos dels grafcets (cap text a sobre d'un altre o d'una línia), les explicacions, la finestra ampliada i el mòbil. |
 | `web-simulator.js` | El simulador a la pàgina: polsadors (també mantenint-los premuts i amb el teclat), sensors, dibuix, mòbil i Google Sites. |
+| `web-glossary.js` | El glossari: enllaç del peu, cercador, temes, enllaç a una paraula i les definicions als textos (també dins de les fitxes, al mòbil i a Google Sites). |
 | `web-pdf.js` | Els PDF del grafcet i de la taula d'entrades i sortides, també dins de Google Sites. |
 
 Cal tenir [Node.js](https://nodejs.org/). La primera vegada:
@@ -191,7 +209,7 @@ I després:
 
 ```
 npm test            # totes les proves (un parell de minuts)
-npm run test:sim    # només les dels grafcets, sense navegador (un segon)
+npm run test:sim    # només les de dades i simulació, sense navegador (un segon)
 node tests/run.js -v   # totes, amb el detall de cada comprovació
 ```
 

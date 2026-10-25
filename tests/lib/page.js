@@ -23,6 +23,12 @@ function grafcets() {
   return new Function(code + '; return {' + names.join(',') + '};')();
 }
 
+// { GLOSSARY, GLOSSARY_CATS }
+function glossary() {
+  const code = between(source(), '  var GLOSSARY_CATS = [', '\n  // Botons comuns a totes les estacions.');
+  return new Function(code + '; return { GLOSSARY: GLOSSARY, GLOSSARY_CATS: GLOSSARY_CATS };')();
+}
+
 // { gfSimCreate, gfSimParse, gfTokens }
 function engine() {
   const html = source();
@@ -32,4 +38,4 @@ function engine() {
   return new Function(code + '; return { gfSimCreate: gfSimCreate, gfSimParse: gfSimParse, gfTokens: gfTokens };')();
 }
 
-module.exports = { grafcets, engine, FILE };
+module.exports = { grafcets, engine, glossary, FILE };
