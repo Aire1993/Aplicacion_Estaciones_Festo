@@ -3925,13 +3925,13 @@
 
   // Al mòbil, dins de Google Sites, la web queda en un recuadre baix amb la seva pròpia barra de desplaçament
   // (l'alçada la decideix Google Sites). L'avís de dalt (i l'enllaç del peu) obre la web publicada a
-  // GitHub Pages en una pestanya nova, a tota la pantalla i a la mateixa estació. L'avís es pot tancar.
+  // GitHub Pages en una pestanya nova, a tota la pantalla i a la mateixa estació. L'avís es pot tancar
+  // (només mentre no es torni a carregar la pàgina: no es recorda).
   var FULL_URL = "https://aire1993.github.io/Aplicacion_Estaciones_Festo/";
   var fsBar = $("fs-bar"), footerFs = $("footer-fs");
   var IN_FRAME = true;
   try { IN_FRAME = window.self !== window.top; } catch (e) { /* marc d'un altre domini */ }
   var fsClosed = false;
-  try { fsClosed = localStorage.getItem("fs-bar") === "closed"; } catch (e) {}
   function fsCheck() {
     var small = IN_FRAME && window.matchMedia && window.matchMedia("(max-width: 760px)").matches;
     fsBar.hidden = !small || fsClosed;
@@ -3941,7 +3941,6 @@
   window.addEventListener("resize", fsCheck);
   $("fs-close").addEventListener("click", function () {
     fsClosed = true;
-    try { localStorage.setItem("fs-bar", "closed"); } catch (e) {}
     fsCheck();
     focusQuietly(homeLink);
   });

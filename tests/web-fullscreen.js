@@ -1,6 +1,6 @@
 // "Obre a pantalla completa": only on a phone inside Google Sites (a low frame with its own scroll bar).
 // It opens the web published on GitHub Pages in a new tab, at the same station. The notice can be closed
-// (remembered in the browser) and the footer keeps the link.
+// (not remembered: it comes back when the page loads again) and the footer keeps the link.
 const B = require('./lib/browser');
 const { title, ok, done } = require('./lib/check');
 
@@ -45,7 +45,9 @@ const shown = (t, id) => t.evaluate(i => !document.getElementById(i).hidden, id)
     await page.reload();
     await page.waitForTimeout(1000);
     frame = page.frames().find(f => f.url().startsWith(B.APP));
-    ok('it stays closed after reloading', !(await shown(frame, 'fs-bar')));
+    ok('it comes back after reloading (not remembered)', await shown(frame, 'fs-bar'));
+    await frame.tap('#fs-close');
+    await page.waitForTimeout(150);
     ok('the footer link is still there', await shown(frame, 'footer-fs'));
     const [tab2] = await Promise.all([context.waitForEvent('page', { timeout: 5000 }), frame.tap('#footer-fs')]);
     await tab2.waitForLoadState();
