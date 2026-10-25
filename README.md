@@ -47,6 +47,16 @@ l'enllaç no canvia i no cal tocar el codi.
 Les imatges i els vídeos es carreguen des de Google Drive, per tant els fitxers han d'estar
 compartits com a "Qualsevol persona amb l'enllaç".
 
+## Icona (favicon)
+
+A la carpeta `icona/` hi ha la icona de la web (una cinta amb una peça, blanca sobre el blau de Festo):
+`icona.svg` i els PNG de 512, 192 i 48 px.
+
+- **Google Sites**: la icona de la pestanya i dels resultats de cerca és la del lloc. Es puja a
+  **Configuració (engranatge) → Imatges de marca → Favicon** (`icona-512.png`) i després cal **Publicar**.
+- **A la web**: la mateixa icona és a `SITE_ICON` (`index.html`). Surt a la pestanya que s'obre per
+  descarregar un PDF i quan s'obre la pàgina sola. Si es canvia la icona, cal canviar-la als dos llocs.
+
 ## Afegir contingut als botons
 
 A `index.html`, cada estació de `STATIONS` té un objecte `sections` amb el contingut

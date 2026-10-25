@@ -44,6 +44,8 @@ async function download(page, selector, name) {
     const [tab] = await Promise.all([context.waitForEvent('page', { timeout: 5000 }), frame.click('.gf-pdf')]);
     await page.waitForTimeout(1500);
     ok('Grafcet PDF opens in a new tab and downloads', downloads.length === 1 && /\.pdf$/.test(downloads[0].suggestedFilename()), downloads.map(d => d.suggestedFilename()));
+    const icon = await tab.evaluate(() => (document.querySelector('link[rel="icon"]') || {}).href || '');
+    ok('the new tab has the site icon', icon.startsWith('data:image/svg+xml'), icon.slice(0, 40));
     await tab.close();
     ok('no errors', !errors.length, errors);
     await browser.close();

@@ -34,6 +34,8 @@ async function visit(t, label) {
   try {
     await page.goto(B.APP);
     await visit(page, 'Computer');
+    const icon = await page.evaluate(() => (document.querySelector('link[rel="icon"]') || {}).href || '');
+    ok('page icon (conveyor with a workpiece)', icon.startsWith('data:image/svg+xml'), icon.slice(0, 40));
     ok('no errors (computer)', !errors.length, errors);
     await browser.close();
 
