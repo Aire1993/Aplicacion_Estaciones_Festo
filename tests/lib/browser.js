@@ -35,7 +35,8 @@ function start() {
     const u = new URL(req.url, 'http://x');
     const sb = u.searchParams.get('sandbox');
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(`<!doctype html><html><body style="margin:0">
+    // Like Google Sites, the page adapts to phones (viewport), so the frame is as wide as the screen.
+    res.end(`<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0">
       <div style="height:200px;background:#eee">Google Sites (simulated)</div>
       <iframe id="embed" ${sb === null ? '' : `sandbox="${sb}"`} src="${APP}${u.searchParams.get('hash') ? '#' + u.searchParams.get('hash') : ''}"
         style="width:100%;height:${+(u.searchParams.get('h') || 2400)}px;border:0;display:block"></iframe>

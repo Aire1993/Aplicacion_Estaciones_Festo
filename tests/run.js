@@ -5,7 +5,7 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 
 const NODE_ONLY = ['grafcet-data.js', 'glossary-data.js', 'sim-distributing.js', 'sim-pick-place.js', 'sim-sorting.js', 'sim-motions.js'];
-const BROWSER = ['web-smoke.js', 'web-grafcet.js', 'web-simulator.js', 'web-glossary.js', 'web-pdf.js'];
+const BROWSER = ['web-smoke.js', 'web-grafcet.js', 'web-simulator.js', 'web-glossary.js', 'web-fullscreen.js', 'web-pdf.js'];
 const files = process.argv[2] === 'sim' ? NODE_ONLY : NODE_ONLY.concat(BROWSER);
 const verbose = process.argv.includes('-v');
 

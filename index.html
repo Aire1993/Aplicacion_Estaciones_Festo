@@ -1058,6 +1058,39 @@
   }
   .panel .io-empty { padding: 16px; background: var(--bg); border: 1px solid var(--border); }
 
+  /* ---------- Avís de pantalla completa (mòbil dins de Google Sites) ---------- */
+  .fs-bar[hidden] { display: none; }
+  .fs-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 12px;
+    padding: 10px 16px;
+    background: var(--festo-blue);
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+  }
+  .fs-bar p { margin: 0; }
+  .fs-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 14px;
+    color: var(--festo-blue-dark);
+    background: #fff;
+    border: 0;
+    cursor: pointer;
+  }
+  .fs-open svg { width: 16px; height: 16px; }
+  .fs-open:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .fs-bar .fs-msg { width: 100%; font-size: 13px; }
+  .fs-bar .fs-msg:empty { display: none; }
+
   /* ---------- Glossari ---------- */
   .gl-page { max-width: 1100px; }
   .gl-intro { max-width: 760px; margin-bottom: 20px; color: var(--text-muted); }
@@ -1638,6 +1671,13 @@
 </head>
 <body>
 
+<!-- Al mòbil, dins de Google Sites: la web va en un recuadre petit; aquest avís l'obre en una pestanya pròpia -->
+<div class="fs-bar" id="fs-bar" hidden>
+  <p>Al mòbil, la web es veu millor a pantalla completa.</p>
+  <button type="button" class="fs-open" id="fs-open"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Obre a pantalla completa</button>
+  <p class="fs-msg" id="fs-msg" role="status"></p>
+</div>
+
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="https://www.festo.com/es/es" target="_blank" rel="noopener noreferrer" title="Festo">FESTO</a>
@@ -1779,6 +1819,9 @@
 <script>
 (function () {
   "use strict";
+
+  // La pàgina tal com arriba, abans que el programa la canviï: és la que s'obre a pantalla completa.
+  var PAGE_HTML = "<!doctype html>\n" + document.documentElement.outerHTML;
 
   // ---------------------------------------------------------------------------
   // Dades
@@ -3864,6 +3907,36 @@
       '<span class="arrow" aria-hidden="true">&rsaquo;</span></div>';
     setImage(a.querySelector("img"), s.imageId, s.title);
     home.appendChild(a);
+  });
+
+  // Al mòbil, dins de Google Sites, la web queda en un recuadre baix amb la seva pròpia barra de desplaçament
+  // (l'alçada la decideix Google Sites). L'avís de dalt l'obre en una pestanya nova, a tota la pantalla.
+  var fsBar = $("fs-bar");
+  var IN_FRAME = true;
+  try { IN_FRAME = window.self !== window.top; } catch (e) { /* marc d'un altre domini */ }
+  function fsCheck() {
+    fsBar.hidden = !(IN_FRAME && window.matchMedia && window.matchMedia("(max-width: 760px)").matches);
+  }
+  fsCheck();
+  window.addEventListener("resize", fsCheck);
+  $("fs-open").addEventListener("click", function () {
+    var msg = $("fs-msg"), win = null;
+    msg.textContent = "";
+    try { win = window.open("", "_blank"); } catch (e) { win = null; }
+    if (!win) {
+      msg.textContent = "No s'ha pogut obrir: permet les finestres emergents d'aquesta pàgina i torna-ho a provar.";
+      return;
+    }
+    try {
+      win.document.open();
+      win.document.write(PAGE_HTML);
+      win.document.close();
+      // S'obre a la mateixa estació que s'estava mirant.
+      if (location.hash) win.location.hash = location.hash;
+    } catch (e) {
+      try { win.close(); } catch (e2) { /* res */ }
+      msg.textContent = "No s'ha pogut obrir la web a pantalla completa.";
+    }
   });
 
   // Peu de pàgina: "Torna a dalt".
