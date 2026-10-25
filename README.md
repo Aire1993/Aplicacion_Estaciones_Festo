@@ -44,6 +44,15 @@ l'enllaç no canvia i no cal tocar el codi.
 1. A Google Sites: **Insereix → Insereix (Embed) → Insereix codi**.
 2. Enganxa tot el contingut de `index.html` i ajusta l'alçada del bloc.
 
+Els cercadors no llegeixen el que hi ha dins del bloc incrustat, sinó el nom del lloc i el text escrit
+directament a Google Sites. Per això el lloc té:
+
+- **Nom del lloc** (a la capçalera, «Introdueix el nom del lloc»): Estacions didàctiques Festo MPS · Escola del Treball
+- **Text breu a sobre del bloc incrustat** (Insereix → Quadre de text): «Documentació de les estacions didàctiques
+  MPS de Festo de l'Institut Escola del Treball de Barcelona: Distributing, Pick and Place i Sorting. Per a cada
+  estació hi ha els esquemes, la taula d'entrades i sortides del PLC, el grafcet amb simulador i els components.»
+- **Favicon**: `icona/icona-512.png` (vegeu [Icona](#icona-favicon)).
+
 Les imatges i els vídeos es carreguen des de Google Drive, per tant els fitxers han d'estar
 compartits com a "Qualsevol persona amb l'enllaç".
 
