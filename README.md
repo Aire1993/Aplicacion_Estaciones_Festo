@@ -249,3 +249,15 @@ node tests/run.js -v   # totes, amb el detall de cada comprovació
 Les proves amb navegador no surten a Internet: Google Drive i el full de càlcul es substitueixen per
 respostes locals (la taula d'entrades i sortides fa servir la còpia guardada a la pàgina). Les captures i els
 PDF que generen queden a `tests/out` (no es pugen al repositori).
+
+## Memòria i codis QR
+
+A `memoria/img` hi ha les imatges de la memòria del projecte (captures de la web a l'ordinador i al mòbil,
+el full de càlcul, l'esbós de les pantalles i els PDF) i els codis QR de les tres estacions. Cada QR obre
+la seva estació a GitHub Pages, a pantalla completa:
+
+| Estació | Imatge | Adreça del QR |
+|---|---|---|
+| Distributing Conveyor Station | `qr-distributing-conveyor.png` | https://aire1993.github.io/Aplicacion_Estaciones_Festo/#distributing-conveyor |
+| Pick and Place Station | `qr-pick-and-place.png` | https://aire1993.github.io/Aplicacion_Estaciones_Festo/#pick-and-place |
+| Sorting Station | `qr-sorting.png` | https://aire1993.github.io/Aplicacion_Estaciones_Festo/#sorting |
