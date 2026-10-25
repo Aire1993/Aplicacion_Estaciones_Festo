@@ -47,8 +47,10 @@ l'enllaç no canvia i no cal tocar el codi.
 **Al mòbil**, Google Sites posa la web en un recuadre baix amb la seva pròpia barra de desplaçament (l'alçada
 del bloc al mòbil la decideix Google Sites a partir de la de l'ordinador, i no es pot canviar des del codi).
 Per això, al mòbil i dins de Google Sites, a dalt de la web surt l'avís **«Obre a pantalla completa»**: obre la
-mateixa web en una pestanya nova, a tota la pantalla i a la mateixa estació. Aquesta pestanya és una còpia de la
-pàgina (`PAGE_HTML`): si es recarrega queda en blanc, i cal tornar a obrir-la des de Google Sites.
+web publicada a **GitHub Pages** (<https://aire1993.github.io/Aplicacion_Estaciones_Festo/>, `FULL_URL` a
+`index.html`) en una pestanya nova, a tota la pantalla i a la mateixa estació. L'avís es pot tancar amb la ×
+(cada navegador ho recorda) i l'enllaç també és al peu de pàgina. GitHub Pages publica la branca `main`: el que
+s'hi puja es veu en aquesta adreça al cap d'un o dos minuts.
 
 Configuració del lloc de Google Sites:
 
@@ -223,7 +225,7 @@ A la carpeta `tests` hi ha proves automàtiques per comprovar la web abans de pu
 | `web-grafcet.js` | Els dibuixos dels grafcets (cap text a sobre d'un altre o d'una línia), les explicacions, la finestra ampliada i el mòbil. |
 | `web-simulator.js` | El simulador a la pàgina: polsadors (també mantenint-los premuts i amb el teclat), sensors, dibuix, mòbil i Google Sites. |
 | `web-glossary.js` | El glossari: enllaç del peu, cercador, temes, enllaç a una paraula, les definicions als textos (també dins de les fitxes, al mòbil i a Google Sites) i l'opció per no subratllar-les. |
-| `web-fullscreen.js` | L'avís «Obre a pantalla completa»: només al mòbil dins de Google Sites; obre la web a la mateixa estació i hi funciona tot. |
+| `web-fullscreen.js` | L'avís «Obre a pantalla completa»: només al mòbil dins de Google Sites; obre GitHub Pages a la mateixa estació, es pot tancar i l'enllaç queda al peu. |
 | `web-pdf.js` | Els PDF del grafcet i de la taula d'entrades i sortides, també dins de Google Sites. |
 
 Cal tenir [Node.js](https://nodejs.org/). La primera vegada:

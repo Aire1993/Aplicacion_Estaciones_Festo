@@ -19,6 +19,7 @@ const OUTER = `http://localhost:${PORT + 1}/`;
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.png': 'image/png', '.jpg': 'image/jpeg', '.mp4': 'video/mp4' };
 // Google Sites gives the embedded page these permissions (no downloads: they go through a new tab).
 const SITES_SANDBOX = 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms';
+const PAGES_URL = 'https://aire1993.github.io/Aplicacion_Estaciones_Festo/';
 const IMAGE = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="#c9d3dc"/></svg>');
 
 let servers = [];
@@ -59,6 +60,8 @@ async function launch(opts = {}) {
   });
   await context.route(url => !/^http:\/\/(127\.0\.0\.1|localhost):/.test(url.href), route => {
     const url = route.request().url();
+    // The web published on GitHub Pages ("Obre a pantalla completa") is this repository's index.html.
+    if (url.startsWith(PAGES_URL)) return route.fulfill({ contentType: 'text/html; charset=utf-8', body: fs.readFileSync(path.join(ROOT, 'index.html')) });
     if (/drive\.google\.com\/thumbnail|googleusercontent\.com/.test(url)) return route.fulfill({ contentType: 'image/svg+xml', body: IMAGE });
     if (/drive\.google\.com\/file\/d\/[^/]+\/preview/.test(url)) return route.fulfill({ contentType: 'text/html', body: '<p>Drive preview</p>' });
     return route.abort();
@@ -95,4 +98,4 @@ function stop() { servers.forEach(s => s.close()); servers = []; }
 const OUT = path.join(__dirname, '..', 'out');
 fs.mkdirSync(OUT, { recursive: true });
 
-module.exports = { launch, embed, openSection, stop, APP, OUTER, OUT, SITES_SANDBOX, STATIONS: ['distributing-conveyor', 'pick-and-place', 'sorting'] };
+module.exports = { launch, embed, openSection, stop, APP, OUTER, OUT, SITES_SANDBOX, PAGES_URL, STATIONS: ['distributing-conveyor', 'pick-and-place', 'sorting'] };
