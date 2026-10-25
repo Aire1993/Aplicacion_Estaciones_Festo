@@ -1058,6 +1058,83 @@
   }
   .panel .io-empty { padding: 16px; background: var(--bg); border: 1px solid var(--border); }
 
+  /* ---------- Glossari ---------- */
+  .gl-page { max-width: 1100px; }
+  .gl-intro { max-width: 760px; margin-bottom: 20px; color: var(--text-muted); }
+  .gl-sample,
+  .gl-term {
+    text-decoration: underline dotted var(--festo-blue);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+  }
+  .gl-term { cursor: help; border-radius: 2px; transition: background 0.15s ease, color 0.15s ease; }
+  .gl-term:hover,
+  .gl-term[aria-expanded="true"] { color: var(--festo-blue-dark); background: #e6f3fb; }
+  .gl-term:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 1px; }
+  .gl-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; margin-bottom: 8px; }
+  .gl-tools .comp-filters { margin-bottom: 0; }
+  .gl-sec { margin-top: 26px; }
+  .gl-cat {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--festo-blue);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .gl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+  .gl-entry {
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--festo-blue);
+    scroll-margin: 80px;
+  }
+  .gl-entry:focus { outline: none; }
+  .gl-entry.is-target { animation: gl-flash 2.4s ease; }
+  @keyframes gl-flash { 0%, 40% { background: #fff4c2; border-color: #e0b400; } 100% { background: var(--bg); } }
+  .gl-entry h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .gl-also { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+  .gl-def { font-size: 14px; line-height: 1.55; }
+  .gl-empty { margin-top: 20px; color: var(--text-muted); }
+  .gl-pop {
+    position: fixed;
+    z-index: 1100;
+    padding: 12px 36px 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--festo-blue);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    text-align: left;
+  }
+  .gl-pop[hidden] { display: none; }
+  .gl-pop:focus { outline: none; }
+  .gl-pop-k { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--festo-blue); }
+  .gl-pop-t { font-size: 16px; font-weight: 600; color: var(--text); margin: 2px 0 4px; }
+  .gl-pop-more { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--festo-blue); text-decoration: none; }
+  .gl-pop-more:hover { text-decoration: underline; }
+  .gl-pop-x {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .gl-pop-x:hover { color: var(--text); }
+  .gl-pop-x:focus-visible,
+  .gl-pop-more:focus-visible { outline: 2px solid var(--festo-blue); outline-offset: 2px; }
+
   /* Fitxa d'un component (finestra emergent) */
   .sheet[hidden] { display: none; }
   .sheet {
@@ -1226,9 +1303,11 @@
   }
   .footer-cols {
     display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
     gap: 20px 40px;
   }
+  .footer-glossary p + p { margin-top: 8px; }
+  .site-footer a.footer-gl { font-weight: 600; }
   .footer-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
   .footer-about p:not(.footer-name) { max-width: 420px; }
   .footer-author { margin-top: 10px; }
@@ -1461,6 +1540,7 @@
 
   /* ---------- Responsive ---------- */
   @media (max-width: 1000px) {
+    .footer-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .comp-modules { grid-template-columns: 1fr; }
     .gf-main { grid-template-columns: 1fr; }
     .gf-side .gf-info { order: -1; }
@@ -1477,6 +1557,7 @@
     .hero-inner { padding: 28px 16px; }
     main { padding: 28px 16px 48px; }
     .footer-cols { grid-template-columns: 1fr; }
+    .gl-grid { grid-template-columns: 1fr; }
     .topbar-inner, .footer-inner { padding-left: 16px; padding-right: 16px; }
     .panel { padding: 16px; }
     .doc { height: 70vh; min-height: 360px; }
@@ -1601,6 +1682,9 @@
 
     <a class="back" href="#">&larr; Tornar a les estacions</a>
   </section>
+
+  <!-- Glossari -->
+  <section id="glossary" class="view hidden"></section>
 </main>
 
 <!-- Peu de pàgina (provisional) -->
@@ -1612,6 +1696,11 @@
         <p>Documentació de les estacions MPS de Festo Didactic: esquemes, entrades i sortides del PLC, grafcet i components.</p>
         <p class="footer-author">Web feta per <b>Alberto Pérez Castillo</b>, estudiant de Mecatrònica Industrial
           de l'Institut Escola del Treball de Barcelona (promoció 2025-2027).</p>
+      </div>
+      <div class="footer-glossary">
+        <h2 class="footer-h">Glossari</h2>
+        <p>Les paraules tècniques de la web explicades: grafcet, sensors, vàlvules, PLC…</p>
+        <p><a class="footer-gl" href="#glossari">Obre el glossari <span aria-hidden="true">&rarr;</span></a></p>
       </div>
       <nav class="footer-nav" aria-label="Enllaços">
         <h2 class="footer-h">Enllaços</h2>
@@ -3524,6 +3613,158 @@
     }
   ];
 
+  // ---------------------------------------------------------------------------
+  // Glossari: paraules tècniques de la web. Als textos, les paraules de "words" (o "term") i "also"
+  // surten subratllades amb punts i en tocar-les se'n veu la definició ("mark: false": no es marquen,
+  // perquè surten a tot arreu).
+  // ---------------------------------------------------------------------------
+
+  var GLOSSARY_CATS = [
+    { key: "grafcet", label: "Grafcet i modes de marxa" },
+    { key: "plc", label: "PLC i senyals" },
+    { key: "sensors", label: "Sensors" },
+    { key: "pneu", label: "Pneumàtica i actuadors" },
+    { key: "mps", label: "Les estacions" }
+  ];
+
+  var GLOSSARY = [
+    // Grafcet i modes de marxa
+    { id: "grafcet", cat: "grafcet", term: "Grafcet", mark: false,
+      def: "Gràfic que descriu pas a pas com funciona un automatisme seqüencial: les etapes (el que fa la màquina), les transicions (quan passa al pas següent) i les accions (les sortides que s'activen). El defineix la norma IEC 60848." },
+    { id: "iec60848", cat: "grafcet", term: "IEC 60848", words: ["norma IEC 60848", "IEC 60848"],
+      def: "Norma internacional del llenguatge GRAFCET: fixa els símbols, com evoluciona el grafcet, com s'escriuen les accions, les temporitzacions i les ordres de forçat." },
+    { id: "etapa", cat: "grafcet", term: "Etapa", mark: false,
+      def: "Quadre numerat del grafcet que representa una situació de la màquina. Mentre és activa, s'executen les seves accions. L'etapa inicial, amb doble quadre, és la que està activa en començar." },
+    { id: "transicio", cat: "grafcet", term: "Transició", mark: false,
+      def: "Barra curta entre dues etapes, amb una condició al costat. Es franqueja quan l'etapa anterior és activa i la condició es compleix: llavors s'activa l'etapa següent i es desactiva l'anterior." },
+    { id: "receptivitat", cat: "grafcet", term: "Receptivitat", words: ["receptivitat", "receptivitats"],
+      def: "Condició d'una transició, escrita amb els senyals del sistema: · vol dir I, + vol dir O, una ratlla a sobre vol dir NO, ↑ és un flanc de pujada, i també hi pot haver temporitzacions." },
+    { id: "validada", cat: "grafcet", term: "Transició validada", words: ["transició validada", "transicions validades"],
+      def: "Transició que ja té l'etapa anterior activa: només falta que es compleixi la condició per franquejar-la. Al simulador es marquen en taronja." },
+    { id: "accio", cat: "grafcet", term: "Acció", mark: false,
+      def: "El que fa una etapa mentre és activa, normalment activar una sortida del PLC (un motor, una vàlvula o una llum). Es dibuixa en un rectangle a la dreta de l'etapa." },
+    { id: "condicionada", cat: "grafcet", term: "Acció condicionada", words: ["acció condicionada", "accions condicionades"],
+      def: "Acció que només s'executa si l'etapa és activa i, a més, es compleix una condició, escrita a sobre del rectangle. Per exemple, la llum RESET només s'encén si el selector és en MAN." },
+    { id: "forcat", cat: "grafcet", term: "Ordre de forçat", words: ["ordre de forçat", "ordres de forçat", "forçat", "forçats"],
+      def: "Ordre amb què un grafcet superior obliga un d'inferior a anar a una situació concreta, sigui quina sigui la que tenia. Es dibuixa amb requadre doble: GP{INIT} (situació inicial), GP{} (cap etapa activa) o GP{8} (etapa 8)." },
+    { id: "jerarquia", cat: "grafcet", term: "Grafcets jerarquitzats", words: ["grafcets jerarquitzats", "jerarquia"],
+      def: "Manera d'organitzar un automatisme en diversos grafcets amb un ordre de prioritat. Aquí n'hi ha tres: Seguretat (GS) mana sobre Conducció (GC), i Conducció mana sobre Producció (GP)." },
+    { id: "divergencia", cat: "grafcet", term: "Divergència en O", words: ["divergència en O", "divergències en O"],
+      def: "Punt on el grafcet es divideix en diverses branques alternatives, cadascuna amb la seva transició. Només se'n segueix una, i per això les condicions han de ser excloents. Per exemple, a Sorting: peça vermella, metàl·lica o negra." },
+    { id: "convergencia", cat: "grafcet", term: "Convergència en O", words: ["convergència en O", "convergències en O"],
+      def: "Punt on les branques d'una divergència en O es tornen a ajuntar en una mateixa etapa." },
+    { id: "flanc", cat: "grafcet", term: "Flanc de pujada", words: ["flanc de pujada", "flancs de pujada"],
+      def: "Instant en què un senyal passa de 0 a 1. S'escriu amb una fletxa (↑S1): la condició només es compleix en aquell instant, no mentre el senyal continua a 1. Per això, mantenir START premut no torna a engegar un cicle." },
+    { id: "temporitzacio", cat: "grafcet", term: "Temporització", words: ["temporització", "temporitzacions", "temporitzador", "temporitzadors"],
+      def: "Condició que es compleix quan un senyal fa un temps determinat que està actiu. «3s/S2» vol dir que S2 fa 3 s que val 1, i «1200ms/X2» que l'etapa 2 fa 1,2 s que és activa." },
+    { id: "variableEtapa", cat: "grafcet", term: "Variable d'etapa", words: ["variable d'etapa", "variables d'etapa"],
+      def: "Senyal intern que val 1 mentre una etapa és activa: X23 és l'etapa 23. Serveix perquè un grafcet tingui en compte en quina etapa és un altre." },
+    { id: "fugac", cat: "grafcet", term: "Evolució fugaç", words: ["evolució fugaç"],
+      def: "Quan, després de franquejar una transició, la següent ja es compleix, el grafcet continua sense aturar-se: les etapes del mig s'activen i es desactiven en el mateix instant i les seves accions no arriben a fer-se." },
+    { id: "gemma", cat: "grafcet", term: "GEMMA",
+      def: "Guia d'estudi dels modes de marxa i aturada (en francès, Guide d'Étude des Modes de Marches et d'Arrêts). Ajuda a decidir com engega, s'atura i es reinicia una màquina: posada a zero, producció, aturada a fi de cicle, aturada d'emergència, defectes… D'aquí surten el grafcet de seguretat i el de conducció." },
+    { id: "posadaZero", cat: "grafcet", term: "Posada a zero", words: ["posada a zero", "posades a zero"],
+      def: "Procés que porta la màquina a la situació inicial, amb els actuadors en repòs i cap peça a mig procés, perquè pugui començar a produir. A les estacions es fa amb RESET i el selector en MAN." },
+    { id: "autoMan", cat: "grafcet", term: "AUTO / MAN", mark: false,
+      def: "Selector de modes del panell. En AUTO l'estació fa cicles seguits; en MAN en fa un de sol cada vegada que es prem START. La posada a zero només es pot fer en MAN." },
+    { id: "fiCicle", cat: "grafcet", term: "Aturada a fi de cicle", words: ["aturada a fi de cicle"],
+      def: "Aturada en què la màquina acaba el cicle que està fent abans de parar, sense deixar peces a mig procés. A les estacions la fa una pulsació curta de STOP." },
+    { id: "seta", cat: "grafcet", term: "Seta d'emergència", words: ["seta d'emergència", "aturada d'emergència"],
+      def: "Polsador vermell en forma de bolet que atura la màquina de seguida. Es queda enclavat fins que es desbloqueja, i després cal fer la posada a zero. És un contacte normalment tancat." },
+
+    // PLC i senyals
+    { id: "plc", cat: "plc", term: "PLC", also: ["autòmat programable"], mark: false,
+      def: "Autòmat programable: ordinador industrial que llegeix les entrades (sensors i polsadors), executa el programa i activa les sortides (motors, vàlvules i llums). Festo dona programes per a PLC de diverses marques." },
+    { id: "es", cat: "plc", term: "Entrades i sortides (E/S)", mark: false,
+      def: "Les entrades porten al PLC els senyals dels sensors i dels polsadors; les sortides van del PLC cap als actuadors i les llums. Cadascuna té una adreça." },
+    { id: "adreca", cat: "plc", term: "Adreça", mark: false,
+      def: "Nom de cada entrada o sortida al PLC: una lletra (I entrada, Q sortida), el byte i el bit. A les estacions MPS el byte 0 és de l'estació i el byte 1 del panell de comandament; per exemple, I1.0 és START." },
+    { id: "syslink", cat: "plc", term: "SysLink",
+      def: "Sistema de connexió de Festo: un sol cable de 24 pins porta 8 entrades, 8 sortides i l'alimentació de 24 V entre el terminal d'E/S de l'estació i el PLC." },
+    { id: "terminalES", cat: "plc", term: "Terminal d'E/S", words: ["terminal d'E/S", "terminal E/S", "terminals d'E/S"],
+      def: "Placa de connexions on arriben els cables dels sensors i dels actuadors d'un mòdul, i d'on surt el cable SysLink cap al PLC. Als esquemes es diu G1XG1, C2XG1, G2XG1…" },
+    { id: "na", cat: "plc", term: "Normalment obert (NA)", words: ["normalment obert", "normalment oberts", "normalment oberta"],
+      def: "Contacte que només deixa passar el corrent quan s'acciona. Un polsador normalment obert dona 1 mentre està premut, com START i RESET. En una vàlvula, normalment oberta vol dir que deixa passar l'aire quan no rep senyal." },
+    { id: "nc", cat: "plc", term: "Normalment tancat (NC)", words: ["normalment tancat", "normalment tancats", "normalment tancada"],
+      def: "Contacte que deixa passar el corrent en repòs i l'obre quan s'acciona. STOP i la seta són normalment tancats: donen 1 quan NO estan premuts. Si es trenca un cable, el PLC ho veu com si s'haguessin premut i s'atura, que és més segur." },
+    { id: "inversa", cat: "plc", term: "Lògica inversa", words: ["lògica inversa"],
+      def: "Senyal que val 1 quan NO passa allò que vigila. Per exemple, el sensor del final de la cinta G1BG3 dona 1 quan el final és lliure i 0 quan hi arriba una peça." },
+    { id: "pnp", cat: "plc", term: "Sortida PNP", words: ["sortida PNP", "PNP"],
+      def: "Tipus de sortida dels sensors electrònics: quan el sensor detecta, connecta la sortida a +24 V i l'entrada del PLC val 1. És la més habitual a Europa i la que fan servir els sensors de les estacions." },
+
+    // Sensors
+    { id: "optic", cat: "sensors", term: "Sensor òptic", words: ["sensor òptic", "sensors òptics"],
+      def: "Sensor que detecta amb llum, sense tocar l'objecte. N'hi ha de reflexió difusa, de barrera i retroreflectors." },
+    { id: "difusa", cat: "sensors", term: "Sensor de reflexió difusa", words: ["sensor de reflexió difusa", "reflexió difusa"],
+      def: "Sensor òptic amb l'emissor i el receptor junts: detecta la llum que torna rebotada en l'objecte. Les peces negres reflecteixen molt poca llum, i per això a Sorting serveix per distingir-les." },
+    { id: "barrera", cat: "sensors", term: "Barrera de llum", words: ["barrera de llum de forquilla", "barrera de llum", "barreres de llum", "barrera fotoelèctrica"],
+      def: "Sensor òptic amb l'emissor i el receptor l'un davant de l'altre: detecta quan un objecte talla el feix de llum. La de forquilla té tots dos en una sola peça en forma d'U." },
+    { id: "retro", cat: "sensors", term: "Sensor retroreflector", words: ["sensor retroreflector", "retroreflector"],
+      def: "Sensor òptic que envia la llum cap a un reflector i detecta quan un objecte talla el feix. A Sorting un de sol vigila les tres rampes." },
+    { id: "fibra", cat: "sensors", term: "Fibra òptica", words: ["fibra òptica", "fibres òptiques"],
+      def: "Fil de plàstic o de vidre que porta la llum entre el sensor i el punt on cal detectar, on el sensor no hi cabria." },
+    { id: "inductiu", cat: "sensors", term: "Sensor inductiu", words: ["sensor de proximitat inductiu", "sensor inductiu", "sensors inductius"],
+      def: "Sensor que detecta objectes metàl·lics sense tocar-los, perquè alteren el camp magnètic que crea. A Sorting distingeix les peces metàl·liques i detecta si els desviadors han avançat." },
+    { id: "magnetic", cat: "sensors", term: "Sensor de proximitat magnètic", also: ["contacte reed"], words: ["sensor de proximitat magnètic", "sensors de proximitat magnètics"],
+      def: "Sensor que es munta a fora d'un cilindre i detecta l'imant que porta el pistó: així se sap si el cilindre és recollit o avançat. El de contacte reed és un contacte que es tanca quan s'hi acosta l'imant." },
+    { id: "pressostat", cat: "sensors", term: "Pressòstat", also: ["sensor de pressió de buit"],
+      def: "Sensor que dona senyal quan la pressió arriba a un valor ajustat. Al Pick and Place mesura el buit de la ventosa (G2BP1): si hi ha una peça agafada, el buit puja i dona 1." },
+
+    // Pneumàtica i actuadors
+    { id: "electrovalvula", cat: "pneu", term: "Electrovàlvula", words: ["electrovàlvula", "electrovàlvules"],
+      def: "Vàlvula pneumàtica que es comuta amb una bobina elèctrica: quan el PLC activa la sortida, la bobina mou la vàlvula i l'aire va cap a l'actuador." },
+    { id: "v52", cat: "pneu", term: "Vàlvula 5/2", words: ["vàlvula 5/2", "5/2"],
+      def: "Vàlvula de 5 vies (connexions) i 2 posicions: en una posició el cilindre avança i en l'altra es recull. És la típica per a cilindres de doble efecte." },
+    { id: "v32", cat: "pneu", term: "Vàlvula 3/2", words: ["vàlvula 3/2", "3/2"],
+      def: "Vàlvula de 3 vies i 2 posicions: dona aire a una sola sortida o la buida. Serveix, per exemple, per a cilindres de simple efecte o per obrir i tancar l'aire de tota l'estació." },
+    { id: "monoestable", cat: "pneu", term: "Vàlvula monoestable", words: ["monoestable", "monoestables"],
+      def: "Vàlvula amb una sola bobina i una molla: quan la bobina deixa de rebre senyal, la molla la torna a la posició de repòs. Per això, si el PLC treu el senyal, el cilindre torna sol." },
+    { id: "biestable", cat: "pneu", term: "Vàlvula biestable", words: ["biestable", "biestables"],
+      def: "Vàlvula amb dues bobines, una per a cada posició, i sense molla: es queda en l'última posició encara que es tregui el senyal, com una memòria. Per tornar enrere cal activar l'altra bobina." },
+    { id: "dobleEfecte", cat: "pneu", term: "Cilindre de doble efecte", words: ["cilindre de doble efecte", "cilindres de doble efecte", "doble efecte"],
+      def: "Cilindre pneumàtic en què l'aire empeny el pistó en tots dos sentits: per una connexió avança i per l'altra es recull." },
+    { id: "terminalValvules", cat: "pneu", term: "Terminal de vàlvules", words: ["terminal de vàlvules", "terminals de vàlvules"],
+      def: "Bloc on es munten juntes diverses electrovàlvules, amb una sola entrada d'aire i les connexions elèctriques agrupades." },
+    { id: "regulCabal", cat: "pneu", term: "Vàlvula reguladora de cabal", words: ["vàlvula reguladora de cabal", "vàlvules reguladores de cabal", "vàlvula d'estrangulació"],
+      def: "Vàlvula que limita el cabal d'aire en un sentit i el deixa passar lliure en l'altre (antiretorn). Serveix per ajustar la velocitat dels cilindres." },
+    { id: "filtreRegulador", cat: "pneu", term: "Filtre regulador", words: ["filtre regulador"],
+      def: "Neteja l'aire comprimit i manté la pressió de treball fixada, que es llegeix al manòmetre." },
+    { id: "engegada", cat: "pneu", term: "Vàlvula d'engegada", words: ["vàlvula d'engegada"],
+      def: "Vàlvula a l'entrada de l'aire de l'estació: dona pas a l'aire comprimit o buida tot el circuit." },
+    { id: "generadorBuit", cat: "pneu", term: "Generador de buit", words: ["generador de buit"],
+      def: "Peça que fa buit a partir d'aire comprimit: quan hi passa l'aire, xucla per la ventosa (efecte Venturi). Al Pick and Place és G2KH1." },
+    { id: "ventosa", cat: "pneu", term: "Ventosa", mark: false,
+      def: "Copa de goma que agafa les peces fent el buit. Quan es treu el buit, deixa anar la peça." },
+    { id: "minicarro", cat: "pneu", term: "Minicarro", words: ["minicarro", "minicarros"],
+      def: "Actuador pneumàtic lineal amb guies que mou una placa (el carro) amb precisió. Al Pick and Place n'hi ha un d'horitzontal, que porta la ventosa de la rampa a la cinta, i un de vertical, que la puja i la baixa." },
+    { id: "electroimant", cat: "pneu", term: "Electroimant", words: ["electroimant", "electroimants"],
+      def: "Bobina que, quan rep corrent, fa de imant i mou una peça de ferro. Mou el separador i els desviadors de la cinta." },
+    { id: "motoreductor", cat: "pneu", term: "Motoreductor", words: ["motoreductor"],
+      def: "Motor elèctric amb una reductora d'engranatges, que fa girar la cinta a poca velocitat i amb força. A les estacions és de corrent continu de 24 V." },
+    { id: "controladorMotor", cat: "pneu", term: "Controlador de motor", words: ["controlador de motor"],
+      def: "Mòdul electrònic entre el PLC i el motor de la cinta: segons quina de les seves entrades activa el PLC, fa girar el motor endavant o enrere." },
+
+    // Les estacions
+    { id: "mps", cat: "mps", term: "MPS", also: ["Modular Production System"],
+      def: "Modular Production System: estacions didàctiques de Festo que fan una part d'un procés de fabricació. Es poden fer servir soles o unides en una línia." },
+    { id: "panell", cat: "mps", term: "Panell de comandament", mark: false,
+      def: "Placa amb els polsadors START, STOP i RESET, el selector AUTO/MAN, la seta d'emergència i les llums. Al PLC és el byte 1." },
+    { id: "magatzem", cat: "mps", term: "Magatzem apilador", words: ["magatzem apilador"],
+      def: "Tub vertical on les peces es posen l'una sobre l'altra. A Distributing, l'expulsor treu la de sota i les altres baixen." },
+    { id: "expulsor", cat: "mps", term: "Expulsor", mark: false,
+      def: "Cilindre de Distributing que empeny la peça de sota del magatzem cap a la cinta." },
+    { id: "separador", cat: "mps", term: "Separador", mark: false,
+      def: "Peça que, quan avança, atura les peces en un punt de la cinta i, quan es recull, les deixa passar. Al Pick and Place reté la carcassa mentre s'hi posa la peça insert." },
+    { id: "pecaInsert", cat: "mps", term: "Peça insert", also: ["carcassa"], words: ["peça insert", "peces insert"],
+      def: "El Pick and Place munta peces de dues parts: la carcassa, que arriba per la cinta, i la peça insert, que la ventosa agafa d'una rampa i hi posa a sobre." },
+    { id: "topall", cat: "mps", term: "Topall", words: ["topall"],
+      def: "Peça que atura la peça a la cinta. A Sorting, sense senyal surt i la deixa davant dels sensors de detecció; el PLC el recull per deixar-la passar." },
+    { id: "desviador", cat: "mps", term: "Desviador", words: ["desviador", "desviadors"],
+      def: "Braç de Sorting que, quan avança, s'atravessa a la cinta i fa caure la peça a una rampa." },
+    { id: "rampa", cat: "mps", term: "Rampa", mark: false,
+      def: "Canal inclinat on cauen o s'esperen les peces. A Sorting n'hi ha tres, una per a cada tipus de peça; al Pick and Place n'hi ha una amb les peces insert." }
+  ];
+
   // Botons comuns a totes les estacions. El contingut de cada botó va a STATIONS[i].sections[key]:
   // { pdf: "ID de Google Drive" } per mostrar un PDF dins la pàgina, { catalog: ... } (components),
   // { grafcet: ... } (grafcet de l'estació), { io: ... } (entrades i sortides del PLC) o un text HTML.
@@ -3588,6 +3829,7 @@
 
   var home = $("home");
   var station = $("station");
+  var glossary = $("glossary");
   var hero = $("hero");
   var pageTitle = $("page-title");
   var homeLink = $("home-link");
@@ -3621,6 +3863,7 @@
     homeLink.setAttribute("aria-current", "page");
     clearPanel();
     station.classList.add("hidden");
+    glossary.classList.add("hidden");
     home.classList.remove("hidden");
     restartAnimation(home);
   }
@@ -3659,6 +3902,7 @@
     }
     if (content && content.catalog) {
       panel.innerHTML = html + renderCatalog(content.catalog);
+      Array.prototype.forEach.call(panel.querySelectorAll(".comp-intro, .comp-module-body"), function (el) { glossLink(el); });
       setCatalogFilter("all");
       return null;
     }
@@ -3854,6 +4098,7 @@
 
   function renderSheet() {
     sheetContent.innerHTML = sheetHtml(sheetList[sheetIndex]);
+    glossLink(sheetContent.querySelector(".sheet-text"));
     sheetContent.scrollTop = 0;
     var isGf = sheetList[sheetIndex].indexOf("gf:") === 0;
     sheetContent.classList.toggle("is-gf", isGf);
@@ -4370,6 +4615,8 @@
     panel.querySelector(".gf-scroll").innerHTML = gfSvg(chart, gfLevel, true).html;
     gfCheckWide();
     panel.querySelector(".gf-about").textContent = chart.about;
+    glossLink(panel.querySelector(".gf-about"));
+    glossLink(panel.querySelector(".gf-intro"));
     panel.querySelector(".gf-vars").innerHTML = gfVarsTable(chart);
     gfSetPinned(gfPinned);
     gfSimPaint();
@@ -4481,6 +4728,7 @@
       html = '<p class="gf-hint">Passa el ratolí per sobre d\'una etapa o d\'una transició, toca-la o arriba-hi amb el tabulador per veure\'n l\'explicació.</p>';
     }
     box.innerHTML = html;
+    glossLink(box);
   }
 
   // Ressalta l'element del dibuix i els senyals que fa servir (o al revés, des de la taula).
@@ -5341,6 +5589,8 @@
       html += "</tbody>";
     });
     wrap.innerHTML = html + "</table>";
+    // Un sol cop cada paraula a tota la taula, perquè no quedi plena de subratllats.
+    glossLink(wrap, null, ".io-comp, .io-obs");
   }
 
   // ---------------------------------------------------------------------------
@@ -6038,6 +6288,7 @@
     stationDesc.innerHTML = s.description.map(function (p) {
       return "<p>" + escapeHtml(p) + "</p>";
     }).join("");
+    glossLink(stationDesc);
 
     buttonsEl.innerHTML = "";
     clearPanel();
@@ -6092,6 +6343,7 @@
     videoSetStation(s);
 
     home.classList.add("hidden");
+    glossary.classList.add("hidden");
     station.classList.remove("hidden");
     restartAnimation(station);
   }
@@ -6099,11 +6351,254 @@
   function route() {
     var slug = location.hash.replace("#", "");
     var s = STATIONS.filter(function (x) { return x.slug === slug; })[0];
+    var gl = /^glossari(?:\/(.*))?$/.exec(slug);
     videoReset();
     closeSheet(true);
-    if (s) showStation(s); else showHome();
+    glClose();
+    if (s) showStation(s);
+    else if (gl) showGlossary(gl[1] && decodeURIComponent(gl[1]));
+    else showHome();
     restartAnimation(hero);
     window.scrollTo(0, 0);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Glossari: pàgina (#glossari) i definicions des dels textos de la web
+  // ---------------------------------------------------------------------------
+
+  var GL_BY_ID = {};
+  GLOSSARY.forEach(function (g) { GL_BY_ID[g.id] = g; });
+  var glQuery = "", glCat = "all";
+
+  // Paraules que es marquen als textos: totes en una sola expressió, les més llargues primer.
+  var GL_LETTER = "A-Za-z0-9À-ÖØ-öø-ÿ·ŀĿ";
+  var glWords = {}, glRe = null;
+  function glRegex() {
+    if (glRe) return glRe;
+    var list = [];
+    GLOSSARY.forEach(function (g) {
+      if (g.mark === false) return;
+      (g.words || [g.term]).concat(g.also || []).forEach(function (w) {
+        glWords[w.toLowerCase()] = g;
+        list.push(w.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&"));
+      });
+    });
+    list.sort(function (a, b) { return b.length - a.length; });
+    glRe = new RegExp("(^|[^" + GL_LETTER + "])(" + list.join("|") + ")(?![" + GL_LETTER + "])", "gi");
+    return glRe;
+  }
+
+  // Marca dins de "root" la primera vegada que surt cada paraula del glossari (menys "except"); amb "only",
+  // només als textos de dins d'aquests elements. Es pot tornar a cridar sobre el mateix text: el que ja
+  // està marcat no es repeteix.
+  var GL_SKIP = /^(A|BUTTON|B|STRONG|H1|H2|H3|H4|H5|H6|LABEL|INPUT|TEXTAREA|SELECT|SUMMARY|SVG|SCRIPT|STYLE)$/;
+  function glossLink(root, except, only) {
+    if (!root) return;
+    var re = glRegex(), used = {}, nodes = [];
+    if (except) used[except] = true;
+    Array.prototype.forEach.call(root.querySelectorAll(".gl-term"), function (t) { used[t.getAttribute("data-gl")] = true; });
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    while (walker.nextNode()) {
+      var n = walker.currentNode, skip = false;
+      for (var p = n.parentNode; p && p !== root.parentNode; p = p.parentNode) {
+        if (GL_SKIP.test(p.nodeName.toUpperCase()) || (p.classList && (p.classList.contains("gl-term") || p.classList.contains("comp-ref")))) {
+          skip = true;
+          break;
+        }
+      }
+      if (!skip && only && !n.parentNode.closest(only)) skip = true;
+      if (!skip && /\S/.test(n.nodeValue)) nodes.push(n);
+    }
+    nodes.forEach(function (n) {
+      var text = n.nodeValue, frag = null, last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(text))) {
+        var g = glWords[m[2].toLowerCase()], start = m.index + m[1].length;
+        if (!g || used[g.id]) continue;
+        used[g.id] = true;
+        frag = frag || document.createDocumentFragment();
+        frag.appendChild(document.createTextNode(text.slice(last, start)));
+        var t = document.createElement("span");
+        t.className = "gl-term";
+        t.setAttribute("data-gl", g.id);
+        t.setAttribute("role", "button");
+        t.setAttribute("tabindex", "0");
+        t.setAttribute("aria-haspopup", "dialog");
+        t.setAttribute("aria-expanded", "false");
+        t.title = "Què vol dir? (glossari)";
+        t.textContent = m[2];
+        frag.appendChild(t);
+        last = start + m[2].length;
+      }
+      if (frag) {
+        frag.appendChild(document.createTextNode(text.slice(last)));
+        n.parentNode.replaceChild(frag, n);
+      }
+    });
+  }
+
+  // --- Definició al costat de la paraula ---
+
+  var glPop = document.createElement("div");
+  glPop.className = "gl-pop";
+  glPop.hidden = true;
+  glPop.tabIndex = -1;
+  glPop.setAttribute("role", "dialog");
+  glPop.setAttribute("aria-labelledby", "gl-pop-t");
+  glPop.innerHTML = '<button type="button" class="gl-pop-x" aria-label="Tanca la definició">&times;</button>' +
+    '<p class="gl-pop-k">Glossari</p><p class="gl-pop-t" id="gl-pop-t"></p><p class="gl-pop-d"></p>' +
+    '<a class="gl-pop-more" href="#glossari">Veure al glossari <span aria-hidden="true">&rarr;</span></a>';
+  var glFrom = null, glFrame = 0;
+
+  function glOpen(t) {
+    var g = GL_BY_ID[t.getAttribute("data-gl")];
+    if (!g) return;
+    glClose();
+    glFrom = t;
+    t.setAttribute("aria-expanded", "true");
+    // Dins de la fitxa, la definició hi ha de quedar a dins (el focus no en surt).
+    (t.closest(".sheet-panel") || document.body).appendChild(glPop);
+    glPop.querySelector(".gl-pop-t").textContent = g.term;
+    glPop.querySelector(".gl-pop-d").textContent = g.def;
+    glPop.querySelector(".gl-pop-more").href = "#glossari/" + g.id;
+    glPop.hidden = false;
+    glPlace();
+    focusQuietly(glPop);
+  }
+  function glClose(back) {
+    if (!glFrom) return;
+    var t = glFrom;
+    glFrom = null;
+    glPop.hidden = true;
+    t.setAttribute("aria-expanded", "false");
+    if (back && document.body.contains(t)) focusQuietly(t);
+  }
+  // Sota la paraula (o a sobre si no hi cap), sense sortir de la pantalla.
+  function glPlace() {
+    if (!glFrom) return;
+    if (!document.body.contains(glFrom)) { glClose(); return; }
+    var r = glFrom.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    var w = Math.min(340, vw - 16);
+    glPop.style.width = w + "px";
+    var h = glPop.offsetHeight, top = r.bottom + 6;
+    if (top + h > vh - 8 && r.top - 6 - h > 8) top = r.top - 6 - h;
+    glPop.style.left = Math.max(8, Math.min(r.left, vw - w - 8)) + "px";
+    glPop.style.top = Math.round(top) + "px";
+  }
+  function glPlaceSoon() {
+    if (!glFrom || glFrame) return;
+    glFrame = requestAnimationFrame(function () { glFrame = 0; glPlace(); });
+  }
+  window.addEventListener("scroll", glPlaceSoon, true);
+  window.addEventListener("resize", glPlaceSoon);
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest(".gl-term");
+    if (t) {
+      if (glFrom === t) glClose(); else glOpen(t);
+      return;
+    }
+    if (!glFrom) return;
+    if (e.target.closest && e.target.closest(".gl-pop-x")) glClose(true);
+    else if (e.target.closest && e.target.closest(".gl-pop-more")) glClose();
+    else if (!glPop.contains(e.target)) glClose();
+  });
+  // Escape tanca la definició abans que la fitxa (per això va a la fase de captura).
+  document.addEventListener("keydown", function (e) {
+    var t = e.target.closest && e.target.closest(".gl-term");
+    if (t && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      if (glFrom === t) glClose(); else glOpen(t);
+    } else if (glFrom && e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      glClose(true);
+    }
+  }, true);
+
+  // --- Pàgina del glossari ---
+
+  function glMatch(g, q) {
+    return !q || ioNorm([g.term, g.def].concat(g.also || [], g.words || []).join(" ")).indexOf(q) >= 0;
+  }
+  function glSorted(list) {
+    return list.slice().sort(function (a, b) { return a.term.localeCompare(b.term, "ca"); });
+  }
+
+  function renderGlossary() {
+    glossary.innerHTML = '<div class="gl-page">' +
+      '<p class="gl-intro">Les paraules tècniques que surten a la web, explicades de manera curta. Als textos de les estacions, ' +
+      'les paraules <span class="gl-sample">subratllades amb punts</span> són d\'aquest glossari: toca-les per veure\'n la definició.</p>' +
+      '<div class="gl-tools"><div class="comp-filters gl-chips" role="group" aria-label="Filtra per tema"></div>' +
+      '<label class="io-search gl-search"><span class="sr-only">Cerca al glossari</span>' +
+      '<input type="search" placeholder="Cerca una paraula…" autocomplete="off"></label></div>' +
+      '<p class="sr-only gl-live" aria-live="polite"></p><div class="gl-list"></div>' +
+      '<a class="back" href="#">&larr; Tornar a les estacions</a></div>';
+    glossary.querySelector(".gl-search input").value = glQuery;
+    drawGlossary();
+  }
+
+  function drawGlossary() {
+    var q = ioNorm(glQuery);
+    var found = GLOSSARY.filter(function (g) { return glMatch(g, q); });
+    var chips = [{ key: "all", label: "Tot", n: found.length }].concat(GLOSSARY_CATS.map(function (c) {
+      return { key: c.key, label: c.label, n: found.filter(function (g) { return g.cat === c.key; }).length };
+    }));
+    glossary.querySelector(".gl-chips").innerHTML = chips.map(function (c) {
+      return '<button type="button" class="comp-chip" data-gl-cat="' + c.key + '" aria-pressed="' + (c.key === glCat) + '">' +
+        escapeHtml(c.label) + '<span class="n">' + c.n + "</span></button>";
+    }).join("");
+    var shown = 0, html = "";
+    GLOSSARY_CATS.forEach(function (c) {
+      if (glCat !== "all" && glCat !== c.key) return;
+      var list = glSorted(found.filter(function (g) { return g.cat === c.key; }));
+      if (!list.length) return;
+      shown += list.length;
+      html += '<section class="gl-sec"><h2 class="gl-cat">' + escapeHtml(c.label) + '</h2><div class="gl-grid">' + list.map(function (g) {
+        return '<article class="gl-entry" id="gl-' + g.id + '" tabindex="-1"><h3>' + escapeHtml(g.term) + "</h3>" +
+          (g.also ? '<p class="gl-also">També: ' + escapeHtml(g.also.join(", ")) + "</p>" : "") +
+          '<p class="gl-def">' + escapeHtml(g.def) + "</p></article>";
+      }).join("") + "</div></section>";
+    });
+    var listEl = glossary.querySelector(".gl-list");
+    listEl.innerHTML = html || '<p class="gl-empty">Cap paraula coincideix amb la cerca.</p>';
+    // Dins de les definicions, les altres paraules del glossari també porten la seva definició.
+    Array.prototype.forEach.call(listEl.querySelectorAll(".gl-def"), function (p) {
+      glossLink(p, p.parentNode.id.slice(3));
+    });
+    glossary.querySelector(".gl-live").textContent = shown ? shown + (shown === 1 ? " paraula" : " paraules") : "Cap paraula coincideix amb la cerca.";
+  }
+
+  glossary.addEventListener("input", function (e) {
+    if (!e.target.closest(".gl-search")) return;
+    glQuery = e.target.value;
+    drawGlossary();
+  });
+  glossary.addEventListener("click", function (e) {
+    var c = e.target.closest && e.target.closest("[data-gl-cat]");
+    if (!c) return;
+    glCat = c.getAttribute("data-gl-cat");
+    drawGlossary();
+  });
+
+  function showGlossary(id) {
+    pageTitle.textContent = "Glossari";
+    homeLink.removeAttribute("aria-current");
+    clearPanel();
+    home.classList.add("hidden");
+    station.classList.add("hidden");
+    glossary.classList.remove("hidden");
+    // Si es ve d'una paraula concreta, es mostren totes perquè s'hi pugui arribar.
+    if (id) { glQuery = ""; glCat = "all"; }
+    renderGlossary();
+    restartAnimation(glossary);
+    var entry = id && $("gl-" + id);
+    if (!entry) return;
+    entry.classList.add("is-target");
+    setTimeout(function () {
+      scrollToEl(entry, "center");
+      focusQuietly(entry);
+    }, REDUCED_MOTION ? 0 : 80);
   }
 
   // ---------------------------------------------------------------------------
